@@ -9,17 +9,18 @@ This project generates a file that shows the recursive dependencies of a Helm Ch
 The generated file can be in JSON format. PlantUML text format or plain text format.  
 
 The JSON file can be used with [helm-inspector](https://github.com/melahn/helm-inspector) to 
-create an interaction visualization of the Helm Chart based using the tree view of [Data Driven Documents](https://d3js.org/).  You can see an example of that
-here &#8594; https://melahn.github.io/helm-inspector/src.
+create an interaction visualization of the Helm Chart based using the tree view of [Data Driven Documents](https://d3js.org/).  You can see an example of 
+such a JSON file here &#8594; https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.json and you can see
+an example of how it can be visualized with helm inspector here &#8594; https://melahn.github.io/helm-inspector/src/?chart=./examples/alfresco-dbp-1.5.0
 
 The PlantUML file can be turned into an image.  You can see an example of that here &#8594; 
-[https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.png].
+https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.png.
 For more information about PlantUML, see http://plantuml.com/.  
 
 The text file provides a simple text summary of the charts and images used, and the dependencies.  It also
 detects anomolies such as a stable chart depending on an incubator chart.
-You can see an example of that here &#8594; 
-[https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt].
+You can see an example of a text file generated from Chart Map here &#8594; 
+https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt.
 
 ## Prerequisites
 
