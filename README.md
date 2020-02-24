@@ -6,12 +6,20 @@ See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://mela
 
 This project generates a file that shows the recursive dependencies of a Helm Chart.  
 
-The generated file can be in either PlantUML text format, JSON format or plain text format.  
+The generated file can be in JSON format. PlantUML text format or plain text format.  
 
-The most useful format is PlantUML since this offers a visual representation of the chart dependencies.  See the example below.
+The JSON file can be used with [helm-inspector](https://github.com/melahn/helm-inspector) to 
+create an interaction visualization of the Helm Chart based using the tree view of [Data Driven Documents](https://d3js.org/).  You can see an example of that
+here &#8594; https://melahn.github.io/helm-inspector/src.
+
+The PlantUML file can be turned into an image.  You can see an example of that here &#8594; 
+[https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.png].
 For more information about PlantUML, see http://plantuml.com/.  
 
-Note that although this project was created in the Alfresco GitHub org, ChartMap can be used with any Helm Chart.   An illustration of this point can be found in the examples.
+The text file provides a simple text summary of the charts and images used, and the dependencies.  It also
+detects anomolies such as a stable chart depending on an incubator chart.
+You can see an example of that here &#8594; 
+[https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt].
 
 ## Prerequisites
 
