@@ -94,17 +94,17 @@ java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -o "wordpress.pu
 ```
 ##### Generating a Chartmap using a file specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -f "/Users/melahn/helm/alfresco-content-services-1.0.1.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0-SNAPSHOT.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 ##### Generating a Chartmap using a url specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-1.0.1.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0-SNAPSHOT.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 ##### Generating a Chartmap using an appr specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -a "quay.io/alfresco/alfresco-dbp@0.2.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0-SNAPSHOT.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 
@@ -264,18 +264,18 @@ Just copy/paste the generated PlantUML text and click 'Submit'.  Then you can vi
 *  Download the [PlantUML jar](http://plantuml.com/download) and use 
 the command line like this ...
  ```
-java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/Downloads/plantuml.jar alfresco-dbp-0.8.0.puml
+java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/Downloads/plantuml.jar alfresco-dbp-1.5.0.puml
  ```
 *  Build PlantUML from [source](https://github.com/plantuml/plantuml) and then use the command line like this ...
 ```
-java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2018.11-SNAPSHOT.jar -tsvg alfresco-dbp-0.8.0.puml
+java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2018.11-SNAPSHOT.jar -tsvg alfresco-dbp-1.5.0.puml
 ```
 **Notes about a local deployment of PlantUML:**
  * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples is useful when creating large images to avoid image truncation.
  * [Graphviz](https://www.graphviz.org/) is a prerequisite
 
 ### Issues
-If you find any problems please open an [issue](https://github.com/Alfresco/alfresco-anaxes-chartmap/issues).
+If you find any problems please open an [issue](https://github.com/melahn/helm-chartmap/issues).
 
 ### License
 Apache 2.0
