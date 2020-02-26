@@ -6,7 +6,7 @@ See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://mela
 
 This project generates a file that shows the recursive dependencies of a Helm Chart.  
 
-The generated file can be in JSON format. PlantUML text format or plain text format.  
+The generated file can be in JSON format, PlantUML text format or plain text format.  
 
 The JSON file can be used with [helm-inspector](https://github.com/melahn/helm-inspector) to 
 create an interaction visualization of the Helm Chart based using the tree view of [Data Driven Documents](https://d3js.org/).  You can see an example of 
