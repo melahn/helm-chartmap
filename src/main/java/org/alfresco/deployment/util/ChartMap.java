@@ -342,7 +342,7 @@ public class ChartMap {
         help += "                          +---  -f <filename>----+\n";
         help += "                          |                      |\n";
         help += "                          +---  -u <url>---------+\n";
-        help += "\nSee http://github.com/Alfresco/alfresco-anaxes-chartmap for more information\n";
+        help += "\nSee http://github.com/melahn/helm-chartmap for more information\n";
         return help;
     }
 
@@ -512,9 +512,9 @@ public class ChartMap {
     private String pullChart(String apprSpec) {
         String chartDirName = null;
         try {
-            // the chart name should be of the form <repo>/<org>/<chartname>@<version> e.g. quay.io/alfresco/alfresco-dbp@0.2.0
+            // the chart name should be of the form <repo>/<org>/<chartname>@<version> e.g. quay.io/alfresco/alfresco-dbp@1.5.0
             if (apprSpec == null || (apprSpec.indexOf('/') == -1) || (apprSpec.indexOf('@') == -1)) {
-                throw new Exception("appr specification invalid: " + apprSpec + " .  I was expecting something like quay.io/alfresco/alfresco-dbp@0.2.0");
+                throw new Exception("appr specification invalid: " + apprSpec + " .  I was expecting something like quay.io/alfresco/alfresco-dbp@1.5.0");
             }
             String command = "helm registry pull ";
             command += apprSpec + " -t helm ";
@@ -541,7 +541,7 @@ public class ChartMap {
      *
      * @param u A string holding the url of the Helm Chart to be downloaded
      * @return the name of the directory where the chart was pulled into
-     * e.g. /temp/alfresco_alfresco-dbp_0.2.0/alfresco-dbp
+     * e.g. /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
      */
 
     private String downloadChart(String u) {
@@ -634,7 +634,7 @@ public class ChartMap {
      *
      * @param chartFilename The name of the tgz file containing the chart
      * @return the name of the directory in which the chart was unpacked
-     * e.g. /temp/alfresco_alfresco-dbp_0.2.0/alfresco-dbp
+     * e.g. /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
      */
     private String unpackChart(String chartFilename) {
         int bufferSize = 1024;
@@ -1182,7 +1182,7 @@ public class ChartMap {
             while (line != null) {
                 if (line.length() > ("# Source: " + chartName).length() && line.charAt(0) == '#') {
                     // a pattern like this  <chartName>/templates/... means that this is
-                    // a template of immediate interest to the chart alfresco-content-services/templates
+                    // a template of immediate interest to the chart e.g. alfresco-content-services/templates
                     String[] s = line.split(File.separator, 3);
                     Boolean b = Boolean.FALSE;
                     if (s.length > 1
