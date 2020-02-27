@@ -125,7 +125,7 @@ In addition to the command line interface, a Java API is provided.
                     
 ```                  
 ##### Description
-Constructs a new instance of the *org.alfresco.deployment.util.ChartMap* class
+Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
 
 ##### Parameters
 * *option*            
@@ -162,8 +162,8 @@ Prints a *ChartMap*
 
 #### Java Example
 ```
-import org.alfresco.deployment.util.ChartMap;
-import org.alfresco.deployment.util.ChartOption;
+import com.melahn.util.helm.ChartMap;
+import ChartOption;
 
 public class ChartMapExample {
     public static void printExampleChartMap(String[] args) {
@@ -183,7 +183,7 @@ public class ChartMapExample {
     }
 }
 ```
-More examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/org/alfresco/deployment/util/ChartMapTest.java).
+More examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/org/com.melahn.util.helm/ChartMapTest.java).
  
 ### Examples of Generated Files
 
