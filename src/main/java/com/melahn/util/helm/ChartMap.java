@@ -828,7 +828,6 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            String m = e.getMessage();
             System.out.println("Exception getting Dependencies: " + e.getMessage());
         }
     }
@@ -955,18 +954,18 @@ public class ChartMap {
     }
 
     /**
-     * vals the values of all the properties found in the values.yaml file in a directory
+     * Collects the values of all the properties found in the values.yaml file in a directory
      * and attaches the result to a Helm Chart object
-     * <p>
+     *
      * Note one cannot just load the values file into a known model because it is
      * file that has no model, hence the need for this more generic approach
      *
      * @param dirName the name of the directory in which the values file exists
      * @param h       the Helm Chart object to which these values apply
-     * @throws Exception Exception if the values file does not exist
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    private void collectValues(String dirName, HelmChart h) throws Exception {
+    private void collectValues(String dirName, HelmChart h) throws IOException {
         if (h == null || dirName == null) {
             return;
         }
@@ -984,10 +983,6 @@ public class ChartMap {
                 }
             }
         }
-        else {
-            throw new Exception("Values file does not exist: " + valuesFile.getAbsolutePath());
-        }
-
     }
 
     /**
