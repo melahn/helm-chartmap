@@ -44,4 +44,4 @@ wordpress:8.1.2 depends on mariadb:7.3.6
 mariadb:7.3.6 uses docker.io/bitnami/mariadb:10.3.21-debian-10-r0
 wordpress:8.1.2 uses docker.io/bitnami/wordpress:5.3.2-debian-10-r0
 
-Generated on 2020/02/07 13:44:11 by org.alfresco.deployment.util.TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)
+Generated on 2020/02/07 13:44:11 by TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)

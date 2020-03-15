@@ -1,4 +1,4 @@
-Chart Map for alfresco-identity-service:1.1.0
+Chart Map for alfresco-identity-service:1.1.1
 
 There are 3 referenced Helm Charts
 ----------------------------------
@@ -17,7 +17,7 @@ Chart: postgresql:0.15.0
 	sources: https://github.com/kubernetes/charts,https://github.com/docker-library/postgres
 	urls: https://kubernetes-charts.storage.googleapis.com/postgresql-0.15.0.tgz
 	version: 0.15.0
-Chart: alfresco-identity-service:1.1.0
+Chart: alfresco-identity-service:1.1.1
 	apiVersion: Not specified
 	appVersion: Not specified
 	created: Not specified
@@ -31,7 +31,7 @@ Chart: alfresco-identity-service:1.1.0
 	name: alfresco-identity-service
 	sources: https://github.com/Alfresco/alfresco-identity-service/helm
 	urls: Not specified
-	version: 1.1.0
+	version: 1.1.1
 Chart: keycloak:4.3.0
 	apiVersion: Not specified
 	appVersion: 4.8.3.Final
@@ -55,9 +55,9 @@ Image: jboss/keycloak:4.8.3.Final
 
 Chart Dependencies
 ------------------
-alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
+alfresco-identity-service:1.1.1 depends on keycloak:4.3.0
 keycloak:4.3.0 depends on postgresql:0.15.0
 postgresql:0.15.0 uses postgres:10.1
 keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 
-Generated on 2020/03/15 09:55:03 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2020/03/15 09:55:00 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

@@ -25,5 +25,5 @@ alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_s
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_workspace_app_1_3_4
 postgresql_1_0_0--[#orange]-|>postgres_9_4_6
 
-center footer Generated on 2020/02/13 07:23:01 by org.alfresco.deployment.util.PlantUmlChartMapPrinter\nhttps://github.com/Alfresco/alfresco-anaxes-chartmap
+center footer Generated on 2020/03/15 09:49:24 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

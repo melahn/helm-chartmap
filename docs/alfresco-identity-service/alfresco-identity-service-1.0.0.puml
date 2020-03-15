@@ -23,5 +23,5 @@ keycloak_4_0_3--[#green]-|>postgresql_0_15_0
 keycloak_4_0_3--[#orange]-|>jboss_keycloak_4_5_0_Final
 postgresql_0_15_0--[#orange]-|>postgres_10_1
 
-center footer Generated on 2020/02/13 10:23:44 by org.alfresco.deployment.util.PlantUmlChartMapPrinter\nhttps://github.com/Alfresco/alfresco-anaxes-chartmap
+center footer Generated on 2020/02/13 10:23:44 by PlantUmlChartMapPrinter\nhttps://github.com/Alfresco/alfresco-anaxes-chartmap
 @enduml

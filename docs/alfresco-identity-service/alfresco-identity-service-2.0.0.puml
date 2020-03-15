@@ -23,5 +23,5 @@ keycloak_6_0_0--[#green]-|>postgresql_6_3_13
 postgresql_6_3_13--[#orange]-|>docker_io_bitnami_postgresql_11_5_0_debian_9_r60
 keycloak_6_0_0--[#orange]-|>alfresco_alfresco_identity_service_1_2
 
-center footer Generated on 2020/02/11 09:11:58 by org.alfresco.deployment.util.PlantUmlChartMapPrinter\nhttps://github.com/Alfresco/alfresco-anaxes-chartmap
+center footer Generated on 2020/03/15 09:54:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

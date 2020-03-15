@@ -48,4 +48,4 @@ alfresco-process-services:0.2.0 uses quay.io/alfresco/alfresco-process-services:
 alfresco-process-services:0.2.0 uses quay.io/alfresco/alfresco-process-workspace-app:1.3.4
 postgresql:1.0.0 uses postgres:9.4.6
 
-Generated on 2020/02/13 07:20:17 by org.alfresco.deployment.util.TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)
+Generated on 2020/03/15 09:49:22 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

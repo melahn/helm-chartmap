@@ -60,4 +60,4 @@ keycloak:4.0.3 depends on postgresql:0.15.0
 keycloak:4.0.3 uses jboss/keycloak:4.5.0.Final
 postgresql:0.15.0 uses postgres:10.1
 
-Generated on 2020/02/13 10:24:04 by org.alfresco.deployment.util.TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)
+Generated on 2020/02/13 10:24:04 by TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)

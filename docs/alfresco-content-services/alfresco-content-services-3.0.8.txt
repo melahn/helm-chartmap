@@ -1,0 +1,120 @@
+Chart Map for alfresco-content-services:3.0.8
+
+There are 5 referenced Helm Charts
+----------------------------------
+Chart: postgresql:0.9.3
+	apiVersion: Not specified
+	appVersion: Not specified
+	created: 2018-03-29T04:56:10.224673062Z
+	dependencies: None
+	description: Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+	digest: 828f019164cfbc9d97824fd6ef39748ec8f5677d8267b90de44b6df59ec2cbbc
+	icon: https://www.postgresql.org/media/img/about/press/elephant.png
+	keywords: postgresql,postgres,database,sql
+	maintainers: databus23
+	repo url: https://kubernetes-charts.storage.googleapis.com
+	name: postgresql
+	sources: https://github.com/kubernetes/charts,https://github.com/docker-library/postgres
+	urls: https://kubernetes-charts.storage.googleapis.com/postgresql-0.9.3.tgz
+	version: 0.9.3
+Chart: alfresco-content-services:3.0.8
+	apiVersion: Not specified
+	appVersion: 6.2.0.2
+	created: Not specified
+	dependencies: alfresco-search:1.0.3, alfresco-sync-service:3.0.2, alfresco-digital-workspace:2.2.1, postgresql:0.9.3
+	description: A Helm chart for deploying Alfresco Content Services
+	digest: Not specified
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: content,content services,alfresco,alfresco content services
+	maintainers: Not specified
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-content-services
+	sources: https://github.com/Alfresco/acs-deployment
+	urls: Not specified
+	version: 3.0.8
+Chart: alfresco-search:1.0.3
+	apiVersion: Not specified
+	appVersion: Not specified
+	created: 2020-02-25T14:46:28.745370211Z
+	dependencies: None
+	description: A Helm chart for deploying Alfresco Search
+	digest: 0c223af2c9af213be974008dcc967d1a84c6f877b1142f46c5b70db66c2e3281
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: search,search services,alfresco search services,insight,insight engine,alfresco insight engine
+	maintainers: Not specified
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-search
+	sources: https://github.com/alfresco/alfresco-search-deployment
+	urls: http://kubernetes-charts.alfresco.com/stable/alfresco-search-1.0.3.tgz
+	version: 1.0.3
+Chart: alfresco-digital-workspace:2.2.1
+	apiVersion: Not specified
+	appVersion: v1.4.0
+	created: 2020-02-25T14:46:28.598018674Z
+	dependencies: None
+	description: A Helm chart for deploying Alfresco Digital Workspace application
+	digest: 53a36d4f92ca5bb5f86c8c079701aa5174f46ef71748a2e91a4d9b70e352e5dc
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: alfresco,digital workspace
+	maintainers: Not specified
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-digital-workspace
+	sources: https://git.alfresco.com/client-applications/digital-workspace-deployment
+	urls: http://kubernetes-charts.alfresco.com/stable/alfresco-digital-workspace-2.2.1.tgz
+	version: 2.2.1
+Chart: alfresco-sync-service:3.0.2
+	apiVersion: Not specified
+	appVersion: 3.3.1
+	created: 2020-02-25T14:46:28.756201928Z
+	dependencies: postgresql:0.9.3
+	description: Alfresco Syncservice
+	digest: 2d87c51a4da90bae02d749dbf62306c1cf90de6d1a30df0c4a61af39a779eefc
+	icon: Not specified
+	keywords: syncservice,alfresco,application
+	maintainers: Alfresco Apps Repo Team
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-sync-service
+	sources: Not specified
+	urls: http://kubernetes-charts.alfresco.com/stable/alfresco-sync-service-3.0.2.tgz
+	version: 3.0.2
+
+There are 14 referenced Docker Images
+-------------------------------------
+Image: alfresco/alfresco-content-repository:6.2.0.2
+Image: postgres:11.4
+Image: alfresco/alfresco-libreoffice:2.1.0
+Image: quay.io/alfresco/alfresco-digital-workspace:1.4.0
+Image: postgres:10.1
+Image: alfresco/alfresco-shared-file-store:0.5.3
+Image: alfresco/alfresco-transform-misc:2.1.0
+Image: quay.io/alfresco/alfresco-transform-router:1.1.0
+Image: alfresco/alfresco-share:6.2.0
+Image: alfresco/alfresco-imagemagick:2.1.0
+Image: quay.io/alfresco/service-sync:3.3.1
+Image: alfresco/alfresco-search-services:1.4.0
+Image: alfresco/alfresco-pdf-renderer:2.1.0
+Image: alfresco/alfresco-tika:2.1.0
+
+Chart Dependencies
+------------------
+alfresco-content-services:3.0.8 depends on alfresco-search:1.0.3
+alfresco-content-services:3.0.8 depends on alfresco-sync-service:3.0.2
+alfresco-sync-service:3.0.2 depends on postgresql:0.9.3
+alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
+alfresco-content-services:3.0.8 depends on postgresql:0.9.3
+postgresql:0.9.3 uses postgres:11.4
+postgresql:0.9.3 uses postgres:10.1
+alfresco-content-services:3.0.8 uses alfresco/alfresco-libreoffice:2.1.0
+alfresco-content-services:3.0.8 uses alfresco/alfresco-shared-file-store:0.5.3
+alfresco-content-services:3.0.8 uses alfresco/alfresco-transform-misc:2.1.0
+alfresco-content-services:3.0.8 uses alfresco/alfresco-pdf-renderer:2.1.0
+alfresco-content-services:3.0.8 uses quay.io/alfresco/alfresco-transform-router:1.1.0
+alfresco-content-services:3.0.8 uses alfresco/alfresco-tika:2.1.0
+alfresco-content-services:3.0.8 uses alfresco/alfresco-content-repository:6.2.0.2
+alfresco-content-services:3.0.8 uses alfresco/alfresco-imagemagick:2.1.0
+alfresco-content-services:3.0.8 uses alfresco/alfresco-share:6.2.0
+alfresco-search:1.0.3 uses alfresco/alfresco-search-services:1.4.0
+alfresco-digital-workspace:2.2.1 uses quay.io/alfresco/alfresco-digital-workspace:1.4.0
+alfresco-sync-service:3.0.2 uses quay.io/alfresco/service-sync:3.3.1
+
+Generated on 2020/03/15 09:26:24 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
