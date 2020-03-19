@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import net.sourceforge.plantuml.preproc.Define;
+import net.sourceforge.plantuml.preproc.Defines;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -60,6 +62,7 @@ public class ChartMap {
     private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced;
     private String envFilename;
     HashSet<String> env;
+    private boolean generateImage;
     private String helmHome;
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
@@ -235,6 +238,7 @@ public class ChartMap {
         options.addOption("d", true, "Directory for Helm Home");
         options.addOption("e", true, "Environment Variable Filename");
         options.addOption("f", true, "Helm Chart File Name");
+        options.addOption("g", false, "Generate Image from PlantUML file");
         options.addOption("h", false, "Help");
         options.addOption("o", true, "The Output Filename");
         options.addOption("r", false, "Update the Helm Chart dependencies");
@@ -255,10 +259,6 @@ public class ChartMap {
                     count++;
                 }
             }
-            if (cmd.hasOption("f")) { // e.g. /Users/johndoe/alfresco-content-services-0.0.1.tgz
-                setChartFilename(cmd.getOptionValue("f"));
-                count++;
-            }
             if (cmd.hasOption("u")) { // e.g. https://alfresco.github.io/charts/incubator/alfresco-content-services-0.0.1.tgz
                 setChartUrl(cmd.getOptionValue("u"));
                 count++;
@@ -268,6 +268,13 @@ public class ChartMap {
             }
             if (cmd.hasOption("e")) {
                 setEnvFilename(cmd.getOptionValue("e"));
+            }
+            if (cmd.hasOption("f")) { // e.g. /Users/johndoe/alfresco-content-services-0.0.1.tgz
+                setChartFilename(cmd.getOptionValue("f"));
+                count++;
+            }
+            if (cmd.hasOption("g")) {
+                setGenerateImage(true);
             }
             if (cmd.hasOption("o")) {
                 setOutputFilename(cmd.getOptionValue("o"));
@@ -1284,10 +1291,50 @@ public class ChartMap {
                     printer.printFooter();
                 }
                 System.out.println("File " + outputFilename + " generated");
+                if (generateImage && printFormat.equals(PrintFormat.PLANTUML)) {
+                    generateImage(outputFilename);
+                }
             }
         } catch (IOException e) {
             System.out.println("Exception printing Map : " + e.getMessage());
             throw (e);
+        }
+    }
+
+    /**
+     * Generates an image from a PUML file
+     * @param f the puml file
+     * @throws IOException if an error occurred generaing the image
+     */
+    private void generateImage(String f) throws IOException {
+        // PlantUML wants the full path of the input file so get the pwd so it can be generated
+        String d = System.getProperty("user.dir");
+        Path i = Paths.get(f.replace("puml", "png"));
+        try {
+            if (Files.exists(i)) {
+                Files.delete(i);
+                if (verbose) {
+                    System.out.println(i.getFileName() + " deleted");
+                }
+            }
+            net.sourceforge.plantuml.SourceFileReader r = new net.sourceforge.plantuml.SourceFileReader(new File(f));
+            boolean e = r.hasError();
+            if (!e) {
+                List<net.sourceforge.plantuml.GeneratedImage> l = r.getGeneratedImages();
+                if (l.size() > 0) {
+                    File p = l.get(0).getPngFile();
+                    if (verbose) {
+                        System.out.println("Image file " + p.getName() + " generated from " + f);
+                    }
+                } else {
+                    System.out.println("Warning: Image file " + i.getFileName() + " was not generated from " + f);
+                }
+            } else {
+                System.out.println("Error in net.sourceforge.plantuml.GeneratedImage trying to generate image from " + d + "/" + f);
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Error generating image file" +  d + "/" + i.getFileName() + " from " + d + "/" + f + " : " + e);
         }
     }
 
@@ -1517,6 +1564,14 @@ public class ChartMap {
 
     private void setOutputFilename(String outputFilename) {
         this.outputFilename = outputFilename;
+    }
+
+    private boolean getGenerateImage() {
+        return generateImage;
+    }
+
+    private void setGenerateImage(boolean b) {
+        this.generateImage = b;
     }
 
     private void setPrinter(IChartMapPrinter printer) {

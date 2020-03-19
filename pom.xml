@@ -149,5 +149,10 @@
       <artifactId>json</artifactId>
       <version>20180130</version>
     </dependency>
+    <dependency>
+      <groupId>net.sourceforge.plantuml</groupId>
+      <artifactId>plantuml</artifactId>
+      <version>8059</version>
+    </dependency>
   </dependencies>
 </project>

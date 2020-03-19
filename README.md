@@ -45,9 +45,9 @@ The junit test cases rely on the environment variable *HELM_HOME* being set.
 
 ```
                                     
-java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+---------------------+--+------------+---+------------+---+------------+
-                          |                      |                                             |                     |  |            |   |            |   |            |
-                          +---  -c <chartname>---+                                             +---  -e <filename ---+  +---  -r  ---+   +---  -v  ---+   +---  -h  ---+
+java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+---------------------+---+------------+---+------------+---+------------+---+------------+
+                          |                      |                                             |                     |   |            |   |            |   |            |   |            |
+                          +---  -c <chartname>---+                                             +---  -e <filename ---+   +---  -g  ---+   +---  -r  ---+   +---  -v  ---+   +---  -h  ---+
                           |                      |                                                                       
                           +---  -f <filename>----+                                                                       
                           |                      |                                                                       
@@ -79,12 +79,14 @@ java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <dir
 * **Optional**
    * **-e** \<filename\>
       *  The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format. 
-   * **-h**
-      * Help.  Whenever specified, any other parameters are ignored.  When no parameters are specified, **-h** is assumed.
+   * **-g**
+      * Generate image.  Whenever specified, an image file is generated from the PlantUML file (if any).
    * **-r**
       * Refresh.  If specified, the Helm command *helm update dependencies* will be run before generating the chart map
    * **-v**
       * Verbose.  If specified, some extra command line output is shown
+   * **-h**
+      * Help.  Whenever specified, any other parameters are ignored.  When no parameters are specified, **-h** is assumed.
  
 #### Example Commands
 
@@ -94,7 +96,7 @@ java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -o "wordpress.pu
 ```
 ##### Generating a Chartmap using a file specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0-SNAPSHOT.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
 
 ```
 ##### Generating a Chartmap using a url specification
