@@ -22,6 +22,7 @@ public class ChartMapTest {
     private static Path testOutputPumlFilePathNRV = Paths.get("target/test/testChartFileNRV.puml");
     private static Path testOutputPumlFilePathRNV = Paths.get("target/test/testChartFileRNV.puml");
     private static Path testOutputPumlFilePathNRNV = Paths.get("target/test/testChartFileNRNV.puml");
+    private static Path testOutputPngFilePathNRNV = Paths.get("target/test/testChartFileNRNV.png");
     private static Path testOutputTextFilePathRV = Paths.get("target/test/testChartFileRV.txt");
     private static Path testOutputTextFilePathNRV = Paths.get("target/test/testChartFileNRV.txt");
     private static Path testOutputTextFilePathRNV = Paths.get("target/test/testChartFileRNV.txt");
@@ -83,7 +84,7 @@ public class ChartMapTest {
     public void printTestPumlChartRefreshVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRV,
-                    true, true);
+                    true, true, true);
             if (testMap != null) {
                 testMap.print();
             }
@@ -97,7 +98,7 @@ public class ChartMapTest {
     public void printTestPumlChartNoRefreshVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRV,
-                    false, true);
+                    true, false, true);
             if (testMap != null) {
                 testMap.print();
             }
@@ -111,7 +112,7 @@ public class ChartMapTest {
     public void printTestPumlChartRefreshNoVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRNV,
-                    true, false);
+                    true, true, false);
             if (testMap != null) {
                 testMap.print();
             }
@@ -125,11 +126,12 @@ public class ChartMapTest {
     public void printTestPumlChartNoRefreshNoVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV,
-                    false, false);
+                    true, false, false);
             if (testMap != null) {
                 testMap.print();
             }
             Assert.assertTrue(Files.exists(testOutputPumlFilePathNRNV));
+            Assert.assertTrue(Files.exists(testOutputPngFilePathNRNV));
         } catch (Exception e) {
             fail("printTestPumlChartNoRefreshNoVerbose failed:" + e.getMessage());
         }
@@ -139,7 +141,7 @@ public class ChartMapTest {
     public void printTestTextChartRefreshVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRV,
-                    true, true);
+                    true, true, true);
             if (testMap != null) {
                 testMap.print();
             }
@@ -154,7 +156,7 @@ public class ChartMapTest {
     public void printTestTextChartNoRefreshVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRV,
-                    false, true);
+                    true, false, true);
             if (testMap != null) {
                 testMap.print();
             }
@@ -168,7 +170,7 @@ public class ChartMapTest {
     public void printTestTextChartRefreshNoVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRNV,
-                    true, false);
+                    true, true, false);
             if (testMap != null) {
                 testMap.print();
             }
@@ -182,7 +184,7 @@ public class ChartMapTest {
     public void printTestTextChartNoRefreshNoVerbose() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRNV,
-                    false, false);
+                    true, false, false);
             if (testMap != null) {
                 testMap.print();
             }
@@ -196,9 +198,9 @@ public class ChartMapTest {
     @Test
     public void testHelp() {
         String helpTextExpected = "\nUsage:\n" +
-                "java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+----------------------+--+------------+---+------------+---+------------+\n" +
-                "                          |                      |                                             |                      |  |            |   |            |   |            |\n" +
-                "                          +---  -c <chartname>---+                                             +---  -e <filename> ---+  +---  -r  ---+   +---  -v  ---+   +---  -h  ---+\n" +
+                "java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+----------------------+---+------------+---+------------+---+------------+---+------------+\n" +
+                "                          |                      |                                             |                      |   |            |   |            |   |            |   |            |\n" +
+                "                          +---  -c <chartname>---+                                             +---  -e <filename> ---+   +---  -g  ---+   +---  -r  ---+   +---  -v  ---+   +---  -h  ---+\n" +
                 "                          |                      |\n" +
                 "                          +---  -f <filename>----+\n" +
                 "                          |                      |\n" +
@@ -214,7 +216,7 @@ public class ChartMapTest {
     }
 
     private ChartMap createTestMap(ChartOption option, Path inputPath, Path outputPath,
-                                   boolean refresh, boolean verbose) throws Exception {
+                                   boolean generateImage, boolean refresh, boolean verbose) throws Exception {
         ChartMap testMap = null;
         try {
             testMap = new ChartMap(
@@ -223,6 +225,7 @@ public class ChartMapTest {
                     outputPath.toAbsolutePath().toString(),
                     System.getenv("HELM_HOME"),
                     testEnvFilePath.toAbsolutePath().toString(),
+                    generateImage,
                     refresh,
                     verbose);
         } catch (Exception e) {

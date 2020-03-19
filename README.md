@@ -122,6 +122,7 @@ In addition to the command line interface, a Java API is provided.
                     String outputFilename,
                     String helmHome,
                     String envFilename,
+                    boolean generate,
                     boolean refresh,
                     boolean verbose)
                     
@@ -140,8 +141,10 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The location of Helm Home
 * *envSpecFilename*          
     * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or <null>.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format. 
+* *generate*            
+  * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
 * *refresh*            
-  * When *true*, refresh the local Helm repo (default *false*)
+    * When *true*, refresh the local Helm repo (default *false*)
 * *verbose*           
   * When *true*, provides a little more information as the Chart Map is generated (default *false*)
                                           

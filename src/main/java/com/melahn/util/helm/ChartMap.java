@@ -140,6 +140,7 @@ public class ChartMap {
      *                       may influence the way the charts are rendered by helm.
      * @param helmHome       The location of the user helm directory.  This is needed to find
      *                       the local cache of index files downloaded from the Helm Chart repos.
+     * @param generateImage  When true, generates an image from the PlantUML file (if any)
      * @param refresh        When true, refresh the local Helm repo
      * @param verbose        When true, provides a little more information as the Chart Map is
      *                       generated
@@ -150,6 +151,7 @@ public class ChartMap {
                     String outputFilename,
                     String helmHome,
                     String envFilename,
+                    boolean generateImage,
                     boolean refresh,
                     boolean verbose) throws Exception {
         initialize();
@@ -169,6 +171,9 @@ public class ChartMap {
         if (envFilename != null) {
             args.add("-e");
             args.add(envFilename);
+        }
+        if (generateImage) {
+            args.add("-g");
         }
         if (refresh) {
             args.add("-r");
@@ -217,6 +222,7 @@ public class ChartMap {
         setEnvFilename(null);
         setTempDirName(null);
         setPrintFormat(PrintFormat.TEXT);
+        setGenerateImage(false);
         setRefreshLocalRepo(false);
         charts = new MultiKeyMap();
         chartsDependenciesPrinted = new HashSet<String>();
@@ -342,9 +348,9 @@ public class ChartMap {
      */
     public static String getHelp() {
         String help = "\nUsage:\n";
-        help += "java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+----------------------+--+------------+---+------------+---+------------+\n";
-        help += "                          |                      |                                             |                      |  |            |   |            |   |            |\n";
-        help += "                          +---  -c <chartname>---+                                             +---  -e <filename> ---+  +---  -r  ---+   +---  -v  ---+   +---  -h  ---+\n";
+        help += "java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+----------------------+---+------------+---+------------+---+------------+---+------------+\n";
+        help += "                          |                      |                                             |                      |   |            |   |            |   |            |   |            |\n";
+        help += "                          +---  -c <chartname>---+                                             +---  -e <filename> ---+   +---  -g  ---+   +---  -r  ---+   +---  -v  ---+   +---  -h  ---+\n";
         help += "                          |                      |\n";
         help += "                          +---  -f <filename>----+\n";
         help += "                          |                      |\n";
