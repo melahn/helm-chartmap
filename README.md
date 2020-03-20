@@ -264,14 +264,19 @@ mvn com.github.jeluard:plantuml-maven-plugin:generate
 ### Generating Images from PlantUML files outside of Maven
 
 Having generated some PlantUML files, if you want to generate image files from the PlantUML files outside of Maven, there are several options. 
-*  Use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
+* The simplest option is to just include the '-g' option when running Chartmap to generate the PlantUML file.
+That will cause Chartmap automatically generate a PNG file for you.  For example,
+```
+java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -g -o "wordpress.puml" -d "/Users/melahn/.helm"
+```
+* You can use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
 Just copy/paste the generated PlantUML text and click 'Submit'.  Then you can view the resulting image as PNG, SVG or Ascii Art. 
-*  Download the [PlantUML jar](http://plantuml.com/download) and use 
+* Download the [PlantUML jar](http://plantuml.com/download) and use 
 the command line like this ...
  ```
 java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/Downloads/plantuml.jar alfresco-dbp-1.5.0.puml
  ```
-*  Build PlantUML from [source](https://github.com/plantuml/plantuml) and then use the command line like this ...
+*  You can build PlantUML from [source](https://github.com/plantuml/plantuml) and then use the command line like this ...
 ```
 java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2018.11-SNAPSHOT.jar -tsvg alfresco-dbp-1.5.0.puml
 ```
