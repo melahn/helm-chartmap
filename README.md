@@ -73,14 +73,15 @@ java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <dir
       * The file system location of HELM_HOME 
    * **-o** \<filename\>
       * The name of the file to be generated.  
-      If a file extension of 'puml' is specifed the format of the generated file will be PlantUML. 
+      If a file extension of 'puml' is specifed the format of the generated file will be PlantUML.
       If a file extension of 'json' is specifed the format of the generated file will be in JSON format.
       Otherwise it will be plain text. 
 * **Optional**
    * **-e** \<filename\>
       *  The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format. 
    * **-g**
-      * Generate image.  Whenever specified, an image file is generated from the PlantUML file (if any).
+      * Generate image.  Whenever specified, an image file is generated from the PlantUML file.  This is only applicable if
+      the filename of the generated output file has the extension 'puml'.
    * **-r**
       * Refresh.  If specified, the Helm command *helm update dependencies* will be run before generating the chart map
    * **-v**
@@ -281,7 +282,7 @@ java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/Downloads/plantuml.jar alfresco-dbp-1.5.0
 java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2018.11-SNAPSHOT.jar -tsvg alfresco-dbp-1.5.0.puml
 ```
 **Notes about a local deployment of PlantUML:**
- * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples is useful when creating large images to avoid image truncation.
+ * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples or setting it as a system environment variable is useful when creating large images to avoid image truncation.
  * [Graphviz](https://www.graphviz.org/) is a prerequisite
 
 ### Issues
