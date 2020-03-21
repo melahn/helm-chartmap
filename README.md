@@ -266,7 +266,7 @@ mvn com.github.jeluard:plantuml-maven-plugin:generate
 
 Having generated some PlantUML files, if you want to generate image files from the PlantUML files outside of Maven, there are several options. 
 * The simplest option is to just include the '-g' option when running Chartmap to generate the PlantUML file.
-That will cause Chartmap automatically generate a PNG file for you.  For example,
+That will cause Chartmap to automatically generate a PNG file for you.  For example,
 ```
 java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -g -o "wordpress.puml" -d "/Users/melahn/.helm"
 ```
