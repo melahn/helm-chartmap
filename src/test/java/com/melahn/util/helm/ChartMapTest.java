@@ -197,16 +197,21 @@ public class ChartMapTest {
 
     @Test
     public void testHelp() {
-        String helpTextExpected = "\nUsage:\n" +
-                "java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+----------------------+---+------------+---+------------+---+------------+---+------------+\n" +
-                "                          |                      |                                             |                      |   |            |   |            |   |            |   |            |\n" +
-                "                          +---  -c <chartname>---+                                             +---  -e <filename> ---+   +---  -g  ---+   +---  -r  ---+   +---  -v  ---+   +---  -h  ---+\n" +
-                "                          |                      |\n" +
-                "                          +---  -f <filename>----+\n" +
-                "                          |                      |\n" +
-                "                          +---  -u <url>---------+\n" +
-                "\n" +
-                "See https://github.com/melahn/helm-chartmap for more information\n";
+        String helpTextExpected = "\nUsage:\n\n"
+                .concat("java -jar chartmap-1.0.1.jar\n")
+                .concat("\nFlags:\n")
+                .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
+                .concat("\t-c\t<chartname>\tA name and version of a chart\n")
+                .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
+                .concat("\t-u\t<url>\t\tA url for a Helm Chart\n")
+                .concat("\t-d\t<directoryname>\tThe file system location of HELM_HOME\n")
+                .concat("\t-o\t<filename>\tA name and version of the chart as an appr specification\n")
+                .concat("\t-e\t<filename>\tThe location of an Environment Specification\n")
+                .concat("\t-g\t\t\tGenerate image from PlantUML file\n")
+                .concat("\t-r\t\t\tRefresh\n")
+                .concat("\t-v\t\t\tVerbose\n")
+                .concat("\t-h\t\t\tHelp\n")
+                .concat("\nSee https://github.com/melahn/helm-chartmap for more information\n");
         try {
             String helpText = ChartMap.getHelp();
             assert(helpText.equals(helpTextExpected));

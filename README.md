@@ -1,4 +1,7 @@
 # Chart Map
+![version](https://img.shields.io/badge/version-1.0.1-green)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/) 
 
@@ -44,29 +47,32 @@ The junit test cases rely on the environment variable *HELM_HOME* being set.
 ### Command Line Syntax
 
 ```
-                                    
-java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <directoryname>----+---------------------+---+------------+---+------------+---+------------+---+------------+
-                          |                      |                                             |                     |   |            |   |            |   |            |   |            |
-                          +---  -c <chartname>---+                                             +---  -e <filename ---+   +---  -g  ---+   +---  -r  ---+   +---  -v  ---+   +---  -h  ---+
-                          |                      |                                                                       
-                          +---  -f <filename>----+                                                                       
-                          |                      |                                                                       
-                          +---  -u <url>---------+        
-                   
+java -jar chartmap-1.0.1.jar
+
+Flags:
+	-a	<apprspec>	A name and version of a chart as an appr specification
+	-c	<chartname>	A name and version of a chart
+	-f	<filename>	A location in the file system for a Helm Chart package (a tgz file)
+	-u	<url>		A url for a Helm Chart
+	-d	<directoryname>	The file system location of HELM_HOME
+	-o	<filename>	A name and version of the chart as an appr specification
+	-e	<filename>	The location of an Environment Specification
+	-g			Generate image from PlantUML file
+	-r			Refresh
+	-v			Verbose
+	-h			Help               
 ```
 
-#### Parameters
+#### Flags
 
 * **Required**
-   * \<filename\>
-     * The name of the jar file (e.g. target/chartmap-1.0-SNAPSHOT.jar)
-   * To specify the Helm Chart, one of the following input formats must be specified
+   * To specify the Helm Chart, *one* of the following input formats must be specified
      * **-a** \<apprspec\>
-          *  The name and version of the chart as an appr specification \<host\>/\<org\>/\<chart-name\>@\<chart-version\>   
+          *  A name and version of the chart as an appr specification \<host\>/\<org\>/\<chart-name\>@\<chart-version\>   
      * **-c** \<chartname\>
-          *  The name and version of the chart in the format \<chart-name\:chart-version\>
+          *  A name and version of the chart in the format \<chart-name\:chart-version\>
      * **-f** \<filename\>
-          *  The location in the file system for a Helm Chart package (a tgz file)
+          *  A location in the file system for a Helm Chart package (a tgz file)
      * **-u** \<url\>
           *  A url for the Helm Chart
    * **-d** \<directoryname\>
@@ -93,21 +99,21 @@ java -jar ---<filename>---+---  -a <apprspec>----+---  -o <filename>---  -d <dir
 
 ##### Generating a Chartmap using a chart reference 
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -o "wordpress.puml" -d "/Users/melahn/.helm"
+java -jar chartmap-1.0.1.jar -c "wordpress:0.8.17" -r -v -o "wordpress.puml" -d "/Users/melahn/.helm"
 ```
 ##### Generating a Chartmap using a file specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
+java -jar chartmap-1.0.1.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
 
 ```
 ##### Generating a Chartmap using a url specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0.1.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 ##### Generating a Chartmap using an appr specification
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar chartmap-1.0.1.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 
@@ -248,7 +254,7 @@ viewer, a text viewer or [helm-inspector](https://github.com/melahn/helm-inspect
 mvn clean install 
 
 ```
-Note: The [prebuilt jar](resource/jar/chartmap-1.0.0.jar) that is included in the ./resources directory targets Java 8 for the widest compatibiity. You can target a different
+Note: The [prebuilt jar](resource/jar/chartmap-1.0.1.jar) that is included in the ./resources directory targets Java 8 for the widest compatibiity. You can target a different
 version of Java by modifying the configuration in the maven-compiler-plugin to use a different target like in the example below.
 ```
 <target>11</target>
