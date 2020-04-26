@@ -47,7 +47,7 @@ The junit test cases rely on the environment variable *HELM_HOME* being set.
 ### Command Line Syntax
 
 ```
-java -jar chartmap-1.0.1.jar
+java -jar helm-chartmap-1.0.2.jar
 
 Flags:
 	-a	<apprspec>	A name and version of a chart as an appr specification
@@ -99,21 +99,21 @@ Flags:
 
 ##### Generating a Chartmap using a chart reference 
 ```
-java -jar chartmap-1.0.1.jar -c "wordpress:0.8.17" -r -v -o "wordpress.puml" -d "/Users/melahn/.helm"
+java -jar helm-chartmap-1.0.2.jar -c "wordpress:0.8.17" -r -v -o "wordpress.puml" -d "/Users/melahn/.helm"
 ```
 ##### Generating a Chartmap using a file specification
 ```
-java -jar chartmap-1.0.1.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
+java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
 
 ```
 ##### Generating a Chartmap using a url specification
 ```
-java -jar chartmap-1.0.1.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 ##### Generating a Chartmap using an appr specification
 ```
-java -jar chartmap-1.0.1.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -jar helm-chartmap-1.0.2.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 

@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.melahn</groupId>
-  <artifactId>chartmap</artifactId>
-  <version>1.0.1</version>
+  <artifactId>helm-chartmap</artifactId>
+  <version>1.0.2</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

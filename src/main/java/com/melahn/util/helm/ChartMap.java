@@ -348,7 +348,7 @@ public class ChartMap {
      */
     public static String getHelp() {
         String help = "\nUsage:\n\n"
-                .concat("java -jar chartmap-1.0.1.jar\n")
+                .concat("java -jar helm-chartmap-1.0.2.jar\n")
                 .concat("\nFlags:\n")
                 .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
