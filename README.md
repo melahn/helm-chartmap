@@ -1,5 +1,5 @@
 # Chart Map
-![version](https://img.shields.io/badge/version-1.0.1-green)
+![version](https://img.shields.io/badge/version-1.0.2-green)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 
