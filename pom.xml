@@ -7,6 +7,28 @@
   <groupId>com.melahn</groupId>
   <artifactId>helm-chartmap</artifactId>
   <version>1.0.2</version>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>A tool for generating Helm Chart dependency reports</description>
+  <url>https://github.com/melahn/helm-chartmap</url>
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git://github.com/melahn/helm-chartmap.git</connection>
+    <developerConnection>scm:git:ssh://github.com:melahn/helm-chartmap.git</developerConnection>
+    <url>https://github.com/melahn/helm-chartmap/tree/master</url>
+  </scm>
+  <developers>
+    <developer>
+      <name>Gregory Melahn</name>
+      <email>gregorymelahn@gmail.com</email>
+      <organization>melahn.com</organization>
+      <organizationUrl>http://melahn.com</organizationUrl>
+    </developer>
+  </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
