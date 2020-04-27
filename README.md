@@ -186,6 +186,7 @@ public class ChartMapExample {
                     "my-chartmap.puml",
                     System.getenv("HELM_HOME"),
                     "resource/example/example-env-spec.yaml",
+                    true,
                     false,
                     true);
             testMap.print();
