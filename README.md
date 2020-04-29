@@ -25,6 +25,17 @@ detects anomolies such as a stable chart depending on an incubator chart.
 You can see an example of a text file generated from Chart Map here &#8594; 
 https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt.
 
+## Maven Central 
+
+The Chart Map jar file, along with source and javadoc, is available from **Maven Central**.  
+```
+<dependency>
+  <groupId>com.melahn</groupId>
+  <artifactId>helm-chartmap</artifactId>
+  <version>1.0.2</version>
+</dependency>
+
+```
 ## Prerequisites
 
 Java 8 or later.  
@@ -35,12 +46,13 @@ For instructions on installing the Helm Client, see https://docs.helm.sh/using_h
 
 The junit test cases rely on the environment variable *HELM_HOME* being set.
 
-
 ## Using Chart Map
 
 ### Setup
 
-1. Download the executable jar from the [resource directory](./resource/jar), or build it yourself from source (see below).
+1. Download the executable jar from the [resource directory](./resource/jar),
+or from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.0.2/helm-chartmap-1.0.2.jar) or
+or build it yourself from source (see below).
 
 2. Run the command line, or write a Java program using the API, to generate a chart.  See Syntax and Examples below.
 
