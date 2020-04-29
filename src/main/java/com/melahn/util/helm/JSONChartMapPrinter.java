@@ -64,10 +64,10 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
     /**
      * A recursive method to adds a chart or image to the tree
      *
-     * @param   h   a Helm chart or Docker image to add to the tee
+     * @param   h   a Helm chart or Docker image to add to the tree
+     * @param   p   the parent helm chart of h
      * @param   j   a JSONObject to which the properties will
      *              be written
-     * @throws  IOException     IOException
      */
     public void addChartToObject(HelmChart h, HelmChart p, JSONObject j) {
         addProperties(h, j);

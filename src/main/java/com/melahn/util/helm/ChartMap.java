@@ -114,7 +114,6 @@ public class ChartMap {
      * Parses the command line and generates a Chart Map file
      *
      * @param arg The command line args
-     * @throws IOException
      */
     public static void main(String[] arg) {
         ChartMap chartMap = new ChartMap();
@@ -144,6 +143,7 @@ public class ChartMap {
      * @param refresh        When true, refresh the local Helm repo
      * @param verbose        When true, provides a little more information as the Chart Map is
      *                       generated
+     * @throws Exception     Throws Exception
      **/
 
     public ChartMap(ChartOption option,
@@ -196,6 +196,8 @@ public class ChartMap {
      * Prints the Chart Map by creating a temp directory, loading the local
      * repo with charts, resolving the dependencies of the selected chart,
      * printing the Chart Map, then cleans up
+     *
+     * @throws IOException  Throws IOException
      */
     public void print() throws IOException {
         createTempDir();
