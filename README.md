@@ -111,21 +111,22 @@ Flags:
 
 ##### Generating a Chartmap using a chart reference 
 ```
-java -jar helm-chartmap-1.0.2.jar -c "wordpress:0.8.17" -r -v -o "wordpress.puml" -d "/Users/melahn/.helm"
+java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -d "/Users/melahn/.helm" -o wordpress-10.6.10.txt  -v
 ```
 ##### Generating a Chartmap using a file specification
 ```
-java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v -g
+java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -d "/Users/melahn/.helm" -o  alfresco-content-services-3.0.8.puml -v 
 
 ```
 ##### Generating a Chartmap using a url specification
 ```
-java -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-2.1.3.tgz" " -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -d "/Users/melahn/.helm" -o  alfresco-content-services-3.0.8.puml -g -v
 
 ```
+Note in this example, the *-g* flag is set to automatically generate the image from the plantunl file and the *PLANTUML_LIMIT_SIZE* variable is set to a larger value so the resulting image does not get truncated 
 ##### Generating a Chartmap using an appr specification
 ```
-java -jar helm-chartmap-1.0.2.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
 
@@ -287,7 +288,7 @@ Having generated some PlantUML files, if you want to generate image files from t
 * The simplest option is to just include the '-g' option when running Chartmap to generate the PlantUML file.
 That will cause Chartmap to automatically generate a PNG file for you.  For example,
 ```
-java -jar chartmap-1.0-SNAPSHOT.jar -c "wordpress:0.8.17" -r -v -g -o "wordpress.puml" -d "/Users/melahn/.helm"
+java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -r -v -g -o "wordpress-10.6.10.puml" -d "/Users/melahn/.helm"
 ```
 * You can use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
 Just copy/paste the generated PlantUML text and click 'Submit'.  Then you can view the resulting image as PNG, SVG or Ascii Art. 
