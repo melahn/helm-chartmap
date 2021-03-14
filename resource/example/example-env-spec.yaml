@@ -2,7 +2,7 @@
 environment:
   alfresco-api-gateway.keycloakURL : 'http://localhost-k8s/auth'
   alfresco-content-services.alfresco-infrastructure.enabled : 'false'
-  alfresco-content-services.externalHost : 'localhostk8s'
+  alfresco-content-services.externalHost : 'localhost-k8s'
   alfresco-content-services.networkpolicysetting.enabled : 'false'
   alfresco-content-services.repository.environment.IDENTITY_SERVICE_URI : 'http://localhost-k8s/auth'
   alfresco-infrastructure.activemq.adminUser.username : 'foo'
