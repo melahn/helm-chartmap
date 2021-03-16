@@ -74,7 +74,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
         writeLine("\tapiVersion: " + formatString(chart.getApiVersion()));
         writeLine("\tappVersion: " + formatString(chart.getAppVersion()));
         writeLine("\tcreated: " + formatString(chart.getCreated()));
-        writeLine("\tdependencies: " + formatDependencies(chart.getDependencies()));
+        writeLine("\tdependencies: " + formatDependencies(chart.getDiscoveredDependencies()));
         writeLine("\tdescription: " + formatString(chart.getDescription()));
         writeLine("\tdigest: " + formatString(chart.getDigest()));
         writeLine("\ticon: " + formatString(chart.getIcon()));
@@ -129,6 +129,22 @@ public class ChartMapPrinter implements IChartMapPrinter {
 
     public HelmChart getChart() {
         return chart;
+    }
+
+     /**
+     * Helm V3 introduced the library chart type so return 
+     * the value of type if found.
+     *
+     * @param   c       a helm chart
+     * @return          the string "library" if this is a library
+     *                  chart, "application" otherwise
+     */
+    public String getChartType(HelmChart c) {
+        if (c.getType() != null && c.getType().equals("library")) {
+            return c.getType();
+        } else {
+            return "application";
+        }
     }
 
     String getCurrentDateTime() {

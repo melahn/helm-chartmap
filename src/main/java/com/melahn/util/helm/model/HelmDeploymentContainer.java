@@ -32,7 +32,7 @@ public class HelmDeploymentContainer {
         this.image = image;
     }
     // the equals and hashCode overrides are needed to make comparisons when adding to arrays that
-    // are used for the chart maps since there are cases where the same container be be used by multiple
+    // are used for the chart maps since there are cases where the same container may be used by multiple
     // templates that are used by a helm chart.  For an example, see the StateFul Sets in wordpress:8.1.2.
     @Override
     public boolean equals(Object o) {

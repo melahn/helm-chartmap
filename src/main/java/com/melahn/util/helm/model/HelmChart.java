@@ -2,6 +2,7 @@ package com.melahn.util.helm.model;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import com.melahn.util.helm.ChartUtil;
 
 public class HelmChart {
@@ -13,6 +14,18 @@ public class HelmChart {
     private HashSet<HelmChart> dependencies = new HashSet<>();
     private HashSet<HelmDeploymentTemplate> deploymentTemplates = new HashSet<>();
     private String digest;
+    private HashSet<HelmChart> discoveredDependencies = new HashSet<>(); // this is not part of the 
+                                                                         // yaml file. This property
+                                                                         // holds the values of the 
+                                                                         // dependencies discovered
+                                                                         // by parsing the descendent
+                                                                         // directories and rendering
+                                                                         // templates. This is needed
+                                                                         // because the dependencies
+                                                                         // property in the yaml file
+                                                                         // can hold bogus values (e.g
+                                                                         // the 1.x.x versions in the
+                                                                         // wordpress 10.6.10 chart)
     private String icon;
     private String[] keywords;
     private HelmMaintainer[] maintainers;
@@ -20,6 +33,7 @@ public class HelmChart {
     private String repoUrl;  // This is information that is not to be found in the Chart.yaml file
                              // We add it if we can after we load the chart from the yaml file
     private String[] sources;
+    private String type; // introduced in Helm V3
     private String[] urls;
     private Map<String, Object> values;
     private String version;
@@ -67,8 +81,11 @@ public class HelmChart {
         return condition;
     }
 
-    public void setCondition(Boolean condition) {
-        this.condition = condition;
+    public void setCondition(String enabled) {
+        condition = Boolean.FALSE;
+        if (enabled.endsWith(".enabled")) {
+            condition = Boolean.TRUE;
+        }
     }
 
     public String getCreated() {
@@ -83,11 +100,19 @@ public class HelmChart {
         return dependencies;
     }
 
-    public void setDependencies(HashSet<HelmChart> d) {
-        dependencies = d;
+    public void setDependencies(Set<HelmChart> d) {
+        dependencies = (HashSet)d;
     }
 
-    public HashSet<HelmDeploymentTemplate> getDeploymentTemplates() {
+    public HashSet<HelmChart> getDiscoveredDependencies() {
+        return discoveredDependencies;
+    }
+
+    public void setDiscoveredDependencies(Set<HelmChart> d) {
+        discoveredDependencies = (HashSet)d;
+    }
+
+    public Set<HelmDeploymentTemplate> getDeploymentTemplates() {
         return deploymentTemplates;
     }
 
@@ -153,6 +178,14 @@ public class HelmChart {
 
     public void setSources(String[] s) {
         sources = s;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String t) {
+        type = t;
     }
 
     public String[] getUrls() {

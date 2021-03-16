@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -13,7 +12,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class ChartMapTest {

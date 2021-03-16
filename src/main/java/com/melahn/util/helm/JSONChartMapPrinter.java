@@ -73,7 +73,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
         addProperties(h, j);
         JSONArray a = new JSONArray(); // array of children
         addContainers(h, p, a);
-        Iterator<HelmChart> itr = h.getDependencies().iterator();
+        Iterator<HelmChart> itr = h.getDiscoveredDependencies().iterator();
         while(itr.hasNext()){
             JSONObject c = new JSONObject(); // new child object
             addChartToObject(itr.next(),h, c);

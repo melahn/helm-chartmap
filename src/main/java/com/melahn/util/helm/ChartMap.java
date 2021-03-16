@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import net.sourceforge.plantuml.preproc.Define;
-import net.sourceforge.plantuml.preproc.Defines;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -33,7 +31,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.IOException;
-import java.lang.System;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.FileVisitResult;
@@ -70,6 +67,7 @@ public class ChartMap {
     private PrintFormat printFormat;
     private IChartMapPrinter printer;
     private boolean refreshLocalRepo;
+    private final String startOfTemplate = "# Source: ";
     private String tempDirName;
     private boolean verbose;
     final private String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of the file we use to hold the rendered templates
@@ -114,7 +112,7 @@ public class ChartMap {
      * Parses the command line and generates a Chart Map file
      *
      * @param arg The command line args
-     */
+     */    
     public static void main(String[] arg) {
         ChartMap chartMap = new ChartMap();
         try {
@@ -349,7 +347,7 @@ public class ChartMap {
      * @return a string containing some help
      */
     public static String getHelp() {
-        String help = "\nUsage:\n\n"
+        return "\nUsage:\n\n"
                 .concat("java -jar helm-chartmap-1.0.2.jar\n")
                 .concat("\nFlags:\n")
                 .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
@@ -364,7 +362,6 @@ public class ChartMap {
                 .concat("\t-v\t\t\tVerbose\n")
                 .concat("\t-h\t\t\tHelp\n")
                 .concat("\nSee https://github.com/melahn/helm-chartmap for more information\n");
-        return help;
     }
     /**
      * Finds all the local repositories the user has previously added (using for example
@@ -788,6 +785,9 @@ public class ChartMap {
     private void collectDependencies(String chartDirName, HelmChart h) {  // TODO add a test for a dependency cycle
         HelmChart parentHelmChart = null;
         try {
+            if (h != null && verbose) {
+                System.out.println("Processing Chart " + h.getName() + ":" + h.getVersion());        
+            }
             File currentDirectory = new File(chartDirName);
             String[] directories = currentDirectory.list(new FilenameFilter() {
                 @Override
@@ -805,7 +805,7 @@ public class ChartMap {
                     if (chartFile.exists()) {
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);   // this reference is not in the map
+                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);  // this reference is not in the map
                         HelmChart currentHelmChart = (HelmChart) charts.get(currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
                             // this is most likely because the local Helm charts are out of date and should be refreshed
@@ -835,13 +835,13 @@ public class ChartMap {
                         if (condition) {
                             collectValues(chartDirName + File.separator + directory, currentHelmChart);
                             if (parentHelmChart != null) {
-                               parentHelmChart.getDependencies().add(currentHelmChart);   // add this chart as a dependent
+                               parentHelmChart.getDiscoveredDependencies().add(currentHelmChart);   // add this chart as a dependent
                             }
                             chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(), currentHelmChart); // may be redundant given we added parent already in an earlier iteration
                             renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
                             File chartsDirectory = new File(chartDirName + File.separator + directory + File.separator + "charts");
                             if (chartsDirectory.exists()) {
-                                collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart);  // recursion }
+                                collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart);  // recursion 
                             }
                         }
                     }
@@ -1026,15 +1026,29 @@ public class ChartMap {
      *
      * @param dir The directory in which the chart directory exists
      * @param h   The Helm Chart containing the templates
+     * @param p   The Helm Chart that is the parent of h
      */
     private void renderTemplates(File dir, HelmChart h, HelmChart p) {
         try {
+            if (h.getType() != null && h.getType().equals("library")) {
+                // skip rendering library charts (these were intruduced in Helm V3)
+                return;
+            }
             String command = "helm ";
-            // Get any environment variables the user may have specified and
+            // Get any variables the user may have specified and
             // append to the command
             List<String> envVars = getEnvVars();
-            for (String envVar : envVars) {
-                command = command.concat(" --set ").concat(envVar).concat(" ");
+            if (!envVars.isEmpty()) {
+                command = command.concat(" --set \"");
+                for (int i = 0; i < envVars.size(); i ++) {
+                  command = command.concat(envVars.get(i));
+                  if (i<envVars.size()-1) {
+                    command = command.concat(",");
+                    }
+                    else {
+                        command = command.concat("\" ");
+                    }
+                }
             }
             command = command.concat("template ").concat(h.getName());
             Process r = Runtime.getRuntime().exec(command, null, dir);
@@ -1150,13 +1164,23 @@ public class ChartMap {
                 File envFile = new File(envFilename);
                 EnvironmentSpecification env = mapper.readValue(envFile, EnvironmentSpecification.class);
                 Map<String, String> vars = env.getEnvironment();
-                vars.forEach((k, v) -> envVars.add(k + ("=") + v));
+                vars.forEach((k, v) -> envVars.add(getEscapedVariable(k + "=") + v));
             } catch (Exception e) {
                 System.out.println("Error reading Environment Variables File " + envFilename + " : " + e.getMessage());
                 throw e;
             }
         }
         return envVars;
+    }
+    /**
+     * 
+     * @param v     String which may or may not contain values that need to be escaped to form
+     *              a value --set argument for helm.  Note: this seems to be necessary since helm
+     *              V3 though I don't see any documentation about it
+     * @return      String with '-' escaped
+     */
+    String getEscapedVariable (String v) {
+        return v.replace("-","\\-");
     }
 
     /**
@@ -1190,40 +1214,34 @@ public class ChartMap {
     private ArrayList<Boolean> getTemplateArray(File f, String chartName) {
         ArrayList<Boolean> a = new ArrayList<>();
         String line = null;
-        try {
-            FileReader fileReader = new FileReader(f);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+        try (FileReader fileReader = new FileReader(f);BufferedReader bufferedReader = new BufferedReader(fileReader);){
             line = bufferedReader.readLine();
             while (line != null) {
-                if (line.length() > ("# Source: " + chartName).length() && line.charAt(0) == '#') {
+                if (line.length() > (startOfTemplate + chartName).length() && line.charAt(0) == '#') {
                     // a pattern like this  <chartName>/templates/... means that this is
                     // a template of immediate interest to the chart e.g. alfresco-content-services/templates
                     String[] s = line.split(File.separator, 3);
                     Boolean b = Boolean.FALSE;
                     if (s.length > 1
-                            && s[0].equals("# Source: " + chartName)
+                            && s[0].equals(startOfTemplate + chartName)
                             && s[1].equals("templates")
                             && !line.endsWith(RENDERED_TEMPLATE_FILE)) {  // ignore the template file we generate
                         b = Boolean.TRUE; // the yaml files in this section are ones we care about
                     }
                     boolean endOfYamlInFile = false;
-                    line = bufferedReader.readLine();
-                    while (line != null && !endOfYamlInFile) { // read until you find the end of this yaml object
-                        if (line.equals("---")) {
+                    while (!endOfYamlInFile) { // read until you find the end of this yaml object
+                        line = bufferedReader.readLine();
+                        // EOF or the start of a new yaml section means the current object is completely read
+                        if (line == null || (line.startsWith(startOfTemplate))) {
+                            endOfYamlInFile = true;
                             a.add(b);
                         }
-                        line = bufferedReader.readLine();
-                        if (line != null) {
-                            if (line.startsWith("# Source:")) {
-                                endOfYamlInFile = true;
-                            }
-                        }
                     }
-                } else {
-                    line = bufferedReader.readLine();
+                } 
+                else {
+                    line = bufferedReader.readLine(); 
                 }
             }
-            fileReader.close();
         } catch (Exception e) {
             System.out.println("Exception creating template array in " + f.getName() + " with line " + line);
         }
@@ -1242,32 +1260,26 @@ public class ChartMap {
     private ArrayList<String> getTemplateArray(File d, File f) {
         ArrayList<String> a = new ArrayList<>();
         String line = null;
-        try {
-            FileReader fileReader = new FileReader(f);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+        try (FileReader fileReader = new FileReader(f);BufferedReader bufferedReader = new BufferedReader(fileReader);){
             line = bufferedReader.readLine();
             while (line != null) {
-                if (line.startsWith("# Source: ")) {
-                    String[] s = line.split("# Source: ", line.length());
+                if (line.startsWith(startOfTemplate)) {
+                    String[] s = line.split(startOfTemplate, line.length());
                     String fileName = s[1];
                     boolean endOfYamlInFile = false;
                     line = bufferedReader.readLine();
-                    while (line != null && !endOfYamlInFile) { // read until you find the end of this yaml object
-                        if (line.equals("---")) {
-                            a.add(d.getAbsolutePath() + File.separator + fileName);
-                        }
+                    while (!endOfYamlInFile) { // read until you find the end of this yaml object
                         line = bufferedReader.readLine();
-                        if (line != null) {
-                            if (line.startsWith("# Source:")) {
-                                endOfYamlInFile = true;
-                            }
-                        }
+                        // EOF or the start of a new yaml section means the current object is completely read
+                        if (line == null || (line.startsWith(startOfTemplate))) {
+                            endOfYamlInFile = true;
+                            a.add(d.getAbsolutePath() + File.separator + fileName);
+                        }                     
                     }
                 } else {
                     line = bufferedReader.readLine();
                 }
             }
-            fileReader.close();
         } catch (Exception e) {
             System.out.println("Exception creating template array in " + f.getName() + " with line " + line);
         }
@@ -1336,9 +1348,7 @@ public class ChartMap {
                 List<net.sourceforge.plantuml.GeneratedImage> l = r.getGeneratedImages();
                 if (l.size() > 0) {
                     File p = l.get(0).getPngFile();
-                    if (verbose) {
-                        System.out.println("Image file " + p.getName() + " generated from " + f);
-                    }
+                    System.out.println("Image file " + p.getName() + " generated from " + f);
                 } else {
                     System.out.println("Warning: Image file " + i.getFileName() + " was not generated from " + f);
                 }
@@ -1361,10 +1371,10 @@ public class ChartMap {
             if (parent.getNameFull().equals(chart.getNameFull())) {
                 printer.printSectionHeader("Chart Dependencies");
             }
-            if (parent.getDependencies() != null) {
+            if (parent.getDiscoveredDependencies() != null) {
                 // Print the chart to chart dependencies recursively
                 boolean stable=isStable(parent, false); // check if the parent chart is stable
-                for (HelmChart dependent : parent.getDependencies()) {
+                for (HelmChart dependent : parent.getDiscoveredDependencies()) {
                     if (!chartsDependenciesPrinted.contains(parent.getNameFull() + "_" + dependent.getNameFull())) {
                         printer.printChartToChartDependency(parent, dependent);
                         if (stable) { // if the parent is stable and the child is not then print a message if verbose
@@ -1442,7 +1452,7 @@ public class ChartMap {
      */
     private boolean isStable(HelmChart h, boolean checkContainers) {
         boolean stable = true;
-        if (h.getRepoUrl().contains("/incubator")) {
+        if (h.getRepoUrl() != null && h.getRepoUrl().contains("/incubator")) {
             if (isDebug()) {
                 System.out.println("chart " + h.getNameFull() + " does not appear to be stable");
             }
