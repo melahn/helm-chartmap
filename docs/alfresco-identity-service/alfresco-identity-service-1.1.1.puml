@@ -8,20 +8,16 @@ skinparam artifactArrowColor LightSlateGray
 
 title Chart Map for alfresco-identity-service:1.1.1
 
-'There are 3 referenced Helm Charts
-artifact "postgresql:0.15.0\n====\n\tpostgresql\n====\n\t0.15.0\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: databus23\n====\n\tKeywords: postgresql\npostgres\ndatabase\nsql" as postgresql_0_15_0 #LightSteelBlue
-artifact "alfresco-identity-service:1.1.1\n====\n\talfresco-identity-service\n====\n\t1.1.1\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_1_1_1 #Chartreuse
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
+'There are 2 referenced Helm Charts
+artifact "alfresco-identity-service:1.1.1\n====\n\talfresco-identity-service\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_1_1_1 #Chartreuse
+artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
 
-'There are 2 referenced Docker Images
-usecase "Image\n====\n\tDocker Hub\n====\n\tpostgres\n====\n\t10.1" as postgres_10_1 #Ivory
+'There is one referenced Docker Image
 usecase "Image\n====\n\tDocker Hub\n====\n\tjboss/keycloak\n====\n\t4.8.3.Final" as jboss_keycloak_4_8_3_Final #LemonChiffon
 
 'Chart Dependencies
 alfresco_identity_service_1_1_1--[#green]-|>keycloak_4_3_0
-keycloak_4_3_0--[#green]-|>postgresql_0_15_0
-postgresql_0_15_0--[#orange]-|>postgres_10_1
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2020/03/15 09:55:02 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2021/03/16 17:36:52 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

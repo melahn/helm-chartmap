@@ -24,47 +24,13 @@
       "kerberos",
       "ldap"
     ],
-    "children": [
-      {
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "alfresco/alfresco-identity-service",
-        "type": "image",
-        "version": "1.2"
-      },
-      {
-        "maintainers": [
-          {
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          },
-          {
-            "name": "desaintmartin",
-            "email": "cedric@desaintmartin.fr"
-          }
-        ],
-        "keywords": [
-          "postgresql",
-          "postgres",
-          "database",
-          "sql",
-          "replication",
-          "cluster"
-        ],
-        "children": [{
-          "repoHost": "docker.io",
-          "children": [],
-          "name": "bitnami/postgresql",
-          "type": "image",
-          "version": "11.5.0-debian-9-r60"
-        }],
-        "name": "postgresql:6.3.13",
-        "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-        "type": "chart",
-        "shortName": "postgresql",
-        "version": "6.3.13"
-      }
-    ],
+    "children": [{
+      "repoHost": "Docker Hub",
+      "children": [],
+      "name": "alfresco/alfresco-identity-service",
+      "type": "image",
+      "version": "1.2"
+    }],
     "name": "keycloak:6.0.0",
     "description": "Open Source Identity and Access Management For Modern Applications and Services",
     "type": "chart",

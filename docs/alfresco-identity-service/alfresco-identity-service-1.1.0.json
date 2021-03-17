@@ -24,36 +24,13 @@
       "kerberos",
       "ldap"
     ],
-    "children": [
-      {
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "jboss/keycloak",
-        "type": "image",
-        "version": "4.8.3.Final"
-      },
-      {
-        "maintainers": [{"name": "databus23"}],
-        "keywords": [
-          "postgresql",
-          "postgres",
-          "database",
-          "sql"
-        ],
-        "children": [{
-          "repoHost": "Docker Hub",
-          "children": [],
-          "name": "postgres",
-          "type": "image",
-          "version": "10.1"
-        }],
-        "name": "postgresql:0.15.0",
-        "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-        "type": "chart",
-        "shortName": "postgresql",
-        "version": "0.15.0"
-      }
-    ],
+    "children": [{
+      "repoHost": "Docker Hub",
+      "children": [],
+      "name": "jboss/keycloak",
+      "type": "image",
+      "version": "4.8.3.Final"
+    }],
     "name": "keycloak:4.3.0",
     "description": "Open Source Identity and Access Management For Modern Applications and Services",
     "type": "chart",
