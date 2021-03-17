@@ -123,7 +123,7 @@ java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-servic
 java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -d "/Users/melahn/.helm" -o  alfresco-content-services-3.0.8.puml -g -v
 
 ```
-Note in this example, the *-g* flag is set to automatically generate the image from the plantunl file and the *PLANTUML_LIMIT_SIZE* variable is set to a larger value so the resulting image does not get truncated 
+Note in this example, the *-g* flag is set to automatically generate the image from the PlantUML file and the *PLANTUML_LIMIT_SIZE* variable is set to a larger value so the resulting image does not get truncated 
 ##### Generating a Chartmap using an appr specification
 ```
 java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
