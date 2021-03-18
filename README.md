@@ -40,7 +40,7 @@ The Chart Map jar file, along with source and javadoc, is available from **Maven
 
 Java 8 or later.  
 
-Helm Client 2.9.1 or later.  The Helm Client is required since the chart map is based on the dependencies discovered by the Kubernetes Helm client. I have tested it with version 2.9.1 of the Helm Client though other versions may also work. 
+The Helm Client is required since the chart map is based on the dependencies discovered by the Kubernetes Helm client using the *helm template* command. I have tested it with version 3.5.2 of the Helm Client though other versions may also work. 
 
 For instructions on installing the Helm Client, see https://docs.helm.sh/using_helm/#installing-helm
 
