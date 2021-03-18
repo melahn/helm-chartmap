@@ -96,7 +96,7 @@ Chart: alfresco-content-services:2.1.3
 	apiVersion: Not specified
 	appVersion: 6.1.1.2
 	created: 2020-07-08T12:03:13.148588148Z
-	dependencies: alfresco-infrastructure:4.1.1, alfresco-sync-service:1.1.1, alfresco-digital-workspace:2.2.0, postgresql:0.9.3, alfresco-search:1.0.1
+	dependencies: alfresco-infrastructure:4.1.1, alfresco-search:1.0.1, alfresco-sync-service:1.1.1, alfresco-digital-workspace:2.2.0, postgresql:0.9.3
 	description: A Helm chart for deploying Alfresco Content Services
 	digest: 1da20b49dd8cb532bec4ddb0fe1a6a713f1a6b68d3ea258ba9878ce5ea509cfe
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -230,11 +230,11 @@ alfresco-infrastructure:4.1.1 depends on activemq:1.1.1
 alfresco-infrastructure:4.1.1 depends on alfresco-identity-service:1.1.0
 alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
 alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
+alfresco-content-services:2.1.3 depends on alfresco-search:1.0.1
 alfresco-content-services:2.1.3 depends on alfresco-sync-service:1.1.1
 alfresco-sync-service:1.1.1 depends on postgresql:0.9.3
 alfresco-content-services:2.1.3 depends on alfresco-digital-workspace:2.2.0
 alfresco-content-services:2.1.3 depends on postgresql:0.9.3
-alfresco-content-services:2.1.3 depends on alfresco-search:1.0.1
 alfresco-dbp:1.5.0 depends on alfresco-infrastructure:4.1.1
 alfresco-dbp:1.5.0 depends on alfresco-process-services:0.2.0
 alfresco-process-services:0.2.0 depends on alfresco-infrastructure:4.1.1
@@ -261,4 +261,4 @@ nginx-ingress:0.14.0 uses k8s.gcr.io/defaultbackend:1.3
 nginx-ingress:0.14.0 uses quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.12.0
 keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 
-Generated on 2021/03/16 17:35:44 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2021/03/18 17:50:50 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

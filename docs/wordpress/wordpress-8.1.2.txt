@@ -1,47 +1,79 @@
-Chart Map for wordpress:8.1.2
+Chart Map for wordpress:10.6.10
 
-There are 2 referenced Helm Charts
+There are 4 referenced Helm Charts
 ----------------------------------
-Chart: mariadb:7.3.6
-	apiVersion: v1
-	appVersion: 10.3.21
-	created: 2020-01-29T07:29:08.823810504Z
+Chart: common:1.4.1
+	apiVersion: v2
+	appVersion: 1.4.1
+	created: 2021-02-23T14:16:25.700860051Z
 	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 7e4300b0cd0a7912f6f51186e8819d586207ef162b0fbc3fab70ee2226520180
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,http://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.4.1.tgz
+	version: 1.4.1
+Chart: mariadb:9.3.4
+	apiVersion: v2
+	appVersion: 10.5.9
+	created: 2021-02-23T00:28:35.711995385Z
+	dependencies: common:1.4.0
 	description: Fast, reliable, scalable, and easy to use open-source relational database system. MariaDB Server is intended for mission-critical, heavy-load production systems as well as for embedding into mass-deployed software. Highly available MariaDB cluster.
-	digest: 9eb7b1d2a1a5a4ee0cb4fd0f7b36778bdd6e6e1570e56c250c870c467bb41bbc
+	digest: 4aa0b19b962eb88a158fefeb36e3ad7f53c2dfe76fce87740f5f3080d420c482
 	icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
 	keywords: mariadb,mysql,database,sql,prometheus
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.bitnami.com/bitnami
 	name: mariadb
-	sources: https://github.com/bitnami/bitnami-docker-mariadb,https://github.com/prometheus/mysqld_exporter
-	urls: https://kubernetes-charts.storage.googleapis.com/mariadb-7.3.6.tgz
-	version: 7.3.6
-Chart: wordpress:8.1.2
-	apiVersion: v1
-	appVersion: 5.3.2
+	sources: https://github.com/bitnami/bitnami-docker-mariadb,https://github.com/prometheus/mysqld_exporter,https://mariadb.org
+	urls: https://charts.bitnami.com/bitnami/mariadb-9.3.4.tgz
+	version: 9.3.4
+Chart: common:1.4.0
+	apiVersion: v2
+	appVersion: 1.4.0
+	created: 2021-02-22T15:02:06.690729531Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 82f9170f43a44c006f9bab16377cf11f33e1e27a619ee7e8da2c76cd6c5a512d
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,http://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.4.0.tgz
+	version: 1.4.0
+Chart: wordpress:10.6.10
+	apiVersion: v2
+	appVersion: 5.6.2
 	created: Not specified
-	dependencies: mariadb:7.3.6
+	dependencies: common:1.4.1, mariadb:9.3.4
 	description: Web publishing platform for building blogs and websites.
 	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
-	keywords: wordpress,cms,blog,http,web,application,php
+	keywords: application,blog,cms,http,php,web,wordpress
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.bitnami.com/bitnami
 	name: wordpress
-	sources: https://github.com/bitnami/bitnami-docker-wordpress
+	sources: https://github.com/bitnami/bitnami-docker-wordpress,http://www.wordpress.com/
 	urls: Not specified
-	version: 8.1.2
+	version: 10.6.10
 
 There are 2 referenced Docker Images
 ------------------------------------
-Image: docker.io/bitnami/mariadb:10.3.21-debian-10-r0
-Image: docker.io/bitnami/wordpress:5.3.2-debian-10-r0
+Image: docker.io/bitnami/wordpress:5.6.2-debian-10-r8
+Image: docker.io/bitnami/mariadb:10.5.9-debian-10-r0
 
 Chart Dependencies
 ------------------
-wordpress:8.1.2 depends on mariadb:7.3.6
-mariadb:7.3.6 uses docker.io/bitnami/mariadb:10.3.21-debian-10-r0
-wordpress:8.1.2 uses docker.io/bitnami/wordpress:5.3.2-debian-10-r0
+wordpress:10.6.10 depends on common:1.4.1
+wordpress:10.6.10 depends on mariadb:9.3.4
+mariadb:9.3.4 depends on common:1.4.0
+mariadb:9.3.4 uses docker.io/bitnami/mariadb:10.5.9-debian-10-r0
+wordpress:10.6.10 uses docker.io/bitnami/wordpress:5.6.2-debian-10-r8
 
-Generated on 2020/02/07 13:44:11 by TextChartMapPrinter (https://github.com/Alfresco/alfresco-anaxes-chartmap)
+Generated on 2021/03/18 17:52:20 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
