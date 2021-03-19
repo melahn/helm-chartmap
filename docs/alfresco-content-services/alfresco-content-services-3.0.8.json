@@ -70,25 +70,65 @@
       "version": "6.2.0"
     },
     {
-      "maintainers": [{"name": "databus23"}],
+      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
       "keywords": [
-        "postgresql",
-        "postgres",
-        "database",
-        "sql"
+        "syncservice",
+        "alfresco",
+        "application"
+      ],
+      "children": [
+        {
+          "repoHost": "quay.io",
+          "children": [],
+          "name": "alfresco/service-sync",
+          "type": "image",
+          "version": "3.3.1"
+        },
+        {
+          "maintainers": [{"name": "databus23"}],
+          "keywords": [
+            "postgresql",
+            "postgres",
+            "database",
+            "sql"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "postgres",
+            "type": "image",
+            "version": "10.1"
+          }],
+          "name": "postgresql:0.9.3",
+          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+          "type": "chart",
+          "shortName": "postgresql",
+          "version": "0.9.3"
+        }
+      ],
+      "name": "alfresco-sync-service:3.0.2",
+      "description": "Alfresco Syncservice",
+      "type": "chart",
+      "shortName": "alfresco-sync-service",
+      "version": "3.0.2"
+    },
+    {
+      "keywords": [
+        "alfresco",
+        "digital workspace"
       ],
       "children": [{
-        "repoHost": "Docker Hub",
+        "repoHost": "quay.io",
         "children": [],
-        "name": "postgres",
+        "name": "alfresco/alfresco-digital-workspace",
         "type": "image",
-        "version": "11.4"
+        "version": "1.4.0"
       }],
-      "name": "postgresql:0.9.3",
-      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "name": "alfresco-digital-workspace:2.2.1",
+      "description": "A Helm chart for deploying Alfresco Digital Workspace application",
       "type": "chart",
-      "shortName": "postgresql",
-      "version": "0.9.3"
+      "shortName": "alfresco-digital-workspace",
+      "version": "2.2.1"
     },
     {
       "keywords": [
@@ -114,6 +154,24 @@
     },
     {
       "children": [
+        {
+          "keywords": [
+            "activemq",
+            "message broker"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-activemq",
+            "type": "image",
+            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
+          }],
+          "name": "activemq:1.1.1",
+          "description": "A Helm chart Providing Apache ActiveMQ.",
+          "type": "chart",
+          "shortName": "activemq",
+          "version": "1.1.1"
+        },
         {
           "maintainers": [{"name": "Alfresco"}],
           "keywords": [
@@ -158,24 +216,6 @@
           "type": "chart",
           "shortName": "alfresco-identity-service",
           "version": "1.1.0"
-        },
-        {
-          "keywords": [
-            "activemq",
-            "message broker"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-activemq",
-            "type": "image",
-            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
-          }],
-          "name": "activemq:1.1.1",
-          "description": "A Helm chart Providing Apache ActiveMQ.",
-          "type": "chart",
-          "shortName": "activemq",
-          "version": "1.1.1"
         },
         {
           "maintainers": [
@@ -226,65 +266,25 @@
       "version": "4.1.1"
     },
     {
+      "maintainers": [{"name": "databus23"}],
       "keywords": [
-        "alfresco",
-        "digital workspace"
+        "postgresql",
+        "postgres",
+        "database",
+        "sql"
       ],
       "children": [{
-        "repoHost": "quay.io",
+        "repoHost": "Docker Hub",
         "children": [],
-        "name": "alfresco/alfresco-digital-workspace",
+        "name": "postgres",
         "type": "image",
-        "version": "1.4.0"
+        "version": "11.4"
       }],
-      "name": "alfresco-digital-workspace:2.2.1",
-      "description": "A Helm chart for deploying Alfresco Digital Workspace application",
+      "name": "postgresql:0.9.3",
+      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
       "type": "chart",
-      "shortName": "alfresco-digital-workspace",
-      "version": "2.2.1"
-    },
-    {
-      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
-      "keywords": [
-        "syncservice",
-        "alfresco",
-        "application"
-      ],
-      "children": [
-        {
-          "repoHost": "quay.io",
-          "children": [],
-          "name": "alfresco/service-sync",
-          "type": "image",
-          "version": "3.3.1"
-        },
-        {
-          "maintainers": [{"name": "databus23"}],
-          "keywords": [
-            "postgresql",
-            "postgres",
-            "database",
-            "sql"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "postgres",
-            "type": "image",
-            "version": "10.1"
-          }],
-          "name": "postgresql:0.9.3",
-          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-          "type": "chart",
-          "shortName": "postgresql",
-          "version": "0.9.3"
-        }
-      ],
-      "name": "alfresco-sync-service:3.0.2",
-      "description": "Alfresco Syncservice",
-      "type": "chart",
-      "shortName": "alfresco-sync-service",
-      "version": "3.0.2"
+      "shortName": "postgresql",
+      "version": "0.9.3"
     }
   ],
   "name": "alfresco-content-services:3.0.8",

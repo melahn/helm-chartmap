@@ -47,21 +47,21 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-search-services\n=
 usecase "Image\n====\n\tquay.io\n====\n\talfresco/alfresco-libreoffice:2.0.17\n====\n\t2.0.17" as quay_io_alfresco_alfresco_libreoffice_2_0_17 #Khaki
 
 'Chart Dependencies
-alfresco_dbp_1_5_0--[#green]-|>alfresco_content_services_2_1_3
-alfresco_content_services_2_1_3--[#green]-|>alfresco_sync_service_1_1_1
-alfresco_sync_service_1_1_1--[#green]-|>postgresql_0_9_3
-alfresco_content_services_2_1_3--[#green]-|>postgresql_0_9_3
-alfresco_content_services_2_1_3--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_dbp_1_5_0--[#green]-|>alfresco_process_services_0_2_0
+alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
+alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
 alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
 alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
 alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
 alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
-alfresco_content_services_2_1_3--[#green]-|>alfresco_digital_workspace_2_2_0
+alfresco_dbp_1_5_0--[#green]-|>alfresco_content_services_2_1_3
 alfresco_content_services_2_1_3--[#green]-|>alfresco_search_1_0_1
+alfresco_content_services_2_1_3--[#green]-|>alfresco_digital_workspace_2_2_0
+alfresco_content_services_2_1_3--[#green]-|>postgresql_0_9_3
+alfresco_content_services_2_1_3--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_content_services_2_1_3--[#green]-|>alfresco_sync_service_1_1_1
+alfresco_sync_service_1_1_1--[#green]-|>postgresql_0_9_3
 alfresco_dbp_1_5_0--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_dbp_1_5_0--[#green]-|>alfresco_process_services_0_2_0
-alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
-alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_admin_1_10_0
@@ -84,5 +84,5 @@ nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2021/03/18 17:51:11 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2021/03/19 06:09:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

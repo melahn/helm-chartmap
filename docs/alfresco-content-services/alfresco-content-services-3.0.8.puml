@@ -41,16 +41,16 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-pdf-renderer\n====
 usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-tika\n====\n\t2.1.0" as alfresco_alfresco_tika_2_1_0 #DeepSkyBlue
 
 'Chart Dependencies
-alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
-alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
-alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
-alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
-alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
-alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
-alfresco_content_services_3_0_8--[#green]-|>alfresco_digital_workspace_2_2_1
 alfresco_content_services_3_0_8--[#green]-|>alfresco_sync_service_3_0_2
 alfresco_sync_service_3_0_2--[#green]-|>postgresql_0_9_3
+alfresco_content_services_3_0_8--[#green]-|>alfresco_digital_workspace_2_2_1
+alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
+alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
+alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
+alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
+alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
+alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_libreoffice_2_1_0
@@ -70,5 +70,5 @@ nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_in
 alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2021/03/18 17:50:36 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2021/03/19 06:09:27 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
