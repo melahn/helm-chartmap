@@ -7,6 +7,9 @@ helmdir=/Users/melahn/.helm
 docdir=../../docs
 pumlopt=-DPLANTUML_LIMIT_SIZE=8192
 
+# Update the local charts
+helm repo update
+
 # Alfresco Content Services
 chart=alfresco-content-services
 outdir=$docdir/$chart
@@ -46,6 +49,6 @@ outdir=$docdir/$chart
 java          -jar $jarfile -c "$chart:8.1.2" -o "$outdir/$chart-8.1.2.txt"  -d $helmdir
 java          -jar $jarfile -c "$chart:8.1.2" -o "$outdir/$chart-8.1.2.json" -d $helmdir
 java $pumlopt -jar $jarfile -c "$chart:8.1.2" -o "$outdir/$chart-8.1.2.puml" -d $helmdir -g
-java          -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-8.1.2.txt"  -d $helmdir
+java          -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.txt"  -d $helmdir
 java          -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.json" -d $helmdir
 java $pumlopt -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.puml" -d $helmdir -g
