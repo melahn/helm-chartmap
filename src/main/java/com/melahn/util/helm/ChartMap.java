@@ -15,6 +15,7 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,6 +31,7 @@ import java.io.FilenameFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.StandardCopyOption;
@@ -61,6 +63,7 @@ public class ChartMap {
     HashSet<String> env;
     private boolean generateImage;
     private String helmHome;
+    private enum helmMajorVersion { V2, V3 };
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     private String outputFilename;
@@ -195,9 +198,9 @@ public class ChartMap {
      * repo with charts, resolving the dependencies of the selected chart,
      * printing the Chart Map, then cleans up
      *
-     * @throws IOException  Throws IOException
+     * @throws Exception  Throws Exception
      */
-    public void print() throws IOException {
+    public void print() throws Exception {
         createTempDir();
         loadLocalRepos();
         resolveChartDependencies();
@@ -365,23 +368,94 @@ public class ChartMap {
     }
     /**
      * Finds all the local repositories the user has previously added (using for example
-     * 'helm repo add') and constructs a HelmChartReposLocal from them.   Then calls a method
-     * to load all the charts in that repo into the charts map where they are raw material for
-     * being referenced later
+     * 'helm repo add') and constructs a HelmChartReposLocal from them. Then calls a method
+     * to load all the charts found in that cache into the charts map where they are raw material 
+     * for use later.
+     * 
+     * @return void
      */
-    private void loadLocalRepos() throws IOException {
+    private void loadLocalRepos() throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            File reposYamlFile = new File(helmHome + "/repository/repositories.yaml");
-            localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
-            if (isVerbose()) {
-                printLocalRepos();
+            String helmRepoFilename = "";
+            helmMajorVersion version = getHelmVersion();
+            if (version == helmMajorVersion.V2) {
+                 // in v2 all the repos were nicely collected into a single yaml file in helm home
+                helmRepoFilename = helmHome.concat("/repository/repositories.yaml");
+            } else if (version == helmMajorVersion.V3) {
+                // in v3 the location of the repo list is os dependent
+                String repositoriesDirname = null;
+                if (SystemUtils.IS_OS_MAC_OSX) {
+                    repositoriesDirname = System.getenv("HOME").concat("/Library/Preferences/helm");
+                } else if (SystemUtils.IS_OS_LINUX) {
+                    repositoriesDirname = System.getenv("HOME").concat("/.config/helm");
+                } else if (SystemUtils.IS_OS_WINDOWS) {
+                    repositoriesDirname = System.getenv("APPDATA").concat("/helm");
+                } else {
+                    throw (new IOException("unknown OS"));
+                }
+                helmRepoFilename = repositoriesDirname.concat("/repositories.yaml");
             }
+            File reposYamlFile = new File(helmRepoFilename);
+            localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
+            // in helm v2, the cache location was set. In v3, it must be synthesized from
+            // an OS specific location
+            if (version == helmMajorVersion.V3) {
+                HelmChartRepoLocal[] repos = localRepos.getRepositories();
+                String cacheDirname = "";
+                if (SystemUtils.IS_OS_MAC_OSX) {
+                    cacheDirname = System.getenv("HOME").concat("/Library/Caches/helm");
+                } else if (SystemUtils.IS_OS_LINUX) {
+                    cacheDirname = System.getenv("HOME").concat("/.cache/helm");
+                } else if (SystemUtils.IS_OS_WINDOWS) {
+                    cacheDirname = System.getenv("TEMP").concat("/helm");
+                }
+                cacheDirname = cacheDirname.concat("/repository/");
+                for (HelmChartRepoLocal r : repos) {
+                    r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
+                }
+            }
+            printLocalRepos();
             loadLocalCharts();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
             throw (e);
+        }
+    }
+
+    /**
+     * Gets the major version of the helm client.  The helm version command offers templated output
+     * using go template syntax but the values were not designed to be forward or backward compatible (!) 
+     * hence the tortured logic here 
+     * 
+     * @return helmMajorVersion
+     */
+    private helmMajorVersion getHelmVersion() throws Exception {
+        String cmdArray[] = {"helm", "version", "--template", "{{ .Version }}" };
+        Process p = Runtime.getRuntime().exec(cmdArray);
+        p.waitFor(30000, TimeUnit.MILLISECONDS);
+        int exitCode = p.exitValue();
+        if (exitCode == 0 ) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                String o = br.readLine();
+                if (o != null && o.length()>1) {
+                    // in helm V3 the templated output of the command should look like 'v3.5.2'
+                    // so pick off the second character to get the major version
+                    if (o.charAt(1) == '3') {
+                        return helmMajorVersion.V3;
+                    } else {
+                        // in helm V2 there is no .Version variable so expect to get a complaint about that
+                        String nv = "<no value>";
+                        if (o.length() >= nv.length() && o.substring(0, nv.length()-1).equals(nv)) {
+                            return helmMajorVersion.V2;
+                        }
+                    }
+                }
+            }
+            throw new Exception("Unsupported Helm Version "); // we found neither V2 nor V3
+        }   
+         else { // we could not even execute the helm command
+            throw new Exception("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
         }
     }
 
@@ -431,8 +505,20 @@ public class ChartMap {
             for (Map.Entry<String, HelmChart[]> entry : entries.entrySet()) {
                 for (HelmChart h : entry.getValue()) {
                     // Here we remember the url of the chart repo in which we found the chart.
-                    // Note that this url cannot be inferred from the url of
+                    // Note that this url cannot be inferred from the url of the chart
                     h.setRepoUrl(r.getUrl());
+                    // some chart entries don't contain the full url (ie one starting with 'http')
+                    // but rather only contain a relative url and even that is not consistent.  We do
+                    // our best to construct a url from what we have
+                    if (h.getUrls()[0] != null && !h.getUrls()[0].substring(0,"http".length()).equals("http")) {
+                        String[] url = new String[1];
+                        url[0] = r.getUrl();
+                        if (url[0].charAt(url[0].length()-1) != '/') {
+                            url[0] = url[0].concat("/");
+                        }
+                        url[0] = url[0].concat(h.getUrls()[0]);
+                        h.setUrls(url);
+                    }                        
                     charts.put(h.getName(), h.getVersion(), h);
                 }
             }
