@@ -52,3 +52,10 @@ java $pumlopt -jar $jarfile -c "$chart:8.1.2" -o "$outdir/$chart-8.1.2.puml" -d 
 java          -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.txt"  -d $helmdir
 java          -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.json" -d $helmdir
 java $pumlopt -jar $jarfile -c "$chart:10.6.10" -o "$outdir/$chart-10.6.10.puml" -d $helmdir -g
+# Nuxeo
+chart=nuxeo
+outdir=$docdir/$chart
+java          -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.txt"  -d $helmdir 
+java          -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.json" -d $helmdir
+java $pumlopt -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.puml" -d $helmdir -g
+
