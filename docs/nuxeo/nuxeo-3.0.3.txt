@@ -1,0 +1,29 @@
+Chart Map for nuxeo:3.0.3
+
+There is one referenced Helm Chart
+----------------------------------
+Chart: nuxeo:3.0.3
+	apiVersion: v1
+	appVersion: Not specified
+	created: Not specified
+	dependencies: None
+	description: A Helm chart for Kubernetes
+	digest: Not specified
+	icon: Not specified
+	keywords: Not specified
+	maintainers: Not specified
+	repo url: https://chartmuseum.platform.dev.nuxeo.com/
+	name: nuxeo
+	sources: Not specified
+	urls: Not specified
+	version: 3.0.3
+
+There is one referenced Docker Image
+------------------------------------
+Image: docker.packages.nuxeo.com/nuxeo/nuxeo:latest
+
+Chart Dependencies
+------------------
+nuxeo:3.0.3 uses docker.packages.nuxeo.com/nuxeo/nuxeo:latest
+
+Generated on 2021/03/21 17:47:10 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

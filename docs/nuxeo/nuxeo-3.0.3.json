@@ -1,0 +1,14 @@
+{
+  "children": [{
+    "repoHost": "docker.packages.nuxeo.com",
+    "children": [],
+    "name": "nuxeo/nuxeo",
+    "type": "image",
+    "version": "latest"
+  }],
+  "name": "nuxeo:3.0.3",
+  "description": "A Helm chart for Kubernetes",
+  "type": "chart",
+  "shortName": "nuxeo",
+  "version": "3.0.3"
+}
