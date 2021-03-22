@@ -21,6 +21,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedInputStream;
@@ -63,9 +65,11 @@ public class ChartMap {
     HashSet<String> env;
     private boolean generateImage;
     private String helmHome;
+    private helmMajorVersion helmMajorVersionUsed;
     private enum helmMajorVersion { V2, V3 };
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
+    private static final Logger logger = LogManager.getLogger(ChartMap.class);
     private String outputFilename;
     private PrintFormat printFormat;
     private IChartMapPrinter printer;
@@ -216,23 +220,29 @@ public class ChartMap {
      * Initializes the instance variables
      */
     private void initialize() {
-        setChartName(null);
-        setOutputFilename(getDefaultOutputFilename());
-        setChartFilename(null);
-        setChartUrl(null);
-        setVerbose(false);
-        setHelmHome(getDefaultHelmHome());
-        setEnvFilename(null);
-        setTempDirName(null);
-        setPrintFormat(PrintFormat.TEXT);
-        setGenerateImage(false);
-        setRefreshLocalRepo(false);
-        charts = new MultiKeyMap();
-        chartsDependenciesPrinted = new HashSet<String>();
-        chartsReferenced = new MultiKeyMap();
-        env = new HashSet<String>();
-        imagesReferenced = new HashSet<>();
-        deploymentTemplatesReferenced = new HashMap<>();
+        try {
+            helmMajorVersionUsed = getHelmVersion();
+            setChartName(null);
+            setOutputFilename(getDefaultOutputFilename());
+            setChartFilename(null);
+            setChartUrl(null);
+            setVerbose(false);
+            setHelmHome(getDefaultHelmHome());
+            setEnvFilename(null);
+            setTempDirName(null);
+            setPrintFormat(PrintFormat.TEXT);
+            setGenerateImage(false);
+            setRefreshLocalRepo(false);
+            charts = new MultiKeyMap();
+            chartsDependenciesPrinted = new HashSet<String>();
+            chartsReferenced = new MultiKeyMap();
+            env = new HashSet<String>();
+            imagesReferenced = new HashSet<>();
+            deploymentTemplatesReferenced = new HashMap<>();
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     /**
@@ -379,11 +389,10 @@ public class ChartMap {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             String helmRepoFilename = "";
-            helmMajorVersion version = getHelmVersion();
-            if (version == helmMajorVersion.V2) {
+            if (helmMajorVersionUsed == helmMajorVersion.V2) {
                  // in v2 all the repos were nicely collected into a single yaml file in helm home
                 helmRepoFilename = helmHome.concat("/repository/repositories.yaml");
-            } else if (version == helmMajorVersion.V3) {
+            } else if (helmMajorVersionUsed == helmMajorVersion.V3) {
                 // in v3 the location of the repo list is os dependent
                 String repositoriesDirname = null;
                 if (SystemUtils.IS_OS_MAC_OSX) {
@@ -401,7 +410,7 @@ public class ChartMap {
             localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
             // in helm v2, the cache location was set. In v3, it must be synthesized from
             // an OS specific location
-            if (version == helmMajorVersion.V3) {
+            if (helmMajorVersionUsed == helmMajorVersion.V3) {
                 HelmChartRepoLocal[] repos = localRepos.getRepositories();
                 String cacheDirname = "";
                 if (SystemUtils.IS_OS_MAC_OSX) {
@@ -424,8 +433,10 @@ public class ChartMap {
     }
 
     /**
-     * Gets the major version of the helm client.  The helm version command offers templated output
-     * using go template syntax but the values were not designed to be forward or backward compatible (!) 
+     * Gets the major version of the helm client and sets helmMajorVersionUsed.
+     * 
+     * The helm version command offers templated output using go template syntax 
+     * but the values were not designed to be forward or backward compatible (!) 
      * hence the tortured logic here 
      * 
      * @return helmMajorVersion
@@ -442,17 +453,21 @@ public class ChartMap {
                     // in helm V3 the templated output of the command should look like 'v3.5.2'
                     // so pick off the second character to get the major version
                     if (o.charAt(1) == '3') {
-                        return helmMajorVersion.V3;
+                        helmMajorVersionUsed = helmMajorVersion.V3;
+                        logger.debug("Helm Version 3 detected");
+                         return helmMajorVersion.V3;
                     } else {
                         // in helm V2 there is no .Version variable so expect to get a complaint about that
                         String nv = "<no value>";
                         if (o.length() >= nv.length() && o.substring(0, nv.length()-1).equals(nv)) {
+                            helmMajorVersionUsed = helmMajorVersion.V2;
+                            logger.debug("Helm Version 2 detected");
                             return helmMajorVersion.V2;
                         }
                     }
                 }
             }
-            throw new Exception("Unsupported Helm Version "); // we found neither V2 nor V3
+            throw new Exception("Unsupported Helm Version"); // we found neither V2 nor V3
         }   
          else { // we could not even execute the helm command
             throw new Exception("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
