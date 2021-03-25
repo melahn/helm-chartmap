@@ -22,6 +22,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
+
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.BufferedReader;
@@ -47,7 +49,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.yaml.snakeyaml.Yaml;
 import com.melahn.util.helm.model.*;
-
 public class ChartMap {
 
     private String apprSpec;
@@ -70,15 +71,17 @@ public class ChartMap {
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     private static final Logger logger = LogManager.getLogger(ChartMap.class);
+    private Level logLevelVerbose;
     private String outputFilename;
     private PrintFormat printFormat;
     private IChartMapPrinter printer;
     private boolean refreshLocalRepo;
-    private final String startOfTemplate = "# Source: ";
+    private static final String START_OF_TEMPLATE = "# Source: ";
     private String tempDirName;
     private boolean verbose;
-    final private String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of the file we use to hold the rendered templates
-    final private int MAX_WEIGHT = 100;
+    private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of the file we use to hold the rendered templates
+    private static final int MAX_WEIGHT = 100;
+    private static final String TEMP_DIR = "Temporary Directory ";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -126,9 +129,9 @@ public class ChartMap {
             chartMap.parseArgs(arg);
             chartMap.print();
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            logger.error("IOException:".concat(e.getMessage()));
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            logger.error("IOException:".concat(e.getMessage()));
         }
     }
 
@@ -310,15 +313,32 @@ public class ChartMap {
             if (args.length == 0
                     || cmd.hasOption("h")
                     || count != 1) {
-                System.out.println(ChartMap.getHelp());
+                logger.info(ChartMap.getHelp());
                 System.exit(0);
             }
+            setLogLevel();
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             throw (e);
         }
     }
 
+    /**
+     * If the user has specified the verbose flag, set the log level so it has a higher priority 
+     * (ie. a lower level value) than the logger configured in log4j2.xml, which is 
+     * INFO (level 400). Otherwise set it to a higher level number so verbose log entries
+     * will be ignored.
+     * 
+     * @return level  the setting of logLevelVerbose
+    */
+    private Level setLogLevel() {
+        if (isVerbose()) {
+           logLevelVerbose = Level.forName("VERBOSE",350);  // higher priority than INFO
+        } else {
+           logLevelVerbose = Level.forName("VERBOSE",450);  // lower priority than INFO 
+        }
+        return logLevelVerbose;
+    }
     /**
      * Parses a Appr Specification of the format <chart-repp>/<org>/<chart-name>@<chart-version>
      * and sets the values chartName and chartVersion
@@ -1318,13 +1338,13 @@ public class ChartMap {
         try (FileReader fileReader = new FileReader(f);BufferedReader bufferedReader = new BufferedReader(fileReader);){
             line = bufferedReader.readLine();
             while (line != null) {
-                if (line.length() > (startOfTemplate + chartName).length() && line.charAt(0) == '#') {
+                if (line.length() > (START_OF_TEMPLATE + chartName).length() && line.charAt(0) == '#') {
                     // a pattern like this  <chartName>/templates/... means that this is
                     // a template of immediate interest to the chart e.g. alfresco-content-services/templates
                     String[] s = line.split(File.separator, 3);
                     Boolean b = Boolean.FALSE;
                     if (s.length > 1
-                            && s[0].equals(startOfTemplate + chartName)
+                            && s[0].equals(START_OF_TEMPLATE + chartName)
                             && s[1].equals("templates")
                             && !line.endsWith(RENDERED_TEMPLATE_FILE)) {  // ignore the template file we generate
                         b = Boolean.TRUE; // the yaml files in this section are ones we care about
@@ -1333,7 +1353,7 @@ public class ChartMap {
                     while (!endOfYamlInFile) { // read until you find the end of this yaml object
                         line = bufferedReader.readLine();
                         // EOF or the start of a new yaml section means the current object is completely read
-                        if (line == null || (line.startsWith(startOfTemplate))) {
+                        if (line == null || (line.startsWith(START_OF_TEMPLATE))) {
                             endOfYamlInFile = true;
                             a.add(b);
                         }
@@ -1364,15 +1384,15 @@ public class ChartMap {
         try (FileReader fileReader = new FileReader(f);BufferedReader bufferedReader = new BufferedReader(fileReader);){
             line = bufferedReader.readLine();
             while (line != null) {
-                if (line.startsWith(startOfTemplate)) {
-                    String[] s = line.split(startOfTemplate, line.length());
+                if (line.startsWith(START_OF_TEMPLATE)) {
+                    String[] s = line.split(START_OF_TEMPLATE, line.length());
                     String fileName = s[1];
                     boolean endOfYamlInFile = false;
                     line = bufferedReader.readLine();
                     while (!endOfYamlInFile) { // read until you find the end of this yaml object
                         line = bufferedReader.readLine();
                         // EOF or the start of a new yaml section means the current object is completely read
-                        if (line == null || (line.startsWith(startOfTemplate))) {
+                        if (line == null || (line.startsWith(START_OF_TEMPLATE))) {
                             endOfYamlInFile = true;
                             a.add(d.getAbsolutePath() + File.separator + fileName);
                         }                     
@@ -1584,10 +1604,10 @@ public class ChartMap {
             Path p = Files.createTempDirectory(this.getClass().getCanonicalName() + ".");
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
             if (isVerbose()) {
-                System.out.println("Temporary Directory " + getTempDirName() + " will be used");
+                logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," will be used");
             }
         } catch (IOException e) {
-            System.out.println("Error creating temp directory: " + e.getMessage());
+            logger.error("%s%s","Error creating temp directory: ",e.getMessage());
             throw (e);
         }
     }
@@ -1597,7 +1617,7 @@ public class ChartMap {
      */
     private void removeTempDir() throws IOException {
         if (isDebug()) {
-            System.out.println("Temporary Directory " + getTempDirName() + " was not removed");
+            System.out.println(TEMP_DIR + getTempDirName() + " was not removed");
         } else {
             Path directory = Paths.get(getTempDirName());
             try {
@@ -1615,7 +1635,7 @@ public class ChartMap {
                     }
                 });
                 if (isVerbose()) {
-                    System.out.println("Temporary Directory " + getTempDirName() + " removed");
+                    System.out.println(TEMP_DIR + getTempDirName() + " removed");
                 }
             } catch (IOException e) {
                 System.out.println("Error <" + e.getMessage() + "> removing temporary directory " + getTempDirName());
