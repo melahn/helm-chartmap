@@ -15,6 +15,7 @@ import java.io.IOException;
 public class PlantUmlChartMapPrinter extends ChartMapPrinter {
 
     private String[] colors;
+    private static String SEPARATOR = "\\n====\\n";
 
     /**
      * Constructor
@@ -39,7 +40,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
     @Override
     public void printHeader() throws IOException {
         writeLine("@startuml");
-        writeLine("skinparam linetype ortho");  // TODO: get these from config
+        writeLine("skinparam linetype ortho");  
         writeLine("skinparam backgroundColor white");
         writeLine("skinparam usecaseBorderColor black");
         writeLine("skinparam usecaseArrowColor LightSlateGray");
@@ -102,7 +103,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      */
     @Override
      public void printImage(String imageName)  throws IOException {
-        //     image: "quay.io/alfresco/service-sync:2.2-SNAPSHOT"
+        // e.g. image: "quay.io/alfresco/service-sync:2.2-SNAPSHOT"
         writeLine("usecase \"" + getImageBody(imageName) + "\" as " + getNameAsPlantUmlReference(imageName) + " " + getImageArtifactColor(imageName));
     }
 
@@ -198,7 +199,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return      PlantUML text for a separator
      */
     private String getSeparator() {
-        return "\\n====\\n";
+        return SEPARATOR;
     }
 
     /**
@@ -209,19 +210,19 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *              commas
      */
     private String getMaintainers(HelmMaintainer[] m) {
-        String maintainers = "Maintainers: ";
+        StringBuilder maintainers = new StringBuilder("Maintainers: ");
         boolean first = true;
         if (m != null) {
             for (HelmMaintainer hm : m) {
                 if (first) {
-                    maintainers += hm.getName();
+                    maintainers.append(hm.getName());
                     first = false;
                 } else {
-                    maintainers += ", " + hm.getName();
+                    maintainers.append(", " + hm.getName());
                 }
             }
         }
-        return maintainers;
+        return maintainers.toString();
     }
 
     /**
@@ -231,19 +232,19 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return      a formatted String of the keywords one per line
      */
     private String getKeywords(String[] k) {
-        String keywords = "Keywords: ";
+        StringBuilder keywords = new StringBuilder("Keywords: ");
         boolean first = true;
         if (k != null) {
             for (String aKeyword : k) {
                 if (first) {
-                    keywords += aKeyword;
+                    keywords.append(aKeyword);
                     first = false;
                 } else {
-                    keywords += "\\n" + aKeyword;
+                    keywords.append("\\n").append(aKeyword);
                 }
             }
         }
-        return keywords;
+        return keywords.toString();
     }
 
     /**
