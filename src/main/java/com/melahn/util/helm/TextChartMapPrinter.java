@@ -9,7 +9,7 @@ import com.melahn.util.helm.model.HelmChart;
 
 public class TextChartMapPrinter extends ChartMapPrinter {
 
-    public TextChartMapPrinter(String outputFilename, MultiKeyMap charts, HelmChart chart) {
-        super(outputFilename, charts, chart);
+    public TextChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
+        super(chartMap, outputFilename, charts, chart);
     }
 }

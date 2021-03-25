@@ -70,8 +70,8 @@ public class ChartMap {
     private enum helmMajorVersion { V2, V3 };
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
-    private static final Logger logger = LogManager.getLogger(ChartMap.class);
-    private Level logLevelVerbose;
+    protected final Logger logger = LogManager.getLogger(ChartMap.class);
+    protected Level logLevelVerbose;
     private String outputFilename;
     private PrintFormat printFormat;
     private IChartMapPrinter printer;
@@ -129,9 +129,9 @@ public class ChartMap {
             chartMap.parseArgs(arg);
             chartMap.print();
         } catch (IOException e) {
-            logger.error("IOException:".concat(e.getMessage()));
+            chartMap.logger.error("IOException:".concat(e.getMessage()));
         } catch (Exception e) {
-            logger.error("IOException:".concat(e.getMessage()));
+            chartMap.logger.error("IOException:".concat(e.getMessage()));
         }
     }
 
@@ -1415,11 +1415,11 @@ public class ChartMap {
             if (chart != null) {
                 detectPrintFormat(outputFilename);
                 if (printFormat.equals(PrintFormat.PLANTUML)) {
-                    printer = new PlantUmlChartMapPrinter(outputFilename, charts, chart);
+                    printer = new PlantUmlChartMapPrinter(this, outputFilename, charts, chart);
                 } else if (printFormat.equals(PrintFormat.JSON)) {
-                    printer = new JSONChartMapPrinter(outputFilename, charts, chart);
+                    printer = new JSONChartMapPrinter(this, outputFilename, charts, chart);
                 } else {
-                    printer = new TextChartMapPrinter(outputFilename, charts, chart);
+                    printer = new TextChartMapPrinter(this, outputFilename, charts, chart);
                 }
                 // JSON print formats are handled differently because the charts, images
                 // and dependencies are intermingled in a tree

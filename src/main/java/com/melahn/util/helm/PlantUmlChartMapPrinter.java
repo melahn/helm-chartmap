@@ -20,14 +20,15 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
     /**
      * Constructor
      *
+     * @param   chartMap        the instance of chartMap using this printer
      * @param   outputFilename  the name of the PlantUML file to be created.
      * @param   charts          a multi-key map of all the Helm Charts that
      *                          might be referenced.  The map is keyed by
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public PlantUmlChartMapPrinter(String outputFilename, MultiKeyMap charts, HelmChart chart) {
-        super(outputFilename, charts, chart);
+    public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
+        super(chartMap, outputFilename, charts, chart);
         initializeColors();
     }
 

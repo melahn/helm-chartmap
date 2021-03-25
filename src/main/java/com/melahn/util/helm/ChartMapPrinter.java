@@ -15,17 +15,20 @@ import com.melahn.util.helm.model.HelmChart;
 public class ChartMapPrinter implements IChartMapPrinter {
 
     protected HelmChart chart;
+    protected ChartMap chartMap;
     protected String outputFilename;
     protected int indent=2; // indent for tree view
     protected FileWriter writer;
+    private static final String NOT_SPECIFIED = "Not specified";
 
-    ChartMapPrinter(String outputFilename, MultiKeyMap charts, HelmChart chart) {
+    ChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
         this.outputFilename = outputFilename;
         this.chart = chart;
+        this.chartMap = chartMap;
         try {
             writer = new FileWriter(outputFilename);
         } catch (IOException e) {
-            System.out.println("Error creating FileWriter for file " + outputFilename + " : " + e.getMessage());
+            chartMap.logger.error("{}{}{}{}","Error creating FileWriter for file ",outputFilename, " : ", e.getMessage());
         }
     }
 
@@ -34,17 +37,17 @@ public class ChartMapPrinter implements IChartMapPrinter {
             writer.write(l + "\n");
             writer.flush();
         } catch (IOException e) {
-            System.out.println("Error writing line to file " + outputFilename);
+            chartMap.logger.error("{}{}","Error writing line to file ",outputFilename);
             throw (e);
         }
     }
 
-    String formatString(String v) {
-        if (v == null || v.trim().isEmpty() ) {
-            return "Not specified";
+    String formatString(String s) {
+        if (s == null || s.trim().isEmpty() ) {
+            return NOT_SPECIFIED;
         }
         else {
-            return v;
+            return s;
         }
     }
 
@@ -98,7 +101,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
     }
 
     public void printSectionHeader(String header) throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for(int c = 1; c <= header.length(); c++){
             sb.append('-');
         }
@@ -169,7 +172,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
             }
         }
         else {
-            sb = sb.append("Not specified");
+            sb = sb.append(NOT_SPECIFIED);
         }
         return sb.toString();
     }
@@ -197,14 +200,14 @@ public class ChartMapPrinter implements IChartMapPrinter {
             }
         }
         else {
-            sb = sb.append(("Not specified"));
+            sb = sb.append((NOT_SPECIFIED));
         }
         return sb.toString();
     }
 
     private String formatDependencies(HashSet<HelmChart> d) {
         StringBuilder sb = new StringBuilder("");
-        if (d.size() == 0) {
+        if (d.isEmpty()) {
             sb.append("None");
         } else {
             boolean first = true;
