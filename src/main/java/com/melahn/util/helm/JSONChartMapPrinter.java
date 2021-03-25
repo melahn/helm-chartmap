@@ -36,7 +36,9 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *
      * @throws IOException      IOException
      */
+    @Override
     public void printHeader() throws IOException {
+        /* For JSON there is no header */
     }
 
     /**
@@ -44,8 +46,9 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *
      * @throws IOException      IOException
      */
+    @Override
     public void printFooter() throws IOException {
-        // NOP
+        /* For JSON there is no footer */
     }
 
     /**
@@ -55,7 +58,8 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   c   a Helm chart
      * @throws  IOException     IOException
      */
-    public void printTree(HelmChart c) throws IOException {
+    @Override
+     public void printTree(HelmChart c) throws IOException {
         // create a root JSON object to get started
         JSONObject j = new JSONObject();  // root object
         addChartToObject(c, null, j); // recursively fill out the  rest of the tree
@@ -164,9 +168,9 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      */
     private void printObject(JSONObject j) throws IOException {
         String s = j.toString(indent);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename));
-        writer.write(s);
-        writer.close();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename))) {
+            writer.write(s);
+        }
     }
 
     /**
@@ -178,7 +182,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
     public void addImageDetails(String i, JSONObject j) {
         //     image: "quay.io/alfresco/service-sync:2.2-SNAPSHOT"
         String repoHost="Docker Hub";
-        String imageName = i;
+        String imageName;
         String version="not specified";
         int count = i.length() - i.replace("/", "").length();
         if (count == 0) { // e.g. postgres:9.6.2
@@ -204,8 +208,9 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   header the header to be written
      * @throws  IOException     IOException
      */
-    public void printSectionHeader(String header) throws IOException {
-        // NOP
+    @Override
+     public void printSectionHeader(String header) throws IOException {
+       /* For JSON there is no section header */
     }
 
 }
