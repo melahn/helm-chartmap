@@ -1,6 +1,5 @@
 package com.melahn.util.helm;
 
-import com.melahn.util.helm.model.HelmDeploymentContainer;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
 import com.melahn.util.helm.model.HelmChart;
@@ -37,6 +36,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @throws IOException      IOException
      */
+    @Override
     public void printHeader() throws IOException {
         writeLine("@startuml");
         writeLine("skinparam linetype ortho");  // TODO: get these from config
@@ -55,6 +55,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @throws IOException      IOException
      */
+    @Override
     public void printFooter() throws IOException {
         writeLine("");
         writeLine("center footer Generated on " + getCurrentDateTime() + " by " + this.getClass().getCanonicalName() + "\\n" + getGitHubRepoURL());
@@ -68,7 +69,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param   dependentChart  a Helm Chart on which the parent Helm Chart depends
      * @throws  IOException     IOException
      */
-    public void printChartToChartDependency(HelmChart parentChart, HelmChart dependentChart) throws IOException {
+    @Override
+     public void printChartToChartDependency(HelmChart parentChart, HelmChart dependentChart) throws IOException {
         writeLine(getNameAsPlantUmlReference(parentChart.getNameFull()) + "--[#green]-|>" + getNameAsPlantUmlReference(dependentChart.getNameFull()));
     }
 
@@ -79,7 +81,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param   imageName       the name of a Docker Image on which the Helm Chart depends
      * @throws  IOException     IOException
      */
-    public void printChartToImageDependency(HelmChart chart, String imageName) throws IOException {
+    @Override
+     public void printChartToImageDependency(HelmChart chart, String imageName) throws IOException {
         writeLine(getNameAsPlantUmlReference(chart.getNameFull()) + "--[#orange]-|>" + getNameAsPlantUmlReference(imageName));
     }
 
@@ -89,14 +92,16 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param   chart   a Helm Chart
      * @throws  IOException     IOException
      */
-    public void printChart(HelmChart chart) throws IOException {
+    @Override
+     public void printChart(HelmChart chart) throws IOException {
         writeLine("artifact \"" + chart.getNameFull() + getComponentBody(chart) + "\" as " + getNameAsPlantUmlReference(chart.getNameFull()) + " " + getChartArtifactColor(chart));
     }
 
     /**
      * Writes a line to depict a Docker Image
      */
-    public void printImage(String imageName)  throws IOException {
+    @Override
+     public void printImage(String imageName)  throws IOException {
         //     image: "quay.io/alfresco/service-sync:2.2-SNAPSHOT"
         writeLine("usecase \"" + getImageBody(imageName) + "\" as " + getNameAsPlantUmlReference(imageName) + " " + getImageArtifactColor(imageName));
     }
@@ -107,7 +112,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param   comment the comment to be written
      * @throws  IOException     IOException
      */
-    public void printComment(String comment) throws IOException {
+    @Override
+     public void printComment(String comment) throws IOException {
         writeLine("'" + comment);
     }
 
@@ -117,7 +123,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param   header the header to be written
      * @throws  IOException     IOException
      */
-    public void printSectionHeader(String header) throws IOException {
+    @Override
+     public void printSectionHeader(String header) throws IOException {
         writeLine("");
         writer.write("'" + header + "\n");
     }
@@ -269,11 +276,6 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         return "#" + colors[hashValue];
     }
 
-    private String getContainerArtifactColor(HelmDeploymentContainer c) {
-        int hashValue = hashHelmContainerName(c);
-        return "#" + colors[hashValue];
-    }
-
     /**
      *
      * @param   imageName   the name of a Docker Image for which you want a background color
@@ -300,27 +302,6 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      */
     private int hashHelmChartName(HelmChart h) {
         int hashCode =  (h.getName().hashCode() * Integer.MAX_VALUE) / (Integer.MAX_VALUE / (getColors().length) * 2);
-        hashCode = Math.abs(hashCode);
-        return hashCode;
-    }
-
-    /**
-     *
-     * @param   c  a HelmDeploymentContainer from which a hash code will be
-     *              generated (for the purpose of indexing into
-     *              the colors array).   Only the name of the
-     *              Containers is used to create the hash because
-     *              the main point of choosing a color is to associate
-     *              visually a group of related Containers in the
-     *              diagram (e.g. all the Postgresql Containers may be
-     *              colored as 'Chocolate').
-     *
-     * @return      a calculated hash value aa an unsigned int
-     */
-    private int hashHelmContainerName(HelmDeploymentContainer c) {
-        String[] s = c.getImage().split(":");
-        String baseName = s[0];
-        int hashCode =  (baseName.hashCode() * Integer.MAX_VALUE) / (Integer.MAX_VALUE / (getColors().length) * 2);
         hashCode = Math.abs(hashCode);
         return hashCode;
     }
