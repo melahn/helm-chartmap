@@ -43,8 +43,8 @@ public class HelmChart {
      *
      * @return a collection of the containers referenced by this chart
      */
-    public HashSet<HelmDeploymentContainer> getContainers() {
-        HashSet<HelmDeploymentContainer> containers = new HashSet<HelmDeploymentContainer>();
+    public Set<HelmDeploymentContainer> getContainers() {
+        HashSet<HelmDeploymentContainer> containers = new HashSet<>();
         for (HelmDeploymentTemplate t : deploymentTemplates) {
             HelmDeploymentContainer c=null;
             HelmDeploymentContainer[] hdc = t.getSpec().getTemplate().getSpec().getContainers();
@@ -96,28 +96,28 @@ public class HelmChart {
         created = s;
     }
 
-    public HashSet<HelmChart> getDependencies() {
+    public Set<HelmChart> getDependencies() {
         return dependencies;
     }
 
     public void setDependencies(Set<HelmChart> d) {
-        dependencies = (HashSet)d;
+        dependencies = (HashSet<HelmChart>)d;
     }
 
-    public HashSet<HelmChart> getDiscoveredDependencies() {
+    public Set<HelmChart> getDiscoveredDependencies() {
         return discoveredDependencies;
     }
 
     public void setDiscoveredDependencies(Set<HelmChart> d) {
-        discoveredDependencies = (HashSet)d;
+        discoveredDependencies = (HashSet<HelmChart>)d;
     }
 
     public Set<HelmDeploymentTemplate> getDeploymentTemplates() {
         return deploymentTemplates;
     }
 
-    public void setDeploymentTemplates(HashSet<HelmDeploymentTemplate> deploymentTemplates) {
-        this.deploymentTemplates = deploymentTemplates;
+    public void setDeploymentTemplates(Set<HelmDeploymentTemplate> deploymentTemplates) {
+        this.deploymentTemplates = (HashSet<HelmDeploymentTemplate>) deploymentTemplates;
     }
 
     public String getDescription() {

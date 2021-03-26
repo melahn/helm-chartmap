@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.Iterator;
 
 import com.melahn.util.helm.model.HelmMaintainer;
@@ -205,7 +205,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
         return sb.toString();
     }
 
-    private String formatDependencies(HashSet<HelmChart> d) {
+    private String formatDependencies(Set<HelmChart> d) {
         StringBuilder sb = new StringBuilder("");
         if (d.isEmpty()) {
             sb.append("None");

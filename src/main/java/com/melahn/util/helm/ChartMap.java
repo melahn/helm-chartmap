@@ -1134,7 +1134,7 @@ public class ChartMap {
      * @param h The current Helm Chart
      */
     private void collectContainers(HelmChart h) {
-        HashSet<HelmDeploymentContainer> containers = h.getContainers();
+        HashSet<HelmDeploymentContainer> containers = (HashSet<HelmDeploymentContainer>)h.getContainers();
         for (HelmDeploymentContainer c : containers) {
             imagesReferenced.add(c.getImage());
         }
