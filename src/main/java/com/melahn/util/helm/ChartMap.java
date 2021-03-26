@@ -85,6 +85,8 @@ public class ChartMap {
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
+    private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
+    private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -1157,116 +1159,137 @@ public class ChartMap {
                 // skip rendering library charts (these were intruduced in Helm V3)
                 return;
             }
-            String command = "helm ";
-            // Get any variables the user may have specified and
-            // append to the command
-            List<String> envVars = getEnvVars();
-            if (!envVars.isEmpty()) {
-                command = command.concat(" --set \"");
-                for (int i = 0; i < envVars.size(); i ++) {
-                  command = command.concat(envVars.get(i));
-                  if (i<envVars.size()-1) {
-                    command = command.concat(",");
+            File templateFile = runTemplateCommand(dir, h);
+            ArrayList<Boolean> a = getTemplateArray(templateFile, h.getName());
+            ArrayList<String> b = getTemplateArray(dir, templateFile);
+            int i = 0;
+            Yaml yaml = new Yaml();
+            InputStream input = new FileInputStream(templateFile);
+            for (Object data : yaml.loadAll(input)) {  // there may multiple yaml documents in this one document
+                // inspect the object to see if it is a Deployment or a StatefulSet template
+                // if it is add to the deploymentTemplates array
+                if (data instanceof Map) { // todo is this needed?   should it not always be a Map?
+                    Map m = (Map) data;
+                    Object o = m.get("kind");
+                    if (o instanceof String) {
+                        String v = (String) o;
+                        if (v.equals("Deployment") || v.equals("StatefulSet")) {
+                            String s = yaml.dump(m);
+                            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                            HelmDeploymentTemplate template = mapper.readValue(s, HelmDeploymentTemplate.class);
+                            // remember the parent
+                            HelmDeploymentContainer[] containers = template.getSpec().getTemplate().getSpec().getContainers();
+                            for (HelmDeploymentContainer c: containers) {
+                                c._setParent(p);
+                            }
+                            // if this template is a child of this chart remember that fact
+                            if (a.get(i)) {
+                                template._setFileName(b.get(i));  // is this needed?
+                                h.getDeploymentTemplates().add(template);
+                            }
+                            // cases:
+                            // 1.  The Chart has a dependency on this template and nothing supercedes it in some parent chart
+                            // 2.  The Chart has a dependency on this template and a superceding version of this template has already been found
+                            // 3.  The Chart has a dependency on this template and a superceding version of this template will be found later
+                            WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
+                            if (weightedTemplate == null) {
+                                weightedTemplate = new WeightedDeploymentTemplate(dir.getAbsolutePath(), template);
+                                deploymentTemplatesReferenced.put(b.get(i), weightedTemplate);
+                            } else {
+                                // remember the parent
+                                containers = weightedTemplate.getTemplate().getSpec().getTemplate().getSpec().getContainers();
+                                for (HelmDeploymentContainer c: containers) {
+                                    c._setParent(p);
+                                }
+                                if (weightedTemplate.getWeight() > getWeight(dir.getAbsolutePath())) {
+                                    // a superceding template was found so replace the template that is referenced in the
+                                    // global list of templates
+                                    weightedTemplate.setTemplate(template);
+                                }
+                            }
+                        }
                     }
-                    else {
-                        command = command.concat("\" ");
-                    }
+                    i++; // index to the next element in the array that indicates whether the template is of interest for the current chart level
                 }
             }
-            command = command.concat("template ").concat(h.getName());
+        } catch (Exception e) {
+            logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
+        }
+    }
+
+    /**
+     * Runs the helm template command
+     *
+     * @param dir       the directory in which to run the
+     *                  command
+     * @param helmChart the helm chart on which the 
+     *                  template command should be run
+     * @return          the template file that was generated
+     * 
+     */
+    private File runTemplateCommand(File dir, HelmChart h) throws Exception {
+        String command = "helm ";
+        int exitCode = -1;
+        // Get any variables the user may have specified and
+        // append to the command
+        List<String> envVars = getEnvVars();
+        if (!envVars.isEmpty()) {
+            command = command.concat(" --set \"");
+            for (int i = 0; i < envVars.size(); i ++) {
+              command = command.concat(envVars.get(i));
+              if (i<envVars.size()-1) {
+                command = command.concat(",");
+                }
+                else {
+                    command = command.concat("\" ");
+                }
+            }
+        }
+        command = command.concat("template ").concat(h.getName());
+        File f=null;
+        try {
             Process r = Runtime.getRuntime().exec(command, null, dir);
-            BufferedInputStream in = new BufferedInputStream(r.getInputStream());
+            BufferedInputStream bis = new BufferedInputStream(r.getInputStream());
             File templateDir = new File(
-                    dir.getAbsolutePath() + File.separator + h.getName()
-                    + File.separator + "templates");
+                dir.getAbsolutePath() + File.separator + h.getName()
+                + File.separator + "templates");
             templateDir.mkdirs();
             String templateFilename = this.getClass().getCanonicalName() + RENDERED_TEMPLATE_FILE;
-            File f = new File(templateDir, templateFilename);
+            f = new File(templateDir, templateFilename);
             if (!f.createNewFile()) {
                 throw new Exception("File: " + f.getAbsolutePath() + " could not be created.");
             }
-            BufferedOutputStream out =
-                    new BufferedOutputStream(
-                            new FileOutputStream(f));
-            byte[] bytes = new byte[16384];
-            int len;
-            while ((len = in.read(bytes)) > 0) {
-                out.write(bytes, 0, len);
+            try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));) 
+            {
+                byte[] bytes = new byte[16384];
+                int len;
+                while ((len = bis.read(bytes)) > 0) {
+                    bos.write(bytes, 0, len);
+                }
+                r.waitFor(30000, TimeUnit.MILLISECONDS);
+                exitCode = r.exitValue();
             }
-            in.close();
-            out.close();
-            r.waitFor(30000, TimeUnit.MILLISECONDS);
-            int exitCode = r.exitValue();
-            // If an error occurs it is likely due to a helm chart like a missing required property so
-            // let the user know about it.  It's not fatal but could result in an incomplete chart map
+            finally {
+                bis.close();
+            }
             if (exitCode != 0) {
                 String message;
                 InputStream err = r.getErrorStream();
                 BufferedReader br =
-                        new BufferedReader(new java.io.InputStreamReader(err));
+                    new BufferedReader(new java.io.InputStreamReader(err));
                 while ((message = br.readLine()) != null) {
-                    System.err.println(message);
+                    logger.error(message);
                 }
                 err.close();
                 throw new Exception("Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
-            } else {
-                ArrayList<Boolean> a = getTemplateArray(f, h.getName());
-                ArrayList<String> b = getTemplateArray(dir, f);
-                int i = 0;
-                Yaml yaml = new Yaml();
-                InputStream input = new FileInputStream(f);
-                for (Object data : yaml.loadAll(input)) {  // there may multiple yaml documents in this one document
-                    // inspect the object to see if it is a Deployment or a StatefulSet template
-                    // if it is add to the deploymentTemplates array
-                    if (data instanceof Map) { // todo is this needed?   should it not always be a Map?
-                        Map m = (Map) data;
-                        Object o = m.get("kind");
-                        if (o instanceof String) {
-                            String v = (String) o;
-                            if (v.equals("Deployment") || v.equals("StatefulSet")) {
-                                String s = yaml.dump(m);
-                                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                                HelmDeploymentTemplate template = mapper.readValue(s, HelmDeploymentTemplate.class);
-                                // remember the parent
-                                HelmDeploymentContainer[] containers = template.getSpec().getTemplate().getSpec().getContainers();
-                                for (HelmDeploymentContainer c: containers) {
-                                    c._setParent(p);
-                                }
-                                // if this template is a child of this chart remember that fact
-                                if (a.get(i)) {
-                                    template._setFileName(b.get(i));  // is this needed?
-                                    h.getDeploymentTemplates().add(template);
-                                }
-                                // cases:
-                                // 1.  The Chart has a dependency on this template and nothing supercedes it in some parent chart
-                                // 2.  The Chart has a dependency on this template and a superceding version of this template has already been found
-                                // 3.  The Chart has a dependency on this template and a superceding version of this template will be found later
-                                WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
-                                if (weightedTemplate == null) {
-                                    weightedTemplate = new WeightedDeploymentTemplate(dir.getAbsolutePath(), template);
-                                    deploymentTemplatesReferenced.put(b.get(i), weightedTemplate);
-                                } else {
-                                    // remember the parent
-                                    containers = weightedTemplate.getTemplate().getSpec().getTemplate().getSpec().getContainers();
-                                    for (HelmDeploymentContainer c: containers) {
-                                        c._setParent(p);
-                                    }
-                                    if (weightedTemplate.getWeight() > getWeight(dir.getAbsolutePath())) {
-                                        // a superceding template was found so replace the template that is referenced in the
-                                        // global list of templates
-                                        weightedTemplate.setTemplate(template);
-                                    }
-                                }
-                            }
-                        }
-                        i++; // index to the next element in the array that indicates whether the template is of interest for the current chart level
-                    }
-                }
             }
-        } catch (Exception e) {
-            System.out.println("Exception rendering template for " + h.getNameFull() + " : " + e.getMessage());
         }
+        catch (Exception e) {
+            logger.error("Exception: {} running template command: {} ", e.getMessage(), command);
+            throw(e);
+        }
+        return f;
     }
 
     /**
@@ -1278,7 +1301,7 @@ public class ChartMap {
      *              may be empty since such environment variables are not
      *              mandatory
      */
-    List<String> getEnvVars() throws Exception {
+    private List<String> getEnvVars() throws Exception {
         ArrayList<String> envVars = new ArrayList<>();
         if (envFilename != null) {
             try {
@@ -1289,7 +1312,7 @@ public class ChartMap {
                 Map<String, String> vars = env.getEnvironment();
                 vars.forEach((k, v) -> envVars.add(getEscapedVariable(k + "=") + v));
             } catch (Exception e) {
-                System.out.println("Error reading Environment Variables File " + envFilename + " : " + e.getMessage());
+                logger.error(LOG_FORMAT_4, "Error reading Environment Variables File ", envFilename, " : ", e.getMessage());
                 throw e;
             }
         }
@@ -1302,7 +1325,7 @@ public class ChartMap {
      *              V3 though I don't see any documentation about it
      * @return      String with '-' escaped
      */
-    String getEscapedVariable (String v) {
+    private String getEscapedVariable (String v) {
         return v.replace("-","\\-");
     }
 
@@ -1478,7 +1501,7 @@ public class ChartMap {
             }
         }
         catch (IOException e) {
-            logger.error("{}{}{}{}{}{}{}{}{}", "Error generating image file", d, "/", i.getFileName(), " from ", d, "/", f, " : ", e);
+            logger.error(LOG_FORMAT_9, "Error generating image file", d, "/", i.getFileName(), " from ", d, "/", f, " : ", e);
         }
     }
 
@@ -1509,7 +1532,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            logger.error("{}{}","Error printing chart dependencies: ", e.getMessage());
+            logger.error(LOG_FORMAT_2, "Error printing chart dependencies: ", e.getMessage());
         }
     }
 
@@ -1528,7 +1551,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            logger.error("{}{}","Error printing image dependencies: ", e.getMessage());
+            logger.error(LOG_FORMAT_2, "Error printing image dependencies: ", e.getMessage());
         }
     }
 
@@ -1546,7 +1569,7 @@ public class ChartMap {
                 printer.printImage(s);
             }
         } catch (IOException e) {
-            logger.error("{}{}","Error printing images: ", e.getMessage());
+            logger.error(LOG_FORMAT_2, "Error printing images: ", e.getMessage());
         }
     }
 
@@ -1605,7 +1628,7 @@ public class ChartMap {
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
             logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," will be used");
         } catch (IOException e) {
-            logger.error("%s%s","Error creating temp directory: ",e.getMessage());
+            logger.error(LOG_FORMAT_2, "Error creating temp directory: ", e.getMessage());
             throw (e);
         }
     }
@@ -1632,9 +1655,9 @@ public class ChartMap {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-                logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," removed");
+                logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
             } catch (IOException e) {
-                logger.error("{}{}{}{}","Error <",e.getMessage(),"> removing temporary directory ",getTempDirName());
+                logger.error(LOG_FORMAT_4, "Error <",e.getMessage(), "> removing temporary directory ", getTempDirName());
                 throw (e);
             }
         }
@@ -1651,7 +1674,7 @@ public class ChartMap {
     }
 
     private String getDefaultOutputFilename() {
-        return "chartmap.text";
+        return DEFAULT_OUTPUT_FILENAME;
     }
 
     private void setChartName(String chartName) {
@@ -1704,10 +1727,6 @@ public class ChartMap {
 
     private void setHelmHome(String helmHome) {
         this.helmHome = helmHome;
-    }
-
-    private String getHelmHome() {
-        return helmHome;
     }
 
     private String getTempDirName() {
