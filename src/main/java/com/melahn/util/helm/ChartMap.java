@@ -82,6 +82,9 @@ public class ChartMap {
     private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of the file we use to hold the rendered templates
     private static final int MAX_WEIGHT = 100;
     private static final String TEMP_DIR = "Temporary Directory ";
+    private static final String LOG_FORMAT_2 = "{}{}";
+    private static final String LOG_FORMAT_3 = "{}{}{}";
+    private static final String LOG_FORMAT_4 = "{}{}{}{}";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -1363,7 +1366,7 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Exception creating template array in " + f.getName() + " with line " + line);
+           logger.error(LOG_FORMAT_4, "Exception creating template array in ", f.getName(), " with line ", line);
         }
         return a;
     }
@@ -1401,7 +1404,7 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Exception creating template array in " + f.getName() + " with line " + line);
+            logger.error(LOG_FORMAT_4, "Exception creating template array in ", f.getName(), " with line ", line);
         }
         return a;
     }
@@ -1435,13 +1438,13 @@ public class ChartMap {
                     printContainerDependencies();
                     printer.printFooter();
                 }
-                System.out.println("File " + outputFilename + " generated");
+                logger.info(LOG_FORMAT_3, "File ", outputFilename, " generated");
                 if (generateImage && printFormat.equals(PrintFormat.PLANTUML)) {
                     generateImage(outputFilename);
                 }
             }
         } catch (IOException e) {
-            System.out.println("Exception printing Map : " + e.getMessage());
+            logger.error(LOG_FORMAT_2, "Exception printing Map : ", e.getMessage());
             throw (e);
         }
     }
@@ -1458,26 +1461,24 @@ public class ChartMap {
         try {
             if (Files.exists(i)) {
                 Files.delete(i);
-                if (verbose) {
-                    System.out.println(i.getFileName() + " deleted");
-                }
+                logger.log(logLevelVerbose,LOG_FORMAT_2, i.getFileName(), " deleted");
             }
             net.sourceforge.plantuml.SourceFileReader r = new net.sourceforge.plantuml.SourceFileReader(new File(f));
             boolean e = r.hasError();
             if (!e) {
                 List<net.sourceforge.plantuml.GeneratedImage> l = r.getGeneratedImages();
-                if (l.size() > 0) {
+                if (!l.isEmpty()) {
                     File p = l.get(0).getPngFile();
-                    System.out.println("Image file " + p.getName() + " generated from " + f);
+                    logger.info(LOG_FORMAT_4, "Image file ", p.getName(), " generated from ", f);
                 } else {
-                    System.out.println("Warning: Image file " + i.getFileName() + " was not generated from " + f);
+                    logger.warn(LOG_FORMAT_4, "Warning: Image file ", i.getFileName()," was not generated from ", f);
                 }
             } else {
-                System.out.println("Error in net.sourceforge.plantuml.GeneratedImage trying to generate image from " + d + "/" + f);
+                logger.error(LOG_FORMAT_4, "Error in net.sourceforge.plantuml.GeneratedImage trying to generate image from ", d, "/", f);
             }
         }
         catch (IOException e) {
-            System.out.println("Error generating image file" +  d + "/" + i.getFileName() + " from " + d + "/" + f + " : " + e);
+            logger.error("{}{}{}{}{}{}{}{}{}", "Error generating image file", d, "/", i.getFileName(), " from ", d, "/", f, " : ", e);
         }
     }
 
@@ -1497,10 +1498,10 @@ public class ChartMap {
                 for (HelmChart dependent : parent.getDiscoveredDependencies()) {
                     if (!chartsDependenciesPrinted.contains(parent.getNameFull() + "_" + dependent.getNameFull())) {
                         printer.printChartToChartDependency(parent, dependent);
-                        if (stable) { // if the parent is stable and the child is not then print a message if verbose
-                            if (!isStable(dependent, true) && isVerbose()) {
-                                printer.printComment("WARNING: Chart " + parent.getNameFull() + " is stable but depends on " + dependent.getNameFull() + " which may not be stable");
-                            }
+                        // if the parent is stable and the child is not then print a message if verbose
+                        if (stable && !isStable(dependent, true) && isVerbose())
+                        { 
+                            printer.printComment("WARNING: Chart " + parent.getNameFull() + " is stable but depends on " + dependent.getNameFull() + " which may not be stable");
                         }
                         chartsDependenciesPrinted.add(parent.getNameFull() + "_" + dependent.getNameFull());
                     }
@@ -1508,7 +1509,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error printing chart dependencies: " + e.getMessage());
+            logger.error("{}{}","Error printing chart dependencies: ", e.getMessage());
         }
     }
 
@@ -1527,7 +1528,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error printing image dependencies: " + e.getMessage());
+            logger.error("{}{}","Error printing image dependencies: ", e.getMessage());
         }
     }
 
@@ -1545,7 +1546,7 @@ public class ChartMap {
                 printer.printImage(s);
             }
         } catch (IOException e) {
-            System.out.println("Error printing images: " + e.getMessage());
+            logger.error("{}{}","Error printing images: ", e.getMessage());
         }
     }
 
@@ -1602,9 +1603,7 @@ public class ChartMap {
         try {
             Path p = Files.createTempDirectory(this.getClass().getCanonicalName() + ".");
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
-            if (isVerbose()) {
-                logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," will be used");
-            }
+            logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," will be used");
         } catch (IOException e) {
             logger.error("%s%s","Error creating temp directory: ",e.getMessage());
             throw (e);
@@ -1633,11 +1632,9 @@ public class ChartMap {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-                if (isVerbose()) {
-                    System.out.println(TEMP_DIR + getTempDirName() + " removed");
-                }
+                logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," removed");
             } catch (IOException e) {
-                System.out.println("Error <" + e.getMessage() + "> removing temporary directory " + getTempDirName());
+                logger.error("{}{}{}{}","Error <",e.getMessage(),"> removing temporary directory ",getTempDirName());
                 throw (e);
             }
         }
@@ -1651,10 +1648,6 @@ public class ChartMap {
 
     private String getApprSpec() {
         return apprSpec;
-    }
-
-    private void setApprSpec(String apprSpec) {
-        this.apprSpec = apprSpec;
     }
 
     private String getDefaultOutputFilename() {
@@ -1701,28 +1694,12 @@ public class ChartMap {
         this.debug = debug;
     }
 
-    private String getOutputFilename() {
-        return outputFilename;
-    }
-
     private void setOutputFilename(String outputFilename) {
         this.outputFilename = outputFilename;
     }
 
-    private boolean getGenerateImage() {
-        return generateImage;
-    }
-
     private void setGenerateImage(boolean b) {
         this.generateImage = b;
-    }
-
-    private void setPrinter(IChartMapPrinter printer) {
-        this.printer = printer;
-    }
-
-    private IChartMapPrinter getPrinter() {
-        return printer;
     }
 
     private void setHelmHome(String helmHome) {
@@ -1763,10 +1740,6 @@ public class ChartMap {
 
     private void setChartFilename(String chartFilename) {
         this.chartFilename = chartFilename;
-    }
-
-    private String getEnvFilename() {
-        return envFilename;
     }
 
     private void setEnvFilename(String envFilename) {
