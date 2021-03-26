@@ -92,7 +92,6 @@ public class ChartMap {
     private class WeightedDeploymentTemplate {
         private int weight;
         private HelmDeploymentTemplate template;
-        private ArrayList<HelmDeploymentTemplate> affectedTemplates = new ArrayList<>();
 
         WeightedDeploymentTemplate(String fileName, HelmDeploymentTemplate t) {
             weight = MAX_WEIGHT;
