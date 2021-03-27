@@ -155,7 +155,7 @@ public class ChartMap {
      * @param refresh        When true, refresh the local Helm repo
      * @param verbose        When true, provides a little more information as the Chart Map is
      *                       generated
-     * @throws Exception     Throws Exception
+     * @throws ChartMapException
      **/
 
     public ChartMap(ChartOption option,
@@ -165,7 +165,7 @@ public class ChartMap {
                     String envFilename,
                     boolean generateImage,
                     boolean refresh,
-                    boolean verbose) throws Exception {
+                    boolean verbose) throws ChartMapException, ParseException {
         initialize();
         ArrayList<String> args = new ArrayList<>();
         if (option.equals(ChartOption.APPRSPEC)) {
@@ -177,7 +177,7 @@ public class ChartMap {
         } else if (option.equals(ChartOption.URL)) {
             args.add("-u");
         } else {
-            throw new Exception("Invalid Option Specification");
+            throw new ChartMapException("Invalid Option Specification");
         }
         args.add(chart);
         if (envFilename != null) {
@@ -198,7 +198,7 @@ public class ChartMap {
         args.add("-d");
         args.add(helmHome);
         if (helmHome == null) {
-            throw new Exception("HELM HOME is not set");
+            throw new ChartMapException("HELM HOME is not set");
         }
         parseArgs(args.toArray(new String[args.size()]));
     }
@@ -491,10 +491,10 @@ public class ChartMap {
                     }
                 }
             }
-            throw new Exception("Unsupported Helm Version"); // we found neither V2 nor V3
+            throw new ChartMapException("Unsupported Helm Version"); // we found neither V2 nor V3
         }   
          else { // we could not even execute the helm command
-            throw new Exception("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
+            throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
         }
     }
 
@@ -611,7 +611,7 @@ public class ChartMap {
      * 3.  If the user specified the name of a local tgz file, there is no need to fetch a chart
      * 4.  If the user specified the chart by name, the chart is already in the charts map we create from the repo so find the download url from that entry and download it
      */
-    private String getChart() throws Exception {
+    private String getChart() throws ChartMapException {
         String chartDirName = "";
         try {
             if (getApprSpec() != null) {
@@ -619,31 +619,37 @@ public class ChartMap {
             } else if (getChartUrl() != null) {
                 chartDirName = downloadChart(getChartUrl());
             } else if (getChartFilename() != null) {
-                try {
-                    Path src = new File(getChartFilename()).toPath();
-                    Path tgt = new File(getTempDirName()).toPath().resolve(new File(getChartFilename()).getName());
-                    Files.copy(src, tgt, StandardCopyOption.REPLACE_EXISTING);
-                    String s = tgt.toAbsolutePath().toString();
-                    chartDirName = unpackChart(s);
-                } catch (IOException e) {
-                    System.out.println("Exception copying " + getChartFilename() + " to " + getTempDirName() + " : " + e.getMessage());
-                }
+                chartDirName = getChart(getChartFilename());
             } else {
                 HelmChart h = (HelmChart) charts.get(chartName, chartVersion);
                 if (h == null) {
-                    throw (new Exception("chart " + chartName + ":" + chartVersion + " not found"));
+                    throw (new ChartMapException("chart ".concat(chartName.concat(":").concat(chartVersion).concat(" not found"))));
                 }
                 chartDirName = downloadChart(h.getUrls()[0]);
             }
             updateLocalRepo(chartDirName);
-        } catch (Exception e) {
-            System.out.println("Error getting chart: " + e.getMessage());
+        } catch (ChartMapException e) {
+            logger.error("Error getting chart: {}", e.getMessage());
             throw (e);
         }
         chart = (HelmChart) charts.get(chartName, chartVersion);
-        return chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)); // return the parent directory
+        if (chartDirName != null) {
+            return chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)); // return the parent directory
+        }
+        return chartDirName;
     }
 
+    private String getChart(String chartFilename) throws ChartMapException {
+        try {
+            Path src = new File(chartFilename).toPath();
+            Path tgt = new File(getTempDirName()).toPath().resolve(new File(chartFilename).getName());
+            Files.copy(src, tgt, StandardCopyOption.REPLACE_EXISTING);
+            String s = tgt.toAbsolutePath().toString();
+            return(unpackChart(s));
+        } catch (IOException e) {
+            throw (new ChartMapException("Exception copying ".concat(getChartFilename()).concat(" to ").concat(getTempDirName()).concat(" : ").concat(e.getMessage())));
+        }
+    }
     /**
      * Downloads a chart using appr into the temp directory
      *
@@ -651,12 +657,12 @@ public class ChartMap {
      * @return the name of the directory where the chart was downloaded into
      * e.g. /temp/alfresco_alfresco-dbp_0.2.0/alfresco-dbp
      */
-    private String pullChart(String apprSpec) {
+    private String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
         try {
             // the chart name should be of the form <repo>/<org>/<chartname>@<version> e.g. quay.io/alfresco/alfresco-dbp@1.5.0
             if (apprSpec == null || (apprSpec.indexOf('/') == -1) || (apprSpec.indexOf('@') == -1)) {
-                throw new Exception("appr specification invalid: " + apprSpec + " .  I was expecting something like quay.io/alfresco/alfresco-dbp@1.5.0");
+                throw new ChartMapException("appr specification invalid: " + apprSpec + " .  I was expecting something like quay.io/alfresco/alfresco-dbp@1.5.0");
             }
             String command = "helm registry pull ";
             command += apprSpec + " -t helm ";
@@ -668,10 +674,15 @@ public class ChartMap {
                 createChart(chartDirName);
                 unpackEmbeddedCharts(chartDirName);
             } else {
-                throw new Exception("Error Code: " + exitCode + " executing command \"" + command + "\"");
+                throw new ChartMapException("Error Code: " + exitCode + " executing command \"" + command + "\"");
             }
-        } catch (Exception e) {
-            System.out.println("Exception pulling chart from appr using specification " + apprSpec + " : " + e.getMessage());
+        } catch (IOException e) {
+            throw (new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+        } catch (ChartMapException e) {
+            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
         }
         return chartDirName;
     }
@@ -724,20 +735,28 @@ public class ChartMap {
      * @param dirName The name of the directory containing the chart
      * @throws Exception
      */
-    private void updateLocalRepo(String dirName) throws Exception {
+    private void updateLocalRepo(String dirName) throws ChartMapException {
         // if the user wants us to update the Helm dependencies, do so
         if (this.isRefreshLocalRepo()) {
             String command = "helm dep update";
-            Process p = Runtime.getRuntime().exec(command, null, new File(dirName));
-            p.waitFor(30000, TimeUnit.MILLISECONDS);
-            int exitCode = p.exitValue();
+            int exitCode=-1;
+            try {
+                Process p = Runtime.getRuntime().exec(command, null, new File(dirName));
+                p.waitFor(30000, TimeUnit.MILLISECONDS);
+                exitCode = p.exitValue();
+            }
+            catch (IOException e) {
+                throw (new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage())));
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw (new ChartMapException("InterruptedException while executing helm dep update: ".concat(e.getMessage())));
+            }
             if (exitCode != 0) {
-                throw new Exception("Exception updating chart repo in " + dirName + ".  Exit code: " +
+                throw new ChartMapException("Exception updating chart repo in " + dirName + ".  Exit code: " +
                         exitCode + ".  Possibly you cannot access one of your remote charts repos.");
             } else {
-                if (this.isVerbose()) {
-                    System.out.println("Updated Helm dependencies");
-                }
+                logger.log(logLevelVerbose,"Updated Helm dependencies");
             }
         }
     }
@@ -1228,9 +1247,8 @@ public class ChartMap {
      * @return          the template file that was generated
      * 
      */
-    private File runTemplateCommand(File dir, HelmChart h) throws Exception {
+    private File runTemplateCommand(File dir, HelmChart h) throws IOException, ChartMapException {
         String command = "helm ";
-        int exitCode = -1;
         // Get any variables the user may have specified and
         // append to the command
         List<String> envVars = getEnvVars();
@@ -1249,8 +1267,7 @@ public class ChartMap {
         command = command.concat("template ").concat(h.getName());
         File f=null;
         try {
-            Process r = Runtime.getRuntime().exec(command, null, dir);
-            BufferedInputStream bis = new BufferedInputStream(r.getInputStream());
+            Process p = Runtime.getRuntime().exec(command, null, dir);
             File templateDir = new File(
                 dir.getAbsolutePath() + File.separator + h.getName()
                 + File.separator + "templates");
@@ -1258,39 +1275,55 @@ public class ChartMap {
             String templateFilename = this.getClass().getCanonicalName() + RENDERED_TEMPLATE_FILE;
             f = new File(templateDir, templateFilename);
             if (!f.createNewFile()) {
-                throw new Exception("File: " + f.getAbsolutePath() + " could not be created.");
+                throw new ChartMapException("File: " + f.getAbsolutePath() + " could not be created.");
             }
-            try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));) 
-            {
-                byte[] bytes = new byte[16384];
-                int len;
-                while ((len = bis.read(bytes)) > 0) {
-                    bos.write(bytes, 0, len);
-                }
-                r.waitFor(30000, TimeUnit.MILLISECONDS);
-                exitCode = r.exitValue();
-            }
-            finally {
-                bis.close();
-            }
-            if (exitCode != 0) {
-                String message;
-                InputStream err = r.getErrorStream();
-                BufferedReader br =
-                    new BufferedReader(new java.io.InputStreamReader(err));
-                while ((message = br.readLine()) != null) {
-                    logger.error(message);
-                }
-                err.close();
-                throw new Exception("Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
-            }
+            runTemplateCommand(f,p,h);
         }
-        catch (Exception e) {
-            logger.error("Exception: {} running template command: {} ", e.getMessage(), command);
+        catch (ChartMapException e) {
+            logger.error("ChartMapException: {} running template command: {} ", e.getMessage(), command);
             throw(e);
         }
         return f;
     }
+
+     /**
+     * Runs the helm template command give a template f to create and a process. 
+     * Handled in a separate to reduce code complexity of caller.
+     *
+     * @oaram   f   the file to which to write the template
+     * @param   p   the process to use to run the command
+     * @param   h   the helm chart
+     * 
+     */
+    private void runTemplateCommand(File f, Process p, HelmChart h) throws ChartMapException {
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
+             BufferedInputStream bis = new BufferedInputStream(p.getInputStream());) 
+        {
+          byte[] bytes = new byte[16384];
+          int len;
+          while ((len = bis.read(bytes)) > 0) {
+              bos.write(bytes, 0, len);
+           }
+           p.waitFor(30000, TimeUnit.MILLISECONDS);
+           int exitCode = p.exitValue();
+           if (exitCode != 0) {
+               String message;
+               InputStream err = p.getErrorStream();
+               BufferedReader br =
+                   new BufferedReader(new java.io.InputStreamReader(err));
+               while ((message = br.readLine()) != null) {
+                   logger.error(message);
+               }
+               err.close();
+               throw new ChartMapException("Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
+            }
+        } catch (IOException e) {
+            throw (new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+        }
+     }   
 
     /**
      * Returns a list of any environment variables the user wants set
@@ -1301,7 +1334,7 @@ public class ChartMap {
      *              may be empty since such environment variables are not
      *              mandatory
      */
-    private List<String> getEnvVars() throws Exception {
+    private List<String> getEnvVars() throws IOException {
         ArrayList<String> envVars = new ArrayList<>();
         if (envFilename != null) {
             try {
@@ -1311,8 +1344,8 @@ public class ChartMap {
                 EnvironmentSpecification env = mapper.readValue(envFile, EnvironmentSpecification.class);
                 Map<String, String> vars = env.getEnvironment();
                 vars.forEach((k, v) -> envVars.add(getEscapedVariable(k + "=") + v));
-            } catch (Exception e) {
-                logger.error(LOG_FORMAT_4, "Error reading Environment Variables File ", envFilename, " : ", e.getMessage());
+            } catch (IOException e) {
+                logger.error(LOG_FORMAT_4, "IOException reading Environment Variables File ", envFilename, " : ", e.getMessage());
                 throw e;
             }
         }
