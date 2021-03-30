@@ -15,15 +15,17 @@ import com.melahn.util.helm.model.HelmChart;
 public class ChartMapPrinter implements IChartMapPrinter {
 
     protected HelmChart chart;
+    MultiKeyMap<String, String> charts;
     protected ChartMap chartMap;
     protected String outputFilename;
     protected int indent=2; // indent for tree view
     protected FileWriter writer;
     private static final String NOT_SPECIFIED = "Not specified";
 
-    ChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
+    ChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String, String> charts, HelmChart chart) {
         this.outputFilename = outputFilename;
         this.chart = chart;
+        this.charts = charts;
         this.chartMap = chartMap;
         try {
             writer = new FileWriter(outputFilename);

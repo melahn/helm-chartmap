@@ -27,7 +27,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
+    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String,String> charts, HelmChart chart) {
         super(chartMap, outputFilename, charts, chart);
      }
 

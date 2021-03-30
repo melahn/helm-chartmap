@@ -27,7 +27,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap charts, HelmChart chart) {
+    public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String,String> charts, HelmChart chart) {
         super(chartMap, outputFilename, charts, chart);
         initializeColors();
     }
