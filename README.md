@@ -150,10 +150,7 @@ In addition to the command line interface, a Java API is provided.
                     String outputFilename,
                     String helmHome,
                     String envFilename,
-                    boolean generate,
-                    boolean refresh,
-                    boolean verbose)
-                    
+                    boolean[] switches)                  
 ```
 
 ##### Description of ChartMap constructor
@@ -172,12 +169,16 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The location of Helm Home
 * *envSpecFilename*
   * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format.
-* *generate*
-  * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
-* *refresh*
-  * When *true*, refresh the local Helm repo (default *false*)
-* *verbose*
-  * When *true*, provides a little more information as the Chart Map is generated (default *false*)
+* *switches*
+  * An array containing the following boolean values
+  * *switches[0]* *generate*
+    * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
+  * *switches[1]* *refresh*
+    * When *true*, refresh the local Helm repo (default *false*)
+  * *switches[2]* *verbose*
+    * When *true*, provides a little more information as the Chart Map is generated (default *false*)
+  * *switches[3]* *debug*
+    * When *true*, provides a little more information to help debug *ChartMap* itself (default *false*)
 
 ##### Throws
 
