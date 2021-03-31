@@ -1,10 +1,12 @@
 # example chartmap environment specification
 environment:
   alfresco-api-gateway.keycloakURL : 'http://localhost-k8s/auth'
+  alfresco-content-services.alfresco-digital-workspace.enabled : 'true'
   alfresco-content-services.alfresco-infrastructure.enabled : 'false'
   alfresco-content-services.externalHost : 'localhost-k8s'
   alfresco-content-services.networkpolicysetting.enabled : 'false'
   alfresco-content-services.repository.environment.IDENTITY_SERVICE_URI : 'http://localhost-k8s/auth'
+  alfresco-digital-workspace.enabled : 'true'
   alfresco-infrastructure.activemq.adminUser.username : 'foo'
   alfresco-infrastructure.activemq.adminUser.Password : 'bar'
   alfresco-infrastructure.alfresco-api-gateway.enabled : 'false'
@@ -14,6 +16,8 @@ environment:
   alfresco-process-services.alfresco-infrastructure.enabled : 'false'
   alfresco-process-services.alfresco-infrastructure.alfresco-api-gateway.keycloakURL : 'http://localhost-k8s/auth'
   alfresco-process-services.processEngine.environment.IDENTITY_SERVICE_AUTH : 'http://localhost-k8s/auth'
+  alfresco-sync-service.syncservice.enabled : 'true'
+  postgresql-syncservice.enabled  : 'true'
   keycloakURL : 'http://localhost-k8s/auth'
   keycloak.persistence.deployPostgres : 'true'
   keycloak.persistence.dbVendor : 'postgres'
