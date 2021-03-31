@@ -221,6 +221,9 @@ public class ChartMapTest {
     private ChartMap createTestMap(ChartOption option, Path inputPath, Path outputPath,
                                    boolean generateImage, boolean refresh, boolean verbose) throws Exception {
         ChartMap testMap = null;
+        boolean[] switches;
+        boolean debug = true;
+        switches = new boolean[]{generateImage,refresh,verbose,debug};
         try {
             testMap = new ChartMap(
                     option,
@@ -228,9 +231,7 @@ public class ChartMapTest {
                     outputPath.toAbsolutePath().toString(),
                     System.getenv("HELM_HOME"),
                     testEnvFilePath.toAbsolutePath().toString(),
-                    generateImage,
-                    refresh,
-                    verbose);
+                    switches);
         } catch (Exception e) {
             System.out.println("Exception createTestMap: " + e.getMessage());
         }
