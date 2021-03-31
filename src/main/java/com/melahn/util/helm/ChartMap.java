@@ -67,7 +67,7 @@ public class ChartMap {
     private boolean generateImage;
     private String helmHome;
     private helmMajorVersion helmMajorVersionUsed;
-    private enum helmMajorVersion { V2, V3 };
+    private enum helmMajorVersion { V2, V3 }
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     protected final Logger logger = LogManager.getLogger(ChartMap.class);
@@ -87,7 +87,11 @@ public class ChartMap {
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
     private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
-
+    private static final int GENERATE_SWITCH = 0;
+    private static final int REFRESH_SWITCH = 1;
+    private static final int VERBOSE_SWITCH = 2;
+    private static final int DEBUG_SWITCH = 3;
+    private static final String CHART_YAML = "Chart.yaml";
     /**
      * This inner class is used to assign a 'weight' to a template based on its
      * position in the file system (parent templates having the lower weight).
@@ -132,11 +136,12 @@ public class ChartMap {
         try {
             chartMap.parseArgs(arg);
             chartMap.print();
-        } catch (IOException e) {
-            chartMap.logger.error("IOException:".concat(e.getMessage()));
-        } catch (Exception e) {
-            chartMap.logger.error("IOException:".concat(e.getMessage()));
+        } catch (ChartMapException e) {
+            chartMap.logger.error("ChartMapException:".concat(e.getMessage()));
         }
+        catch (Exception e) {
+            chartMap.logger.error("IOException:".concat(e.getMessage()));
+        } 
     }
 
     /**
@@ -151,11 +156,13 @@ public class ChartMap {
      *                       may influence the way the charts are rendered by helm.
      * @param helmHome       The location of the user helm directory.  This is needed to find
      *                       the local cache of index files downloaded from the Helm Chart repos.
-     * @param generateImage  When true, generates an image from the PlantUML file (if any)
-     * @param refresh        When true, refresh the local Helm repo
-     * @param verbose        When true, provides a little more information as the Chart Map is
+     * @param switches       An array containing a list of boolean values as follows when true
+     *                       switches[0] generates an image from the PlantUML file (if any)
+     *                       switches[1] refresh the local Helm repo
+     *                       switches[2] provides a little more information as the Chart Map is
      *                       generated
-     * @throws ChartMapException
+     *                       switches[3] debug mode ... more info about internals printed
+     * @throws Exception
      **/
 
     public ChartMap(ChartOption option,
@@ -163,10 +170,9 @@ public class ChartMap {
                     String outputFilename,
                     String helmHome,
                     String envFilename,
-                    boolean generateImage,
-                    boolean refresh,
-                    boolean verbose) throws ChartMapException, ParseException {
+                    boolean[] switches) throws Exception {
         initialize();
+        
         ArrayList<String> args = new ArrayList<>();
         if (option.equals(ChartOption.APPRSPEC)) {
             args.add("-a");
@@ -184,14 +190,17 @@ public class ChartMap {
             args.add("-e");
             args.add(envFilename);
         }
-        if (generateImage) {
+        if (switches[GENERATE_SWITCH]) {
             args.add("-g");
         }
-        if (refresh) {
+        if (switches[REFRESH_SWITCH]) {
             args.add("-r");
         }
-        if (verbose) {
+        if (switches[VERBOSE_SWITCH]) {
             args.add("-v");
+        }
+        if (switches[DEBUG_SWITCH]) {
+            args.add("-z");
         }
         args.add("-o");
         args.add(outputFilename);
@@ -241,9 +250,9 @@ public class ChartMap {
             setGenerateImage(false);
             setRefreshLocalRepo(false);
             charts = new MultiKeyMap();
-            chartsDependenciesPrinted = new HashSet<String>();
-            chartsReferenced = new MultiKeyMap();
-            env = new HashSet<String>();
+            chartsDependenciesPrinted = new HashSet<>();
+            chartsReferenced = new MultiKeyMap<>();
+            env = new HashSet<>();
             imagesReferenced = new HashSet<>();
             deploymentTemplatesReferenced = new HashMap<>();
         }
@@ -466,7 +475,7 @@ public class ChartMap {
      * @return helmMajorVersion
      */
     private helmMajorVersion getHelmVersion() throws Exception {
-        String cmdArray[] = {"helm", "version", "--template", "{{ .Version }}" };
+        String[] cmdArray = {"helm", "version", "--template", "{{ .Version }}" };
         Process p = Runtime.getRuntime().exec(cmdArray);
         p.waitFor(30000, TimeUnit.MILLISECONDS);
         int exitCode = p.exitValue();
@@ -767,7 +776,7 @@ public class ChartMap {
      * @param chartDirName the name of the directory in which the Chart.yaml file is to be found
      */
     private void createChart(String chartDirName) {
-        String yamlChartFilename = chartDirName + File.separator + "Chart.yaml";
+        String yamlChartFilename = chartDirName + File.separator + CHART_YAML;
         try {
 
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -800,17 +809,16 @@ public class ChartMap {
     private String unpackChart(String chartFilename) {
         int bufferSize = 1024;
         String baseUnpackDirName = null;
-        try {
-            File in = new File(chartFilename);
-            FileInputStream fis = new FileInputStream(chartFilename);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            GzipCompressorInputStream gis = new GzipCompressorInputStream(bis);
-            TarArchiveInputStream tis = new TarArchiveInputStream(gis);
+        try (FileInputStream fis = new FileInputStream(chartFilename);
+             BufferedInputStream bis = new BufferedInputStream(fis);
+             GzipCompressorInputStream gis = new GzipCompressorInputStream(bis);
+             TarArchiveInputStream tis = new TarArchiveInputStream(gis);)
+        {
             TarArchiveEntry entry;
             while ((entry = (TarArchiveEntry) tis.getNextEntry()) != null) {
                 String name = entry.getName();
-                String chartName = name.substring(0, name.lastIndexOf(File.separator));
-                Path dir = new File(chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)), chartName).toPath();
+                String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
+                Path dir = new File(chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)), packedChartName).toPath();
                 if (!Files.exists(dir)) {
                     Files.createDirectories(dir);
                 }
@@ -821,28 +829,28 @@ public class ChartMap {
                 // The reason for this curious logic is that sometimes the tgz file may have a directory entry by itself so
                 // I test for the existence of the file beforehand (as it may have been created already)
                 if (!file.exists()) {
-                    file.createNewFile();
+                    boolean created = file.createNewFile();
+                    if (created) {
+                        logger.info("File {} created",fileName);
+                    }
                 }
                 if (!file.exists()) {
-                    throw new Exception("Error creating file: " + file.getAbsolutePath());
+                    throw new ChartMapException("Error creating file: " + file.getAbsolutePath());
                 }
                 // At this point the entry must have a file entry, either a directory or a file.  If it is a file, then
                 // get the content
                 if (!file.isDirectory()) {
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedOutputStream dos = new BufferedOutputStream(fos, bufferSize);
-                    while ((count = tis.read(data, 0, bufferSize)) != -1) {
-                        dos.write(data, 0, count);
+                    try (FileOutputStream fos = new FileOutputStream(file);
+                         BufferedOutputStream dos = new BufferedOutputStream(fos, bufferSize);) {
+                        while ((count = tis.read(data, 0, bufferSize)) != -1) {
+                            dos.write(data, 0, count);
+                        }
                     }
-                    dos.close();
                     if (baseUnpackDirName == null) {
-                        baseUnpackDirName = tempDirName + chartName;
+                        baseUnpackDirName = tempDirName + packedChartName;
                     }
                 }
             }
-            tis.close();
-            bis.close();
-            fis.close();
             unpackEmbeddedCharts(baseUnpackDirName);
 
             // If the Chart Name or Version were not yet extracted, such as would happen if the chart was provided as a local tgz file
@@ -859,7 +867,7 @@ public class ChartMap {
                 });
                 if (directories != null) {
                     try {
-                        String chartYamlFilename = chartFileDir + File.separator + directories[0] + File.separator + "Chart.yaml";
+                        String chartYamlFilename = chartFileDir + File.separator + directories[0] + File.separator + CHART_YAML;
                         File chartYamlFile = new File(chartYamlFilename);
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -870,12 +878,16 @@ public class ChartMap {
                             charts.put(chartName, chartVersion, h);
                         }
                     } catch (IOException e) {
-                        throw new Exception("Error extracting Chart Name and Chart Version");
+                        throw new ChartMapException("IOException Error extracting Chart Name and Chart Version: ".concat(e.getMessage()));
                     }
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Exception extracting Chart " + chartFilename + ":" + e.getMessage());
+        } 
+        catch (ChartMapException e) {
+            logger.error(LOG_FORMAT_3, "ChartMapException extracting Chart ", chartFilename, ":", e.getMessage());
+        }
+        catch (Exception e) {
+            logger.error(LOG_FORMAT_3, "Exception extracting Chart ", chartFilename, ":", e.getMessage());
         }
         return baseUnpackDirName;
     }
@@ -945,7 +957,7 @@ public class ChartMap {
                         parentHelmChart = (HelmChart) charts.get(h.getName(), h.getVersion());
                         chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
                     }
-                    File chartFile = new File(chartDirName + File.separator + directory + File.separator + "Chart.yaml");
+                    File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
                     if (chartFile.exists()) {
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -953,12 +965,10 @@ public class ChartMap {
                         HelmChart currentHelmChart = (HelmChart) charts.get(currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
                             // this is most likely because the local Helm charts are out of date and should be refreshed
-                            throw new Exception("A dependency on " +
-                                    currentHelmChartFromDisk.getName() + ":" + currentHelmChartFromDisk.getVersion() +
-                                    " was found but that chart was not found in the local Helm charts cache.\n  " +
-                                    " Check to make sure all the helm repos are in your local cache by running the 'helm repo list' command.\n" +
-                                    " Try running the command again with the '-r' option");
-
+                            throw new ChartMapException(String.format("A dependency on %s:%s  was found but that " +
+                                "chart was not found in the local Helm charts cache. " + 
+                                "Check to make sure all the helm repos are in your local cache by running the 'helm repo list' command. " +
+                                "Try running the command again with the '-r' option.", currentHelmChartFromDisk.getName(),currentHelmChartFromDisk.getVersion())); 
                         }
                         // If this is not the root chart, check if there is a condition property in the parent Helm Chart
                         // that corresponds to the current Helm Chart.  If found, get the value
@@ -976,7 +986,7 @@ public class ChartMap {
                         // the referenced charts map and attach it as a dependent of the parent
                         //
                         // Note that a chart with a false condition property will thus not be printed at all
-                        if (condition) {
+                        if (Boolean.TRUE.equals(condition)) {
                             collectValues(chartDirName + File.separator + directory, currentHelmChart);
                             if (parentHelmChart != null) {
                                parentHelmChart.getDiscoveredDependencies().add(currentHelmChart);   // add this chart as a dependent
