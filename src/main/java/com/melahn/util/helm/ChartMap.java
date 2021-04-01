@@ -92,6 +92,7 @@ public class ChartMap {
     private static final int VERBOSE_SWITCH = 2;
     private static final int DEBUG_SWITCH = 3;
     private static final String CHART_YAML = "Chart.yaml";
+    private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     /**
      * This inner class is used to assign a 'weight' to a template based on its
      * position in the file system (parent templates having the lower weight).
@@ -683,15 +684,15 @@ public class ChartMap {
                 createChart(chartDirName);
                 unpackEmbeddedCharts(chartDirName);
             } else {
-                throw new ChartMapException("Error Code: " + exitCode + " executing command \"" + command + "\"");
+                throw new ChartMapException(String.format("Error Code: %c executing command \"%s\"", exitCode, command));
             }
         } catch (IOException e) {
-            throw (new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+            throw (new ChartMapException(String.format("IOException pulling chart from appr using specification %s : %s", apprSpec, e.getMessage())));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+            throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION,apprSpec, e.getMessage()));
         } catch (ChartMapException e) {
-            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+            throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION,apprSpec, e.getMessage()));
         }
         return chartDirName;
     }
@@ -755,11 +756,11 @@ public class ChartMap {
                 exitCode = p.exitValue();
             }
             catch (IOException e) {
-                throw (new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage())));
+                throw new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage()));
             }
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw (new ChartMapException("InterruptedException while executing helm dep update: ".concat(e.getMessage())));
+                throw new ChartMapException("InterruptedException while executing helm dep update: ".concat(e.getMessage()));
             }
             if (exitCode != 0) {
                 throw new ChartMapException("Exception updating chart repo in " + dirName + ".  Exit code: " +
@@ -831,7 +832,7 @@ public class ChartMap {
                 if (!file.exists()) {
                     boolean created = file.createNewFile();
                     if (created) {
-                        logger.info("File {} created",fileName);
+                        logger.log(logLevelVerbose,"File {} created",fileName);
                     }
                 }
                 if (!file.exists()) {
@@ -911,11 +912,7 @@ public class ChartMap {
                 String[] tgzFiles = new File(chartDirName + File.separator + s).list(new FilenameFilter() {
                     @Override
                     public boolean accept(File dir, String name) {
-                        if (name.endsWith(".tgz")) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return name.endsWith(".tgz");
                     }
                 });
                 if (tgzFiles != null) {
@@ -1021,13 +1018,13 @@ public class ChartMap {
         // Check if it was specified as an environment variable, overriding what may be in
         // the chart
         try {
-            List<String> env = getEnvVars();
-            for (String s : env) {
+            List<String> vars = getEnvVars();
+            for (String s : vars) {
                 String n = s.substring(0,s.indexOf('='));
                 if (key.equals(n)) {
                     envCondition = Boolean.TRUE;
                     String v = s.substring(s.indexOf('=')+1,s.length());
-                    if (v.toLowerCase().equals("false")) {
+                    if (v.equalsIgnoreCase("false")) {
                         condition = Boolean.FALSE;
                     }
                 }
@@ -1038,7 +1035,7 @@ public class ChartMap {
         }
         // If the condition was not found in the environment variable set, look in the
         // chart
-        if (!envCondition) {
+        if (Boolean.FALSE.equals(envCondition)) {
             Object o = ChartUtil.getValue(key, h.getValues());
             if (o != null) {
                 if (o instanceof Boolean) {
@@ -1077,18 +1074,14 @@ public class ChartMap {
     HashMap<String, String> getConditionMap (String directoryName) {
         File requirementsFile = new File(directoryName + File.separator + "requirements.yaml");
         HashMap<String, String> conditionMap = new HashMap<>();
-        Map<String, Object> valuesMap = new HashMap<>();
         if (requirementsFile.exists()) {
             try {
                 ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 HelmRequirements requirements = mapper.readValue(requirementsFile, HelmRequirements.class);
-                List<HelmRequirement> dependents = new ArrayList<>();
+                List<HelmRequirement> dependents;
                 dependents = Arrays.asList(requirements.getDependencies());
-                dependents.forEach(r -> {
-                    String c = r.getCondition();
-                    conditionMap.put(r.getName(), r.getCondition());
-                });
+                dependents.forEach(r -> conditionMap.put(r.getName(), r.getCondition()));
             }
             catch (Exception e) {
                 System.out.println("Error parsing requirements file " + requirementsFile.getAbsolutePath());
@@ -1213,7 +1206,7 @@ public class ChartMap {
                                 c._setParent(p);
                             }
                             // if this template is a child of this chart remember that fact
-                            if (a.get(i)) {
+                            if (Boolean.TRUE.equals(a.get(i))) {
                                 template._setFileName(b.get(i));  // is this needed?
                                 h.getDeploymentTemplates().add(template);
                             }
@@ -1328,10 +1321,10 @@ public class ChartMap {
                throw new ChartMapException("Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
             }
         } catch (IOException e) {
-            throw (new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+            throw new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw (new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage())));
+            throw new ChartMapException("InterruptedException pulling chart from appr using specification ".concat(apprSpec).concat(" : ").concat(e.getMessage()));
         }
      }   
 
@@ -1511,7 +1504,7 @@ public class ChartMap {
             }
         } catch (IOException e) {
             logger.error(LOG_FORMAT_2, "Exception printing Map : ", e.getMessage());
-            throw (e);
+            throw e;
         }
     }
 
@@ -1669,10 +1662,10 @@ public class ChartMap {
         try {
             Path p = Files.createTempDirectory(this.getClass().getCanonicalName() + ".");
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
-            logger.log(logLevelVerbose,"{}{}{}",TEMP_DIR,getTempDirName()," will be used");
+            logger.log(logLevelVerbose,LOG_FORMAT_3,TEMP_DIR,getTempDirName()," will be used");
         } catch (IOException e) {
             logger.error(LOG_FORMAT_2, "Error creating temp directory: ", e.getMessage());
-            throw (e);
+            throw e;
         }
     }
 
@@ -1701,7 +1694,7 @@ public class ChartMap {
                 logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
             } catch (IOException e) {
                 logger.error(LOG_FORMAT_4, "Error <",e.getMessage(), "> removing temporary directory ", getTempDirName());
-                throw (e);
+                throw e;
             }
         }
     }
