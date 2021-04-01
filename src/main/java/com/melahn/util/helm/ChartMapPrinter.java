@@ -227,7 +227,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
     }
 
     public void printTree(HelmChart c) throws IOException {
-        // TODO add a generic printTree method
+        // see issue #9 
     }
 
 }
