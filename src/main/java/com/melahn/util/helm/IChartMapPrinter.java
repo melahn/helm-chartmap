@@ -20,8 +20,6 @@ public interface IChartMapPrinter {
 
     void printImage(String s) throws IOException;
 
-    void printTree(HelmChart chart) throws IOException;
-
     void printSectionHeader(String header) throws IOException;
 
     void setOutputFilename (String outputFilename);
