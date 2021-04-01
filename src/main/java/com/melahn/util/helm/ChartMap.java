@@ -935,7 +935,7 @@ public class ChartMap {
      * @param chartDirName the name of a directory containing a Helm Chart
      * @param h            the Helm Chart on which dependencies will be collected
      */
-    private void collectDependencies(String chartDirName, HelmChart h) {  // TODO add a test for a dependency cycle
+    private void collectDependencies(String chartDirName, HelmChart h) {  // see issue #8
         HelmChart parentHelmChart = null;
         try {
             if (h != null && verbose) {
