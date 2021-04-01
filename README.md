@@ -182,7 +182,7 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
 
 ##### Throws
 
-* *java.lang.Exception*
+* *com.melahn.util.helm.Exception*
 
 #### print
 

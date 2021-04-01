@@ -172,7 +172,7 @@ public class ChartMap {
                     String outputFilename,
                     String helmHome,
                     String envFilename,
-                    boolean[] switches) throws Exception {
+                    boolean[] switches) throws ChartMapException {
         initialize();
         
         ArrayList<String> args = new ArrayList<>();
