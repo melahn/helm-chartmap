@@ -67,10 +67,11 @@ public class ChartMap {
     private boolean generateImage;
     private String helmHome;
     private helmMajorVersion helmMajorVersionUsed;
-    private enum helmMajorVersion { V2, V3 }
+    private enum helmMajorVersion { V2, V3, UNKNOWN }
     private HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     protected final Logger logger = LogManager.getLogger(ChartMap.class);
+    protected Level logLevelDebug;
     protected Level logLevelVerbose;
     private String outputFilename;
     private PrintFormat printFormat;
@@ -238,7 +239,6 @@ public class ChartMap {
      */
     private void initialize() {
         try {
-            helmMajorVersionUsed = getHelmVersion();
             setChartName(null);
             setOutputFilename(getDefaultOutputFilename());
             setChartFilename(null);
@@ -267,7 +267,7 @@ public class ChartMap {
      *
      * @param args command line args
      */
-    private void parseArgs(String[] args) throws ParseException {
+    private void parseArgs(String[] args) throws ChartMapException {
         Options options = new Options();
         options.addOption("a", true, "The appr chart location");
         options.addOption("c", true, "The Chart Name");
@@ -331,27 +331,35 @@ public class ChartMap {
                 System.exit(0);
             }
             setLogLevel();
+            helmMajorVersionUsed = getHelmVersion();
         } catch (ParseException e) {
             logger.error(e.getMessage());
-            throw (e);
+            throw new ChartMapException(String.format("Parse Exception: %s" , e.getMessage()));
         }
     }
 
     /**
+     * If the user has specified the debug flag, set the log level so it has a higher priority 
+     * (ie. a lower level value) than the logger configured in log4j2.xml, which is 
+     * INFO (level 400). Otherwise set it to 0 so debug log entries will be ignored.
+     * 
      * If the user has specified the verbose flag, set the log level so it has a higher priority 
      * (ie. a lower level value) than the logger configured in log4j2.xml, which is 
      * INFO (level 400). Otherwise set it to a higher level number so verbose log entries
      * will be ignored.
      * 
-     * @return level  the setting of logLevelVerbose
     */
-    private Level setLogLevel() {
-        if (isVerbose()) {
-           logLevelVerbose = Level.forName("VERBOSE",350);  // higher priority than INFO
+    private void setLogLevel() {
+        if (isDebug()) {
+           logLevelDebug = Level.forName("CHARTMAP_DEBUG",350);       // higher priority than INFO
         } else {
-           logLevelVerbose = Level.forName("VERBOSE",450);  // lower priority than INFO 
+           logLevelDebug = Level.forName("CHARTMAP_DEBUG",0);         // off 
         }
-        return logLevelVerbose;
+        if (isVerbose()) {
+            logLevelVerbose = Level.forName("CHARTMAP_VERBOSE",350);  // higher priority than INFO
+         } else {
+            logLevelVerbose = Level.forName("CHARTMAP_VERBOSE",450);  // lower priority than INFO 
+         }
     }
     /**
      * Parses a Appr Specification of the format <chart-repp>/<org>/<chart-name>@<chart-version>
@@ -475,37 +483,59 @@ public class ChartMap {
      * 
      * @return helmMajorVersion
      */
-    private helmMajorVersion getHelmVersion() throws Exception {
+    private helmMajorVersion getHelmVersion() throws ChartMapException {
         String[] cmdArray = {"helm", "version", "--template", "{{ .Version }}" };
-        Process p = Runtime.getRuntime().exec(cmdArray);
-        p.waitFor(30000, TimeUnit.MILLISECONDS);
-        int exitCode = p.exitValue();
-        if (exitCode == 0 ) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+        try {
+            Process p = Runtime.getRuntime().exec(cmdArray);
+            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            p.waitFor(30000, TimeUnit.MILLISECONDS);
+            int exitCode = p.exitValue();
+            if (exitCode == 0 ) {
                 String o = br.readLine();
                 if (o != null && o.length()>1) {
-                    // in helm V3 the templated output of the command should look like 'v3.5.2'
-                    // so pick off the second character to get the major version
-                    if (o.charAt(1) == '3') {
-                        helmMajorVersionUsed = helmMajorVersion.V3;
-                        logger.debug("Helm Version 3 detected");
-                         return helmMajorVersion.V3;
-                    } else {
-                        // in helm V2 there is no .Version variable so expect to get a complaint about that
-                        String nv = "<no value>";
-                        if (o.length() >= nv.length() && o.substring(0, nv.length()-1).equals(nv)) {
-                            helmMajorVersionUsed = helmMajorVersion.V2;
-                            logger.debug("Helm Version 2 detected");
-                            return helmMajorVersion.V2;
-                        }
-                    }
+                    return parseHelmMajorVersionOutput(o);
+                }
+                throw new ChartMapException("Unsupported Helm Version"); // we found neither V2 nor V3
+            }   
+            else { // we could not even execute the helm command
+                throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
+            }
+        }
+        catch (IOException e) {
+            throw new ChartMapException("IO Exception trying to discover Helm Version: ".concat(e.getMessage())); // we could not get the output of the helm command
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION,apprSpec, e.getMessage()));
+        }
+    }
+
+    /**
+     * Parses a line of output of the Helm version command and answers back the 
+     * version it found
+     * @param l     A line of output of the Helm version command 
+     * @return      helmMajorVersion found in that line
+     */
+    private helmMajorVersion parseHelmMajorVersionOutput(String l) throws ChartMapException {
+        if (l != null && l.length()>1) {
+            // in helm V3 the templated output of the command should look like 'v3.5.2'
+            // so pick off the second character to get the major version
+            if (l.charAt(1) == '3') {
+                helmMajorVersionUsed = helmMajorVersion.V3;
+                logger.log(logLevelDebug, "Helm Version 3 detected");
+                return helmMajorVersion.V3;
+            } else {
+                // in helm V2 there is no .Version variable so expect to get a complaint about that
+                String nv = "<no value>";
+                if (l.length() >= nv.length() && l.substring(0, nv.length()-1).equals(nv)) {
+                    helmMajorVersionUsed = helmMajorVersion.V2;
+                    logger.log(logLevelDebug, "Helm Version 2 detected");
+                    return helmMajorVersion.V2;
                 }
             }
-            throw new ChartMapException("Unsupported Helm Version"); // we found neither V2 nor V3
-        }   
-         else { // we could not even execute the helm command
-            throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
         }
+        // if neither V2 nor V3 is found throw an exception
+        throw new ChartMapException(String.format("Helm Version could not be determined from the string \"%s\"",l));
     }
 
     /**
@@ -1633,9 +1663,7 @@ public class ChartMap {
     private boolean isStable(HelmChart h, boolean checkContainers) {
         boolean stable = true;
         if (h.getRepoUrl() != null && h.getRepoUrl().contains("/incubator")) {
-            if (isDebug()) {
-                System.out.println("chart " + h.getNameFull() + " does not appear to be stable");
-            }
+            logger.log(logLevelDebug,"chart {} does not appear to be stable", h.getNameFull());
             stable = false;
         } else if (checkContainers) {  // also check the images if needed
             for (HelmDeploymentContainer c : h.getContainers()) {
@@ -1646,9 +1674,7 @@ public class ChartMap {
                         imageName.contains("-trial") ||
                         imageName.contains("-rc")) {
                     stable = false;
-                    if (isDebug()) {
-                        System.out.println("image " + c.getImage() + " does not appear to be stable");
-                    }
+                    logger.log(logLevelDebug,"image {} does not appear to be stable", c.getImage());
                 }
             }
         }
@@ -1670,11 +1696,12 @@ public class ChartMap {
     }
 
     /**
-     * Removes the temporary directory created by createTempDir()
+     * Removes the temporary directory created by createTempDir() unless the debug
+     * switch was set
      */
     private void removeTempDir() throws IOException {
         if (isDebug()) {
-            System.out.println(TEMP_DIR + getTempDirName() + " was not removed");
+            logger.log(logLevelDebug,"{} {} was not removed", TEMP_DIR, getTempDirName());
         } else {
             Path directory = Paths.get(getTempDirName());
             try {
