@@ -93,6 +93,7 @@ public class ChartMap {
     private static final int VERBOSE_SWITCH = 2;
     private static final int DEBUG_SWITCH = 3;
     private static final String CHART_YAML = "Chart.yaml";
+    private static final String CHARTS_DIR_NAME = "charts";
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -341,7 +342,8 @@ public class ChartMap {
     /**
      * If the user has specified the debug flag, set the log level so it has a higher priority 
      * (ie. a lower level value) than the logger configured in log4j2.xml, which is 
-     * INFO (level 400). Otherwise set it to 0 so debug log entries will be ignored.
+     * INFO (level 400). Otherwise set it to a higher level number so verbose log entries
+     * will be ignored.
      * 
      * If the user has specified the verbose flag, set the log level so it has a higher priority 
      * (ie. a lower level value) than the logger configured in log4j2.xml, which is 
@@ -353,7 +355,7 @@ public class ChartMap {
         if (isDebug()) {
            logLevelDebug = Level.forName("CHARTMAP_DEBUG",350);       // higher priority than INFO
         } else {
-           logLevelDebug = Level.forName("CHARTMAP_DEBUG",0);         // off 
+           logLevelDebug = Level.forName("CHARTMAP_DEBUG",450);         // off 
         }
         if (isVerbose()) {
             logLevelVerbose = Level.forName("CHARTMAP_VERBOSE",350);  // higher priority than INFO
@@ -542,16 +544,14 @@ public class ChartMap {
      * Prints a summary of some local repo information, if the user wants verbosity
      */
     private void printLocalRepos() {
-        if (isVerbose()) {
-            HelmChartRepoLocal[] repos = localRepos.getRepositories();
-            System.out.println("Api Version: " + localRepos.getApiVersion());
-            System.out.println("Generated: " + localRepos.getGenerated());
-            System.out.println("Number of Repos: " + localRepos.getRepositories().length);
-            for (HelmChartRepoLocal r : repos) {
-                System.out.println("\tName: " + r.getName());
-                System.out.println("\tCache: " + r.getCache());
-                System.out.println("\tUrl: " + r.getUrl());
-            }
+        HelmChartRepoLocal[] repos = localRepos.getRepositories();
+        logger.log(logLevelVerbose,"Api Version: {}",localRepos.getApiVersion());
+        logger.log(logLevelVerbose,"Generated: {}",localRepos.getGenerated());
+        logger.log(logLevelVerbose,"Number of Repos: {}",localRepos.getRepositories().length);
+        for (HelmChartRepoLocal r : repos) {
+            logger.log(logLevelVerbose,"\tName: {}",r.getName());
+            logger.log(logLevelVerbose,"\tCache: {}",r.getCache());
+            logger.log(logLevelVerbose,"\tUrl: {}",r.getUrl());
         }
     }
 
@@ -862,7 +862,7 @@ public class ChartMap {
                 if (!file.exists()) {
                     boolean created = file.createNewFile();
                     if (created) {
-                        logger.log(logLevelVerbose,"File {} created",fileName);
+                        logger.log(logLevelDebug,"File {} created",fileName);
                     }
                 }
                 if (!file.exists()) {
@@ -934,7 +934,7 @@ public class ChartMap {
             @Override
             public boolean accept(File dir, String name) {
                 File file = new File(chartDirName + File.separator + name);
-                return (file.isDirectory() && name.equals("charts"));
+                return (file.isDirectory() && name.equals(CHARTS_DIR_NAME));
             }
         });
         if (directories != null) {
@@ -947,7 +947,7 @@ public class ChartMap {
                 });
                 if (tgzFiles != null) {
                     for (String t : tgzFiles) {
-                        unpackChart(chartDirName + File.separator + "charts" + File.separator + t);   // recursion
+                        unpackChart(chartDirName + File.separator + CHARTS_DIR_NAME + File.separator + t);   // recursion
                     }
                 }
             }
@@ -969,15 +969,11 @@ public class ChartMap {
         HelmChart parentHelmChart = null;
         try {
             if (h != null && verbose) {
-                System.out.println("Processing Chart " + h.getName() + ":" + h.getVersion());        
+                logger.log(logLevelVerbose,"Processing Chart {} : {}", h.getName(), h.getVersion());        
             }
             File currentDirectory = new File(chartDirName);
-            String[] directories = currentDirectory.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File c, String n) {
-                    return new File(c, n).isDirectory();
-                }
-            });
+            String[] directories = currentDirectory.list((c, n) -> new File(c, n).isDirectory());
+            
             if (directories != null) {
                 for (String directory : directories) {
                     if (h != null) {
@@ -1020,7 +1016,7 @@ public class ChartMap {
                             }
                             chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(), currentHelmChart); // may be redundant given we added parent already in an earlier iteration
                             renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
-                            File chartsDirectory = new File(chartDirName + File.separator + directory + File.separator + "charts");
+                            File chartsDirectory = new File(chartDirName + File.separator + directory + File.separator + CHARTS_DIR_NAME);
                             if (chartsDirectory.exists()) {
                                 collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart);  // recursion 
                             }
@@ -1175,9 +1171,7 @@ public class ChartMap {
                 Map<String, Object> chartValues = (Map<String, Object>) o;
                 h.setValues(chartValues);
             } else {
-                if (isVerbose()) {
-                    System.out.println("The values.yaml file:" + valuesFile.getAbsolutePath() + " could not be parsed. Possibly it is empty.");
-                }
+                logger.log(logLevelVerbose,"The values.yaml file: {} could not be parsed. Possibly it is empty.", valuesFile.getAbsolutePath());
             }
         }
     }
@@ -1374,8 +1368,8 @@ public class ChartMap {
                 ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 File envFile = new File(envFilename);
-                EnvironmentSpecification env = mapper.readValue(envFile, EnvironmentSpecification.class);
-                Map<String, String> vars = env.getEnvironment();
+                EnvironmentSpecification envSpec = mapper.readValue(envFile, EnvironmentSpecification.class);
+                Map<String, String> vars = envSpec.getEnvironment();
                 vars.forEach((k, v) -> envVars.add(getEscapedVariable(k + "=") + v));
             } catch (IOException e) {
                 logger.error(LOG_FORMAT_4, "IOException reading Environment Variables File ", envFilename, " : ", e.getMessage());
