@@ -165,7 +165,6 @@ public class ChartMap {
      *                       switches[2] provides a little more information as the Chart Map is
      *                       generated
      *                       switches[3] debug mode ... more info about internals printed
-     * @throws Exception
      **/
 
     public ChartMap(ChartOption option,
@@ -269,6 +268,33 @@ public class ChartMap {
      * @param args command line args
      */
     private void parseArgs(String[] args) throws ChartMapException {
+        Options options = setOptions();
+        CommandLineParser parser = new DefaultParser();
+        int count = 0;
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            count = parseOptions(cmd);
+            parseSwitches(cmd);
+            if (args.length == 0
+                    || cmd.hasOption("h")
+                    || count != 1) {
+                logger.info(ChartMap.getHelp());
+                System.exit(0);
+            }
+            setLogLevel();
+            helmMajorVersionUsed = getHelmVersion();
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+            throw new ChartMapException(String.format("Parse Exception: %s" , e.getMessage()));
+        }
+    }
+
+    
+    /**
+     * Sets up the options we will use for parsing
+     * @return  the Options created
+     */
+    private Options setOptions() {
         Options options = new Options();
         options.addOption("a", true, "The appr chart location");
         options.addOption("c", true, "The Chart Name");
@@ -282,60 +308,61 @@ public class ChartMap {
         options.addOption("u", true, "The Url of the Helm Chart ");
         options.addOption("v", false, "Verbose");
         options.addOption("z", false, "Debug Mode");
-        CommandLineParser parser = new DefaultParser();
-        int count = 0;
-        try {
-            CommandLine cmd = parser.parse(options, args);
-            if (cmd.hasOption("a")) { // e.g. quay.io/alfresco/alfresco-dbp@0.2.0
-                if (parseApprSpec(cmd.getOptionValue("a"))) {
-                    count++;
-                }
-            }
-            if (cmd.hasOption("c")) { // e.g. alfresco-dbp:0.2.0
-                if (parseChartName(cmd.getOptionValue("c"))) {
-                    count++;
-                }
-            }
-            if (cmd.hasOption("u")) { // e.g. https://alfresco.github.io/charts/incubator/alfresco-content-services-0.0.1.tgz
-                setChartUrl(cmd.getOptionValue("u"));
-                count++;
-            }
-            if (cmd.hasOption("d")) {
-                setHelmHome(cmd.getOptionValue("d"));
-            }
-            if (cmd.hasOption("e")) {
-                setEnvFilename(cmd.getOptionValue("e"));
-            }
-            if (cmd.hasOption("f")) { // e.g. /Users/johndoe/alfresco-content-services-0.0.1.tgz
-                setChartFilename(cmd.getOptionValue("f"));
-                count++;
-            }
-            if (cmd.hasOption("g")) {
-                setGenerateImage(true);
-            }
-            if (cmd.hasOption("o")) {
-                setOutputFilename(cmd.getOptionValue("o"));
-            }
-            if (cmd.hasOption("r")) {
-                setRefreshLocalRepo(true);
-            }
-            if (cmd.hasOption("v")) {
-                setVerbose(true);
-            }
-            if (cmd.hasOption("z")) {
-                setDebug(true);
-            }
-            if (args.length == 0
-                    || cmd.hasOption("h")
-                    || count != 1) {
-                logger.info(ChartMap.getHelp());
-                System.exit(0);
-            }
-            setLogLevel();
-            helmMajorVersionUsed = getHelmVersion();
-        } catch (ParseException e) {
-            logger.error(e.getMessage());
-            throw new ChartMapException(String.format("Parse Exception: %s" , e.getMessage()));
+        return options;
+    }
+    /**
+     * Parse the options from the command line
+     * @param cmd   the command line
+     * @return      a count of the options found
+     */
+    private int parseOptions (CommandLine cmd) {
+        int count = 0;  // note these are exclusive options
+        if (cmd.hasOption("a") && parseApprSpec(cmd.getOptionValue("a"))) { // e.g. quay.io/alfresco/alfresco-dbp@0.2.0
+            count++;
+        }
+        if (cmd.hasOption("c") && parseChartName(cmd.getOptionValue("c"))) { // e.g. alfresco-dbp:0.2.0
+            count++;
+        }
+        if (cmd.hasOption("d")) {
+            setHelmHome(cmd.getOptionValue("d"));
+        }
+        if (cmd.hasOption("e")) {
+            setEnvFilename(cmd.getOptionValue("e"));
+        }
+        if (cmd.hasOption("f")) { // e.g. /Users/johndoe/alfresco-content-services-0.0.1.tgz
+            setChartFilename(cmd.getOptionValue("f"));
+            count++;
+        }
+        if (cmd.hasOption("o")) {
+            setOutputFilename(cmd.getOptionValue("o"));
+        }
+        if (cmd.hasOption("u")) { // e.g. https://alfresco.github.io/charts/incubator/alfresco-content-services-0.0.1.tgz
+            setChartUrl(cmd.getOptionValue("u"));
+            count++;
+        }
+        if (count > 1) {
+            logger.log(logLevelDebug,"count of options found is expected to be 0 or 1.  {} options were found instead.", count);
+        }
+        return count;
+    }
+
+    /**
+     * Parse the switches from the command line
+     * @param cmd   the command line
+     */
+    private void parseSwitches(CommandLine cmd)
+    {
+        if (cmd.hasOption("g")) {
+            setGenerateImage(true);
+        }
+        if (cmd.hasOption("r")) {
+            setRefreshLocalRepo(true);
+        }
+        if (cmd.hasOption("v")) {
+            setVerbose(true);
+        }
+        if (cmd.hasOption("z")) {
+            setDebug(true); 
         }
     }
 
@@ -1057,16 +1084,14 @@ public class ChartMap {
             }
         }
         catch (Exception e) {
-            System.out.println("Exception getting condition of " + key);
+            logger.error(("Exception getting condition of {}" + key));
         }
         // If the condition was not found in the environment variable set, look in the
         // chart
         if (Boolean.FALSE.equals(envCondition)) {
             Object o = ChartUtil.getValue(key, h.getValues());
-            if (o != null) {
-                if (o instanceof Boolean) {
-                    condition = (Boolean) o;
-                }
+            if (o instanceof Boolean) {
+                condition = (Boolean) o;
             }
         }
         return condition;
