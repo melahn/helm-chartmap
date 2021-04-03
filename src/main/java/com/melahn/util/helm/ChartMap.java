@@ -1,6 +1,7 @@
 
 package com.melahn.util.helm;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -455,7 +456,7 @@ public class ChartMap {
      * 
      * @return void
      */
-    private void loadLocalRepos() throws Exception {
+    private void loadLocalRepos() throws ChartMapException {
         try {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -473,7 +474,7 @@ public class ChartMap {
                 } else if (SystemUtils.IS_OS_WINDOWS) {
                     repositoriesDirname = System.getenv("APPDATA").concat("/helm");
                 } else {
-                    throw (new IOException("unknown OS"));
+                    throw (new ChartMapException ("unknown OS"));
                 }
                 helmRepoFilename = repositoriesDirname.concat("/repositories.yaml");
             }
@@ -498,8 +499,9 @@ public class ChartMap {
             }
             printLocalRepos();
             loadLocalCharts();
-        } catch (Exception e) {
-            throw (e);
+        }
+        catch (IOException e) {
+            throw new ChartMapException (String.format("IOException found loading local repos: %s.", e.getMessage()));
         }
     }
 
@@ -766,31 +768,29 @@ public class ChartMap {
 
     private String downloadChart(String u) {
         String chartDirName = null;
-        try {
+        String tgzFileName = tempDirName + this.getClass().getCanonicalName() + "_chart.tgz";
+        try (FileOutputStream fos = new FileOutputStream(new File(tgzFileName));) {
             CloseableHttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(u);
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
             int rc = response.getStatusLine().getStatusCode();
-            String tgzFileName = tempDirName + this.getClass().getCanonicalName() + "_chart.tgz";
             if (rc == 200) {
                 InputStream is = entity.getContent();
-                FileOutputStream fos = new FileOutputStream(new File(tgzFileName));
                 int b;
                 while ((b = is.read()) != -1) {
                     fos.write(b);
                 }
                 is.close();
-                fos.close();
                 client.close();
                 chartDirName = unpackChart(tgzFileName);
                 createChart(chartDirName);
             }
             else {
-                System.out.println("Error downloading chart from URL: " + request.getURI() + " : " + rc);
+                logger.error("Error downloading chart from URL: {} : {}", request.getURI(), rc);
             }
         } catch (Exception e) {
-            System.out.println("Error downloading chart " + chartDirName + " : " + e.getMessage());
+            logger.error("Error downloading chart {} : {}", chartDirName, e.getMessage());
         }
         return chartDirName;
     }
