@@ -878,7 +878,7 @@ public class ChartMap {
                 String name = entry.getName();
                 String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
                 Path dir = new File(chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)), packedChartName).toPath();
-                checkZipEntryForSecurityVulnerability(dir, tempDirName);
+                checkForZipSlipSecurityVulnerability(dir, chartFilename);
                 if (!Files.exists(dir)) {
                     Files.createDirectories(dir);
                 }
@@ -889,6 +889,7 @@ public class ChartMap {
                 // The reason for this curious logic is that sometimes the tgz file may have a directory entry by itself so
                 // I test for the existence of the file beforehand (as it may have been created already)
                 if (!file.exists()) {
+                    checkForZipSlipSecurityVulnerability(Paths.get(fileName), chartFilename);
                     boolean created = file.createNewFile();
                     if (created) {
                         logger.log(logLevelDebug,"File {} created",fileName);
@@ -956,13 +957,14 @@ public class ChartMap {
      * and throws a ChartMapException if found
      * 
      * @param p     a target directory in which I am about to create files
-     * @param d     the name of the directory in which the zip file is being unzipped
+     * @param z     the fqfn of the zip file
      * @throws ChartMapException
      */
-    private void checkZipEntryForSecurityVulnerability(Path p, String d) throws ChartMapException {
+    private void checkForZipSlipSecurityVulnerability(Path p, String z) throws ChartMapException {
+        String zipFileDir = z.substring(0, z.lastIndexOf(System.getProperty("file.separator")));
         try {
-            if (!p.startsWith(d)) {
-              throw new IOException(String.format("Directory %s is outside of the target directory %s.", p, d));
+            if (!p.startsWith(zipFileDir)) {
+              throw new IOException(String.format("Directory %s is outside of the target directory of the zip file %s.", p, z));
             }
         }
         catch (IOException e) {
