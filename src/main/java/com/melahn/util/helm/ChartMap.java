@@ -877,7 +877,9 @@ public class ChartMap {
             while ((entry = (TarArchiveEntry) tis.getNextEntry()) != null) {
                 String name = entry.getName();
                 String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
-                Path dir = new File(chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)), packedChartName).toPath();
+                String dirName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
+                checkForZipSlipSecurityVulnerability(Paths.get(dirName), chartFilename);
+                Path dir = new File(dirName, packedChartName).toPath();
                 checkForZipSlipSecurityVulnerability(dir, chartFilename);
                 if (!Files.exists(dir)) {
                     Files.createDirectories(dir);
@@ -885,6 +887,7 @@ public class ChartMap {
                 int count;
                 byte[] data = new byte[bufferSize];
                 String fileName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)) + File.separator + entry.getName();
+                checkForZipSlipSecurityVulnerability(Paths.get(fileName), chartFilename);
                 File file = new File(fileName);
                 // The reason for this curious logic is that sometimes the tgz file may have a directory entry by itself so
                 // I test for the existence of the file beforehand (as it may have been created already)
