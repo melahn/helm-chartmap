@@ -49,6 +49,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.yaml.snakeyaml.Yaml;
+
 import com.melahn.util.helm.model.*;
 public class ChartMap {
 
@@ -877,6 +878,7 @@ public class ChartMap {
                 String name = entry.getName();
                 String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
                 Path dir = new File(chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)), packedChartName).toPath();
+                checkZipEntryForSecurityVulnerability(dir, tempDirName);
                 if (!Files.exists(dir)) {
                     Files.createDirectories(dir);
                 }
@@ -948,6 +950,24 @@ public class ChartMap {
             logger.error(LOG_FORMAT_3, "Exception extracting Chart ", chartFilename, ":", e.getMessage());
         }
         return baseUnpackDirName;
+    }
+    /**
+     * Checks for Security Vulnerability 'Extracting archives should not lead to zip slip vulnerabilities'
+     * and throws a ChartMapException if found
+     * 
+     * @param p     a target directory in which I am about to create files
+     * @param d     the name of the directory in which the zip file is being unzipped
+     * @throws ChartMapException
+     */
+    private void checkZipEntryForSecurityVulnerability(Path p, String d) throws ChartMapException {
+        try {
+            if (!p.startsWith(d)) {
+              throw new IOException(String.format("Directory %s is outside of the target directory %s.", p, d));
+            }
+        }
+        catch (IOException e) {
+            throw new ChartMapException(e.getMessage());
+        }
     }
 
     /**
