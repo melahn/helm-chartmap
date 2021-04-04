@@ -45,6 +45,21 @@
     <sonar.organization>melahn</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
   <build>
     <plugins>
       <plugin>
@@ -58,7 +73,6 @@
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
         <dependencies>
-          <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
           <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -237,6 +251,45 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.6</version>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>COMPLEXITY</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.10</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+       </plugin>
     </plugins>
   </build>
   <dependencies>
