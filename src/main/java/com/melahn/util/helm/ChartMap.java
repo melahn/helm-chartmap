@@ -38,6 +38,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -96,6 +99,7 @@ public class ChartMap {
     private static final String CHART_YAML = "Chart.yaml";
     private static final String CHARTS_DIR_NAME = "charts";
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
+    private static final String TEMP_DIR_ERROR = "Error creating temp directory: ";
     /**
      * This inner class is used to assign a 'weight' to a template based on its
      * position in the file system (parent templates having the lower weight).
@@ -1727,14 +1731,15 @@ public class ChartMap {
     /**
      * Creates a temporary used to download and expand the Helm Chart
      */
-    private void createTempDir() throws IOException {
+    private void createTempDir() throws ChartMapException {
         try {
-            Path p = Files.createTempDirectory(this.getClass().getCanonicalName() + ".");
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-----"));
+            Path p =Files.createTempDirectory(this.getClass().getCanonicalName() + "." + "Temporary.",attr);
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
-            logger.log(logLevelVerbose,LOG_FORMAT_3,TEMP_DIR,getTempDirName()," will be used");
-        } catch (IOException e) {
-            logger.error(LOG_FORMAT_2, "Error creating temp directory: ", e.getMessage());
-            throw e;
+            logger.log(logLevelVerbose,LOG_FORMAT_3,TEMP_DIR,getTempDirName()," will be used as the temporary directory.");
+        } catch (Exception e) {
+            logger.error(LOG_FORMAT_2, TEMP_DIR_ERROR, e.getMessage());
+            throw new ChartMapException(String.format(TEMP_DIR_ERROR + "%s", e.getMessage()));
         }
     }
 
