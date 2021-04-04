@@ -1,7 +1,6 @@
 
 package com.melahn.util.helm;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -1160,7 +1159,7 @@ public class ChartMap {
                 dependents.forEach(r -> conditionMap.put(r.getName(), r.getCondition()));
             }
             catch (Exception e) {
-                System.out.println("Error parsing requirements file " + requirementsFile.getAbsolutePath());
+                logger.error("Error parsing requirements file {}", requirementsFile.getAbsolutePath());
             }
         }
         return conditionMap;
