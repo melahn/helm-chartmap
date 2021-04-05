@@ -1184,7 +1184,7 @@ public class ChartMap {
             HashSet<HelmDeploymentTemplate> a = new HashSet<>();
             for (HelmDeploymentTemplate t : h.getDeploymentTemplates()) {
                 // get the template from the weighted templates array
-                WeightedDeploymentTemplate w = deploymentTemplatesReferenced.get(t._getFileName());
+                WeightedDeploymentTemplate w = deploymentTemplatesReferenced.get(t.getFileName());
                 if (w != null) {
                     // and use that instead of what the Chart was using.  Usually they are not different
                     HelmDeploymentContainer[] helmDeploymentContainers = w.getTemplate().getSpec().getTemplate().getSpec().getContainers();
@@ -1284,7 +1284,7 @@ public class ChartMap {
                             }
                             // if this template is a child of this chart remember that fact
                             if (Boolean.TRUE.equals(a.get(i))) {
-                                template._setFileName(b.get(i));  // is this needed?
+                                template.setFileName(b.get(i));  // is this needed?
                                 h.getDeploymentTemplates().add(template);
                             }
                             // cases:
@@ -1710,7 +1710,7 @@ public class ChartMap {
     private boolean isStable(HelmChart h, boolean checkContainers) {
         boolean stable = true;
         if (h.getRepoUrl() != null && h.getRepoUrl().contains("/incubator")) {
-            logger.log(logLevelDebug,"chart {} does not appear to be stable", h.getNameFull());
+            logger.log(logLevelVerbose,"chart {} does not appear to be stable", h.getNameFull());
             stable = false;
         } else if (checkContainers) {  // also check the images if needed
             for (HelmDeploymentContainer c : h.getContainers()) {
@@ -1721,7 +1721,7 @@ public class ChartMap {
                         imageName.contains("-trial") ||
                         imageName.contains("-rc")) {
                     stable = false;
-                    logger.log(logLevelDebug,"image {} does not appear to be stable", c.getImage());
+                    logger.log(logLevelVerbose,"image {} does not appear to be stable", c.getImage());
                 }
             }
         }
