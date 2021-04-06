@@ -69,6 +69,7 @@ public class ChartMap {
     private String envFilename;
     HashSet<String> env;
     private boolean generateImage;
+    private String helmCommand;
     private String helmHome;
     private helmMajorVersion helmMajorVersionUsed;
     private enum helmMajorVersion { V2, V3, UNKNOWN }
@@ -287,6 +288,7 @@ public class ChartMap {
                 System.exit(0);
             }
             setLogLevel();
+            helmCommand = getHelmCommand();
             helmMajorVersionUsed = getHelmVersion();
         } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -519,7 +521,7 @@ public class ChartMap {
      * @return helmMajorVersion
      */
     private helmMajorVersion getHelmVersion() throws ChartMapException {
-        String[] cmdArray = {"helm", "version", "--template", "{{ .Version }}" };
+        String[] cmdArray = {helmCommand, "version", "--template", "{{ .Version }}" };
         try {
             Process p = Runtime.getRuntime().exec(cmdArray);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -536,12 +538,33 @@ public class ChartMap {
                 throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0] + cmdArray[1] + cmdArray[2] + cmdArray[3]);
             }
         }
-        catch (IOException e) {
-            throw new ChartMapException("IO Exception trying to discover Helm Version: ".concat(e.getMessage())); // we could not get the output of the helm command
+        catch(IOException  e) {
+            throw new ChartMapException(String.format("Exception trying to discover Helm Version: %s ", e.getMessage())); // we could not get the output of the helm command
         }
         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION,apprSpec, e.getMessage()));
+        }
+    }
+
+    /**
+     * Return the helm command to use, giving priority to the value of HELM_BIN if set explictly. 
+     * Setting HELM_BIN explicitly is arguably more secure since the user does not need to worry then 
+     * about some evil helm command in the PATH, though it does then rely on the value of
+     * HELM_BIN itself being secure.
+     * 
+     * @return the helm command
+     */
+    private String getHelmCommand() throws ChartMapException {
+        try {
+            String helmBin = System.getenv("HELM_BIN");
+            logger.log(logLevelDebug,"HELM_BIN = {}", helmBin);
+            String helmCommandResolved = helmBin == null? "helm" : helmBin;
+            logger.log(logLevelDebug,"The helm command {} will be used.", helmCommandResolved);
+            return helmCommandResolved;
+        }
+        catch(SecurityException | NullPointerException e) {
+            throw new ChartMapException(String.format("Exception trying to get HELM_BIN: %s ", e.getMessage())); 
         }
     }
 
@@ -1328,7 +1351,7 @@ public class ChartMap {
      * 
      */
     private File runTemplateCommand(File dir, HelmChart h) throws IOException, ChartMapException {
-        String command = "helm ";
+        String command = helmCommand;
         // Get any variables the user may have specified and
         // append to the command
         List<String> envVars = getEnvVars();
