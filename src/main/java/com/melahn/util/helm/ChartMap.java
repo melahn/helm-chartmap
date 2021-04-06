@@ -635,7 +635,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error loading charts from helm cache: {}", e.getMessage());
         }
     }
 
@@ -656,7 +656,7 @@ public class ChartMap {
                 printer.printChart((HelmChart) it.getValue());
             }
         } catch (IOException e) {
-            System.out.println("Error printing charts: " + e.getMessage());
+            logger.error("IOException printing charts: {} ", e.getMessage());
         }
     }
 
@@ -670,10 +670,10 @@ public class ChartMap {
                 collectDependencies(chartDirName, null);
                 applyTemplates();
             } else {
-                System.out.println("Chart " + chartName + " not found");
+                logger.error("Chart {} was not found", chartName);
             }
         } catch (Exception e) {
-            System.out.println("Error resolving chart dependencies:" + e.getMessage());
+            logger.error("Error resolving chart dependencies: {}", e.getMessage());
         }
     }
 
@@ -857,7 +857,7 @@ public class ChartMap {
             collectValues(chartDirName,h);
             charts.put(h.getName(), h.getVersion(), h);
         } catch (Exception e) {
-            System.out.println("Error extracting Chart information from " + yamlChartFilename);
+            logger.error("Error extracting Chart information from {}", yamlChartFilename);
         }
     }
 
@@ -1080,7 +1080,7 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Exception getting Dependencies: " + e.getMessage());
+            logger.error("Exception getting Dependencies: {}", e.getMessage());
         }
     }
 
