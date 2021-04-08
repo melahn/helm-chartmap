@@ -904,21 +904,18 @@ public class ChartMap {
                 String name = entry.getName();
                 String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
                 String dirName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-                checkForZipSlipSecurityVulnerability(Paths.get(dirName), chartFilename);
                 Path dir = new File(dirName, packedChartName).toPath();
-                checkForZipSlipSecurityVulnerability(dir, chartFilename);
                 if (!Files.exists(dir)) {
+                    checkForZipSlipSecurityVulnerability(dir, entry);
                     Files.createDirectories(dir);
                 }
                 int count;
                 byte[] data = new byte[bufferSize];
                 String fileName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)) + File.separator + entry.getName();
-                checkForZipSlipSecurityVulnerability(Paths.get(fileName), chartFilename);
                 File file = new File(fileName);
                 // The reason for this curious logic is that sometimes the tgz file may have a directory entry by itself so
                 // I test for the existence of the file beforehand (as it may have been created already)
                 if (!file.exists()) {
-                    checkForZipSlipSecurityVulnerability(Paths.get(fileName), chartFilename);
                     boolean created = file.createNewFile();
                     if (created) {
                         logger.log(logLevelDebug,"File {} created",fileName);
@@ -985,20 +982,17 @@ public class ChartMap {
      * Checks for Security Vulnerability 'Extracting archives should not lead to zip slip vulnerabilities'
      * and throws a ChartMapException if found
      * 
-     * @param p     a target directory in which I am about to create files
-     * @param z     the fqfn of the zip file
+     * @param p     a directory in which I propose to do some writes
+     * @param z     the zip entry to check
      * @throws ChartMapException
      */
-    private void checkForZipSlipSecurityVulnerability(Path p, String z) throws ChartMapException {
-        String zipFileDir = z.substring(0, z.lastIndexOf(System.getProperty("file.separator")));
-        try {
-            if (!p.startsWith(zipFileDir)) {
-              throw new IOException(String.format("Directory %s is outside of the target directory of the zip file %s.", p, z));
-            }
+    private void checkForZipSlipSecurityVulnerability(Path p, TarArchiveEntry z) throws ChartMapException {
+        Path resolvedPath = p.resolve(z.getName());
+        Path normalizedPath = resolvedPath.normalize();
+        if (!normalizedPath.startsWith(p)) {
+            throw new ChartMapException(String.format("A Zip Entry contains a name %s is outside of the expected directory for the zip file %s.",z.getName(), p));
         }
-        catch (IOException e) {
-            throw new ChartMapException(e.getMessage());
-        }
+        return;  // everything is OK
     }
 
     /**
