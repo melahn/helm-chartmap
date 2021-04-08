@@ -905,8 +905,8 @@ public class ChartMap {
                 String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
                 String dirName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
                 Path dir = new File(dirName, packedChartName).toPath();
+                boolean vuln = dir.toFile().getCanonicalPath().startsWith(tempDirName);
                 if (!Files.exists(dir)) {
-                    checkForZipSlipSecurityVulnerability(dir, name);
                     Files.createDirectories(dir);
                 }
                 int count;
