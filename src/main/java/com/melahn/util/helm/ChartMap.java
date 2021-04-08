@@ -906,7 +906,7 @@ public class ChartMap {
                 String dirName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
                 Path dir = new File(dirName, packedChartName).toPath();
                 if (!Files.exists(dir)) {
-                    checkForZipSlipSecurityVulnerability(dir, entry);
+                    checkForZipSlipSecurityVulnerability(dir, name);
                     Files.createDirectories(dir);
                 }
                 int count;
@@ -983,14 +983,14 @@ public class ChartMap {
      * and throws a ChartMapException if found
      * 
      * @param p     a directory in which I propose to do some writes
-     * @param z     the zip entry to check
+     * @param n     the name from the zip entry to check
      * @throws ChartMapException
      */
-    private void checkForZipSlipSecurityVulnerability(Path p, TarArchiveEntry z) throws ChartMapException {
-        Path resolvedPath = p.resolve(z.getName());
+    private void checkForZipSlipSecurityVulnerability(Path p, String n) throws ChartMapException {
+        Path resolvedPath = p.resolve(n);
         Path normalizedPath = resolvedPath.normalize();
         if (!normalizedPath.startsWith(p)) {
-            throw new ChartMapException(String.format("A Zip Entry contains a name %s is outside of the expected directory for the zip file %s.",z.getName(), p));
+            throw new ChartMapException(String.format("A Zip Entry contains a name %s is outside of the expected directory for the zip file %s.",n, p));
         }
         return;  // everything is OK
     }
