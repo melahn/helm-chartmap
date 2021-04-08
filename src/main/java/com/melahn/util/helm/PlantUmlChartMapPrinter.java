@@ -15,7 +15,7 @@ import java.io.IOException;
 public class PlantUmlChartMapPrinter extends ChartMapPrinter {
 
     private String[] colors;
-    private static String SEPARATOR = "\\n====\\n";
+    private static final String SEPARATOR = "\\n====\\n";
 
     /**
      * Constructor
