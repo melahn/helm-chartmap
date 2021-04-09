@@ -901,13 +901,15 @@ public class ChartMap {
         {
             TarArchiveEntry entry;
             while ((entry = (TarArchiveEntry) tis.getNextEntry()) != null) {
-                String name = entry.getName();
-                String packedChartName = name.substring(0, name.lastIndexOf(File.separator));
-                String dirName = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-                Path dir = new File(dirName, packedChartName).toPath();
-                boolean vuln = dir.toFile().getCanonicalPath().startsWith(tempDirName);
-                if (!Files.exists(dir)) {
-                    Files.createDirectories(dir);
+                String name = entry.getName(); // e.g. my-chart/Chart.yaml
+                String dirNameFromZip = name.substring(0, name.lastIndexOf(File.separator)); // e.g. my-chart
+                String dirNameOfZip = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator)); // e.g. /temp/my-chart-1.0.0
+                Path dirNameToCreate = new File(dirNameOfZip, dirNameFromZip).toPath(); // e.g. /temp/my-chart-1.0.0/my-chart
+                if (!dirNameToCreate.toFile().getCanonicalPath().startsWith(new File(tempDirName).getCanonicalPath())) {
+                    throw new ChartMapException(String.format("A file %s in the chart zip file lies outside of the directory of the zip file.  This is a security issue.", dirNameToCreate.toFile().getCanonicalPath()));
+                }
+                if (!Files.exists(dirNameToCreate)) {
+                    Files.createDirectories(dirNameToCreate);
                 }
                 int count;
                 byte[] data = new byte[bufferSize];
@@ -934,7 +936,7 @@ public class ChartMap {
                         }
                     }
                     if (baseUnpackDirName == null) {
-                        baseUnpackDirName = tempDirName + packedChartName;
+                        baseUnpackDirName = tempDirName + dirNameFromZip;
                     }
                 }
             }
