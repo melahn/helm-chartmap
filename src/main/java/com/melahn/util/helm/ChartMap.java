@@ -970,13 +970,11 @@ public class ChartMap {
      * @throws IOException if an exception occurs listing the directory
      */
     private String getBaseName(String d) throws IOException {
-        Stream <Path> s = Files.list(Paths.get(d));
-        List <Path> l = s.filter(p->p.toFile().isDirectory())
-        .collect(Collectors.toList());
+        Stream<Path> s = Files.list(Paths.get(d));
+        List<Path> l = s.filter(p -> p.toFile().isDirectory()).collect(Collectors.toList());
         s.close();
         return l.size() == 1 ? l.get(0).toString() : null;
     }
-
 
     /**
      * Starting at the directory in chartDirName, recursively discovers all the
@@ -1080,9 +1078,10 @@ public class ChartMap {
     Boolean getCondition(String key, HelmChart h) {
         Boolean condition = Boolean.TRUE;
         Boolean envCondition = Boolean.FALSE;
-        // Check if it was specified as an environment variable, overriding what may be
-        // in
-        // the chart
+        /**
+         * Check if it was specified as an environment variable, overriding what may be
+         * in the chart
+         */
         try {
             List<String> vars = getEnvVars();
             for (String s : vars) {
@@ -1098,8 +1097,10 @@ public class ChartMap {
         } catch (Exception e) {
             logger.error(("Exception getting condition of {}" + key));
         }
-        // If the condition was not found in the environment variable set, look in the
-        // chart
+        /**
+         * If the condition was not found in the environment variable set, look in the
+         * chart
+         */
         if (Boolean.FALSE.equals(envCondition)) {
             Object o = ChartUtil.getValue(key, h.getValues());
             if (o instanceof Boolean) {
@@ -1177,7 +1178,7 @@ public class ChartMap {
                     HelmDeploymentContainer[] helmDeploymentContainers = w.getTemplate().getSpec().getTemplate()
                             .getSpec().getContainers();
                     for (HelmDeploymentContainer c : helmDeploymentContainers) {
-                        c._setParent(t.getSpec().getTemplate().getSpec().getContainers()[0]._getParent());
+                        c.setParent(t.getSpec().getTemplate().getSpec().getContainers()[0].getParent());
                     }
                     a.add(w.getTemplate());
                 }
@@ -1253,10 +1254,12 @@ public class ChartMap {
             int i = 0;
             Yaml yaml = new Yaml();
             InputStream input = new FileInputStream(templateFile);
-            for (Object data : yaml.loadAll(input)) { // there may multiple yaml documents in this one document
-                // inspect the object to see if it is a Deployment or a StatefulSet template
-                // if it is add to the deploymentTemplates array
-                if (data instanceof Map) { // todo is this needed? should it not always be a Map?
+            for (Object data : yaml.loadAll(input)) { 
+                    /** there may multiple yaml documents in this one document
+                     * inspect the object to see if it is a Deployment or a StatefulSet template
+                     * if it is add to the deploymentTemplates arra
+                     */
+                    if (data instanceof Map) { // todo is this needed? should it not always be a Map?
                     Map m = (Map) data;
                     Object o = m.get("kind");
                     if (o instanceof String) {
@@ -1270,20 +1273,21 @@ public class ChartMap {
                             HelmDeploymentContainer[] containers = template.getSpec().getTemplate().getSpec()
                                     .getContainers();
                             for (HelmDeploymentContainer c : containers) {
-                                c._setParent(p);
+                                c.setParent(p);
                             }
                             // if this template is a child of this chart remember that fact
                             if (Boolean.TRUE.equals(a.get(i))) {
                                 template.setFileName(b.get(i)); // is this needed?
                                 h.getDeploymentTemplates().add(template);
                             }
-                            // cases:
-                            // 1. The Chart has a dependency on this template and nothing supercedes it in
-                            // some parent chart
-                            // 2. The Chart has a dependency on this template and a superceding version of
-                            // this template has already been found
-                            // 3. The Chart has a dependency on this template and a superceding version of
-                            // this template will be found later
+                            /** cases:
+                             * 1. The Chart has a dependency on this template and nothing supercedes it in
+                             * some parent chart
+                             * 2. The Chart has a dependency on this template and a superceding version of
+                             * this template has already been found
+                             * 3. The Chart has a dependency on this template and a superceding version of
+                             * this template will be found later
+                             */
                             WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
                             if (weightedTemplate == null) {
                                 weightedTemplate = new WeightedDeploymentTemplate(dir.getAbsolutePath(), template);
@@ -1293,7 +1297,7 @@ public class ChartMap {
                                 containers = weightedTemplate.getTemplate().getSpec().getTemplate().getSpec()
                                         .getContainers();
                                 for (HelmDeploymentContainer c : containers) {
-                                    c._setParent(p);
+                                    c.setParent(p);
                                 }
                                 if (weightedTemplate.getWeight() > getWeight(dir.getAbsolutePath())) {
                                     // a superceding template was found so replace the template that is referenced
@@ -1308,9 +1312,12 @@ public class ChartMap {
                          // of interest for the current chart level
                 }
             }
-        } catch (Exception e) {
-            logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
-        }
+        }catch(
+
+    Exception e)
+    {
+        logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
+    }
     }
 
     /**
@@ -1323,8 +1330,7 @@ public class ChartMap {
      */
     private File runTemplateCommand(File dir, HelmChart h) throws IOException, ChartMapException {
         String command = helmCommand;
-        // Get any variables the user may have specified and
-        // append to the command
+        // Get any variables the user may have specified and append to the command
         List<String> envVars = getEnvVars();
         if (!envVars.isEmpty()) {
             command = command.concat(" --set \"");
@@ -1589,8 +1595,10 @@ public class ChartMap {
      * @throws IOException if an error occurred generaing the image
      */
     private void generateImage(String f) throws IOException {
-        // PlantUML wants the full path of the input file so get the pwd so it can be
-        // generated
+        /**
+         * PlantUML wants the full path of the input file so get the pwd so it can be
+         * generated
+         */
         String d = System.getProperty("user.dir");
         Path i = Paths.get(f.replace("puml", "png"));
         try {

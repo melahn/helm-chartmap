@@ -51,8 +51,8 @@ public class HelmChart {
             if (hdc != null && hdc.length > 0) {
                 c = new HelmDeploymentContainer();
                 c.setImage(hdc[0].getImage());
-                c._setParent(hdc[0]._getParent()); // remember the parent of the chart that caused this image to
-                                                   // be included
+                c.setParent(hdc[0].getParent()); // remember the parent of the chart that caused this image to
+                                                  // be included
             }
             if (c !=null) {
                 containers.add(c);
