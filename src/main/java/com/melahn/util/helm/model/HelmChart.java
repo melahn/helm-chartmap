@@ -14,18 +14,13 @@ public class HelmChart {
     private HashSet<HelmChart> dependencies = new HashSet<>();
     private HashSet<HelmDeploymentTemplate> deploymentTemplates = new HashSet<>();
     private String digest;
-    private HashSet<HelmChart> discoveredDependencies = new HashSet<>(); // this is not part of the 
-                                                                         // yaml file. This property
-                                                                         // holds the values of the 
-                                                                         // dependencies discovered
-                                                                         // by parsing the descendent
-                                                                         // directories and rendering
-                                                                         // templates. This is needed
-                                                                         // because the dependencies
-                                                                         // property in the yaml file
-                                                                         // can hold bogus values (e.g
-                                                                         // the 1.x.x versions in the
-                                                                         // wordpress 10.6.10 chart)
+    /**
+     * discoveredDependencies is not part of the yaml file. This property holds the values of the 
+     * dependencies discovered by parsing the descendent directories and rendering templates. 
+     * This is needed because the dependencies property in the yaml file can hold bogus values (e.g
+     * the 1.x.x versions in the wordpress 10.6.10 chart)
+     */
+    private HashSet<HelmChart> discoveredDependencies = new HashSet<>(); 
     private String icon;
     private String[] keywords;
     private HelmMaintainer[] maintainers;

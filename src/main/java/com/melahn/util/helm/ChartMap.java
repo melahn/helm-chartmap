@@ -1255,12 +1255,12 @@ public class ChartMap {
             Yaml yaml = new Yaml();
             InputStream input = new FileInputStream(templateFile);
             for (Object data : yaml.loadAll(input)) { 
-                    /** there may multiple yaml documents in this one document
-                     * inspect the object to see if it is a Deployment or a StatefulSet template
-                     * if it is add to the deploymentTemplates arra
-                     */
-                    if (data instanceof Map) { // todo is this needed? should it not always be a Map?
-                    Map m = (Map) data;
+                /** there may multiple yaml documents in this one document
+                 * inspect the object to see if it is a Deployment or a StatefulSet template
+                 * if it is add to the deploymentTemplates arra
+                 */
+                if (data instanceof Map) { 
+                    Map<String, Object> m = (Map<String, Object>) data;
                     Object o = m.get("kind");
                     if (o instanceof String) {
                         String v = (String) o;
