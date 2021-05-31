@@ -2,7 +2,6 @@ package com.melahn.util.helm;
 
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
-import org.apache.commons.collections4.map.MultiKeyMap;
 import org.json.*;
 
 import java.io.BufferedWriter;
@@ -27,7 +26,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String,String> charts, HelmChart chart) {
+    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart) {
         super(chartMap, outputFilename, charts, chart);
      }
 
@@ -126,8 +125,8 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
         for (HelmDeploymentContainer c : h.getContainers()) {
             String ignf = "";
             String pgnf = "";
-            if (c._getParent() != null) {
-                ignf = c._getParent().getNameFull();
+            if (c.getParent() != null) {
+                ignf = c.getParent().getNameFull();
             }
             if (p != null) {
                 pgnf = p.getNameFull();

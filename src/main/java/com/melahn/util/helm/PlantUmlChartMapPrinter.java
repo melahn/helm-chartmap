@@ -1,7 +1,5 @@
 package com.melahn.util.helm;
 
-import org.apache.commons.collections4.map.MultiKeyMap;
-
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmMaintainer;
 
@@ -27,7 +25,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String,String> charts, HelmChart chart) {
+    public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart) {
         super(chartMap, outputFilename, charts, chart);
         initializeColors();
     }

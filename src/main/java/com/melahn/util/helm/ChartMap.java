@@ -53,7 +53,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.MapIterator;
-import org.apache.commons.collections4.map.MultiKeyMap;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -70,12 +70,12 @@ public class ChartMap {
     private String apprSpec;
     private HelmChart chart;
     private String chartFilename;
-    private MultiKeyMap charts;
+    private ChartKeyMap charts;
     private String chartName;
     private String chartVersion;
     private String chartUrl;
     HashSet<String> chartsDependenciesPrinted;
-    private MultiKeyMap chartsReferenced;
+    private ChartKeyMap chartsReferenced;
     private boolean debug;
     private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced;
     private String envFilename;
@@ -271,9 +271,9 @@ public class ChartMap {
             setPrintFormat(PrintFormat.TEXT);
             setGenerateImage(false);
             setRefreshLocalRepo(false);
-            charts = new MultiKeyMap();
+            charts = new ChartKeyMap();
             chartsDependenciesPrinted = new HashSet<>();
-            chartsReferenced = new MultiKeyMap<>();
+            chartsReferenced = new ChartKeyMap();
             env = new HashSet<>();
             imagesReferenced = new HashSet<>();
             deploymentTemplatesReferenced = new HashMap<>();
@@ -684,7 +684,7 @@ public class ChartMap {
      * with a summary of how many charts were referenced
      */
     private void printCharts() {
-        MapIterator it = chartsReferenced.mapIterator();
+        MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
         try {
             if (chartsReferenced.size() == 1) {
                 printer.printSectionHeader("There is one referenced Helm Chart");
@@ -693,7 +693,7 @@ public class ChartMap {
             }
             while (it.hasNext()) {
                 it.next();
-                printer.printChart((HelmChart) it.getValue());
+                printer.printChart(it.getValue());
             }
         } catch (IOException e) {
             logger.error("IOException printing charts: {} ", e.getMessage());
@@ -737,7 +737,7 @@ public class ChartMap {
             } else if (getChartFilename() != null) {
                 chartDirName = getChart(getChartFilename());
             } else {
-                HelmChart h = (HelmChart) charts.get(chartName, chartVersion);
+                HelmChart h = charts.get(chartName, chartVersion);
                 if (h == null) {
                     throw (new ChartMapException(
                             "chart ".concat(chartName.concat(":").concat(chartVersion).concat(" not found"))));
@@ -749,7 +749,7 @@ public class ChartMap {
             logger.error("Error getting chart: {}", e.getMessage());
             throw (e);
         }
-        chart = (HelmChart) charts.get(chartName, chartVersion);
+        chart = charts.get(chartName, chartVersion);
         if (chartDirName != null) {
             return chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)); // return the parent directory
         }
@@ -903,7 +903,7 @@ public class ChartMap {
             // from that chart into the chart we create from the yaml file since otherwise
             // we
             // will lose it. Currently there is only such piece of information, the repo url
-            HelmChart foundChart = (HelmChart) charts.get(h.getName(), h.getVersion());
+            HelmChart foundChart = charts.get(h.getName(), h.getVersion());
             if (foundChart != null) {
                 h.setRepoUrl(foundChart.getRepoUrl());
             }
@@ -999,7 +999,7 @@ public class ChartMap {
             if (directories != null) {
                 for (String directory : directories) {
                     if (h != null) {
-                        parentHelmChart = (HelmChart) charts.get(h.getName(), h.getVersion());
+                        parentHelmChart = charts.get(h.getName(), h.getVersion());
                         chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
                     }
                     File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
@@ -1010,7 +1010,7 @@ public class ChartMap {
                                                                                                            // reference
                                                                                                            // is not in
                                                                                                            // the map
-                        HelmChart currentHelmChart = (HelmChart) charts.get(currentHelmChartFromDisk.getName(),
+                        HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
                                 currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
                             // this is most likely because the local Helm charts are out of date and should
@@ -1164,10 +1164,10 @@ public class ChartMap {
      * children) and set that one in the chart
      */
     private void applyTemplates() {
-        MapIterator i = chartsReferenced.mapIterator();
+        MapIterator<MultiKey<? extends String>, HelmChart> i = chartsReferenced.mapIterator();
         while (i.hasNext()) {
             i.next();
-            HelmChart h = (HelmChart) i.getValue();
+            HelmChart h = i.getValue();
             HashSet<HelmDeploymentTemplate> a = new HashSet<>();
             for (HelmDeploymentTemplate t : h.getDeploymentTemplates()) {
                 // get the template from the weighted templates array
@@ -1662,11 +1662,11 @@ public class ChartMap {
      * chart
      */
     private void printContainerDependencies() {
-        MapIterator it = chartsReferenced.mapIterator();
+        MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
         try {
             while (it.hasNext()) {
                 it.next();
-                HelmChart h = (HelmChart) it.getValue();
+                HelmChart h = it.getValue();
                 for (HelmDeploymentContainer c : h.getContainers()) {
                     printer.printChartToImageDependency(h, c.getImage());
                 }

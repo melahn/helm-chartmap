@@ -8,21 +8,20 @@ import java.util.Set;
 import java.util.Iterator;
 
 import com.melahn.util.helm.model.HelmMaintainer;
-import org.apache.commons.collections4.map.MultiKeyMap;
 
 import com.melahn.util.helm.model.HelmChart;
 
 public class ChartMapPrinter implements IChartMapPrinter {
 
     protected HelmChart chart;
-    MultiKeyMap<String, String> charts;
+    ChartKeyMap charts;
     protected ChartMap chartMap;
     protected String outputFilename;
     protected int indent=2; // indent for tree view
     protected FileWriter writer;
     private static final String NOT_SPECIFIED = "Not specified";
 
-    ChartMapPrinter(ChartMap chartMap, String outputFilename, MultiKeyMap<String, String> charts, HelmChart chart) {
+    ChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart) {
         this.outputFilename = outputFilename;
         this.chart = chart;
         this.charts = charts;
