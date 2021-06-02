@@ -1343,7 +1343,7 @@ public class ChartMap {
                 }
             }
         }
-        command = command.concat("template ").concat(h.getName());
+        command = command.concat(" template ").concat(h.getName());
         File f = null;
         try {
             Process p = Runtime.getRuntime().exec(command, null, dir);
