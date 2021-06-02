@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -11,7 +12,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class ChartMapTest {
@@ -216,6 +219,22 @@ public class ChartMapTest {
         } catch (Exception e) {
         fail("testHelp failed:" + e.getMessage());
         }
+    }
+
+    @Test 
+    public void chartUtilTest() {
+        HashMap<String, Object> hm = new HashMap<String,Object>();
+        hm.put("fookey1","foovalue1");
+        hm.put("fookey2", new HashMap<String,Object>() {{
+            put("fookey3", "foovalue3");
+            put("fookey4", "foovalue4");
+        }});
+        assertEquals("foovalue1", ChartUtil.getValue("fookey1", hm));
+        assertEquals("foovalue3", ChartUtil.getValue("fookey2.fookey3", hm));
+        assertNull(ChartUtil.getValue("fookey", null));
+        assertNull(ChartUtil.getValue("", hm));
+        assertNull(ChartUtil.getValue(".", hm));
+        assertNull(ChartUtil.getValue(null, hm));
     }
 
     private ChartMap createTestMap(ChartOption option, Path inputPath, Path outputPath,
