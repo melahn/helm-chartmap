@@ -17,6 +17,7 @@ import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
+import com.melahn.util.helm.model.HelmRequirement;
 
 public class ChartMapModelTest {
 
@@ -94,6 +95,20 @@ public class ChartMapModelTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    @Test
+    public void testHelmRequirement() {
+        HelmRequirement hr = new HelmRequirement();
+        hr.setCondition(EXPECTED);
+        assertSame(EXPECTED, hr.getCondition());
+        hr.setName(EXPECTED);
+        assertSame(EXPECTED, hr.getName());
+        hr.setRepository(EXPECTED);
+        assertSame(EXPECTED, hr.getRepository());
+        hr.setVersion(EXPECTED);
+        assertSame(EXPECTED, hr.getVersion());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+        
     /**
      * Returns a randomly generated string. 
      * @param c the number of characters in the string you want. If
