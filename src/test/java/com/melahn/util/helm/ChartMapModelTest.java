@@ -1,7 +1,11 @@
 package com.melahn.util.helm;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -22,7 +26,7 @@ import com.melahn.util.helm.model.HelmRequirement;
 public class ChartMapModelTest {
 
     static final String EXPECTED = generateRandomString(10);
-
+    static final String NOTEXPECTED = EXPECTED.concat(EXPECTED);
     
     @Test
     public void testHelmChartLocalCache() {
@@ -58,6 +62,42 @@ public class ChartMapModelTest {
         HelmChartRepoLocal[] r = new HelmChartRepoLocal[1]; 
         hcrl.setRepos(r);
         assertSame(r, hcrl.getRepositories());     
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void testHelmDeploymentContainer() {
+        HelmDeploymentContainer hdc = new HelmDeploymentContainer();
+        hdc.setImage(EXPECTED);
+        assertSame(EXPECTED, hdc.getImage());
+        hdc.setImagePullPolicy(EXPECTED);
+        assertSame(EXPECTED, hdc.getImagePullPolicy());
+        hdc.setName(EXPECTED);
+        assertSame(EXPECTED, hdc.getName());
+        HelmDeploymentContainer hdc2 = new HelmDeploymentContainer();
+        hdc2.setImage(EXPECTED);
+        hdc2.setImagePullPolicy(EXPECTED);
+        hdc2.setName(EXPECTED);
+        boolean e = hdc.equals(hdc2);
+        assertTrue(e);
+        e = hdc.equals(hdc);
+        assertTrue(e);
+        hdc2.setImage(NOTEXPECTED);
+        e = hdc.equals(hdc2);
+        assertFalse(e);
+        hdc2.setImage(EXPECTED);
+        hdc2.setImagePullPolicy(NOTEXPECTED);
+        e = hdc.equals(hdc2);
+        assertFalse(e);
+        hdc2.setImagePullPolicy(EXPECTED);
+        hdc2.setName(NOTEXPECTED);
+        e = hdc.equals(hdc2);
+        assertFalse(e);
+        hdc.equals(null);
+        e = hdc.equals(hdc2);
+        assertFalse(e);
+        e = hdc.equals(new Object());
+        assertFalse(e);
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
