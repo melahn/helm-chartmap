@@ -4,8 +4,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertSame;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Random;
 
+import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
@@ -43,6 +45,9 @@ public class ChartMapModelTest {
         HelmChartLocalCache hclc = new HelmChartLocalCache();
         hclc.setApiVersion(EXPECTED);
         assertSame(EXPECTED, hclc.getApiVersion());
+        HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
+        hclc.setEntries(e);
+        assertSame(e, hclc.getEntries());
         System.out.println("testHelmChartLocalCache test completed");
     }
 
