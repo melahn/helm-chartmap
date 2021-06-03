@@ -10,37 +10,17 @@ import java.util.Random;
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
 import com.melahn.util.helm.model.HelmChartRepo;
+import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
+import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 
 public class ChartMapModelTest {
 
     static final String EXPECTED = generateRandomString(10);
 
-    @Test
-    public void testHelmDeploymentTemplate() {
-        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
-        hdt.setApiVersion(EXPECTED);
-        assertSame(EXPECTED, hdt.getApiVersion());
-        hdt.setFileName(EXPECTED);
-        assertSame(EXPECTED, hdt.getFileName());
-        hdt.setKind(EXPECTED);
-        assertSame(EXPECTED, hdt.getKind());
-        System.out.println("testHelmDeploymentTemplate test completed");
-    }
-
-    @Test
-    public void testHelmDeploymentSpec() {
-        HelmDeploymentSpec hds = new HelmDeploymentSpec();
-        hds.setReplicas(EXPECTED);
-        assertSame(EXPECTED, hds.getReplicas());
-        HelmDeploymentSpecTemplate hdst = new HelmDeploymentSpecTemplate();
-        hds.setTemplate(hdst);
-        assertSame(hdst, hds.getTemplate());
-        System.out.println("testHelmDeploymentSpec test completed");
-    }
-
+    
     @Test
     public void testHelmChartLocalCache() {
         HelmChartLocalCache hclc = new HelmChartLocalCache();
@@ -49,7 +29,7 @@ public class ChartMapModelTest {
         HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
         hclc.setEntries(e);
         assertSame(e, hclc.getEntries());
-        System.out.println("testHelmChartLocalCache test completed");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -62,7 +42,41 @@ public class ChartMapModelTest {
         HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
         hcr.setEntries(e);
         assertSame(e, hcr.getEntries());
-        System.out.println("testHelmChartRepo test completed");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void testHelmDeploymentSpec() {
+        HelmDeploymentSpec hds = new HelmDeploymentSpec();
+        hds.setReplicas(EXPECTED);
+        assertSame(EXPECTED, hds.getReplicas());
+        HelmDeploymentSpecTemplate hdst = new HelmDeploymentSpecTemplate();
+        hds.setTemplate(hdst);
+        assertSame(hdst, hds.getTemplate());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void testHelmDeploymentSpecTemplateSpec() {
+        HelmDeploymentSpecTemplateSpec hdsts = new HelmDeploymentSpecTemplateSpec();
+        HelmDeploymentContainer[] c = new HelmDeploymentContainer[1];
+        hdsts.setContainers(c);
+        assertSame(c, hdsts.getContainers());
+        hdsts.setHostNetwork(EXPECTED);
+        assertSame(EXPECTED, hdsts.getHostNetwork());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void testHelmDeploymentTemplate() {
+        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
+        hdt.setApiVersion(EXPECTED);
+        assertSame(EXPECTED, hdt.getApiVersion());
+        hdt.setFileName(EXPECTED);
+        assertSame(EXPECTED, hdt.getFileName());
+        hdt.setKind(EXPECTED);
+        assertSame(EXPECTED, hdt.getKind());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**
@@ -76,4 +90,5 @@ public class ChartMapModelTest {
         new Random().nextBytes(array);
         return new String(array, Charset.forName("UTF-8"));
     }
+
 }
