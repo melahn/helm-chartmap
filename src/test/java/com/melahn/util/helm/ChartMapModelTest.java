@@ -9,6 +9,7 @@ import java.util.Random;
 
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
+import com.melahn.util.helm.model.HelmChartRepo;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
@@ -49,6 +50,19 @@ public class ChartMapModelTest {
         hclc.setEntries(e);
         assertSame(e, hclc.getEntries());
         System.out.println("testHelmChartLocalCache test completed");
+    }
+
+    @Test
+    public void testHelmChartRepo() {
+        HelmChartRepo hcr = new HelmChartRepo();
+        hcr.setApiVersion(EXPECTED);
+        assertSame(EXPECTED, hcr.getApiVersion());
+        hcr.setGenerated(EXPECTED);
+        assertSame(EXPECTED, hcr.getGenerated());
+        HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
+        hcr.setEntries(e);
+        assertSame(e, hcr.getEntries());
+        System.out.println("testHelmChartRepo test completed");
     }
 
     /**
