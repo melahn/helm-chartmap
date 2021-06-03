@@ -10,6 +10,8 @@ import java.util.Random;
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
 import com.melahn.util.helm.model.HelmChartRepo;
+import com.melahn.util.helm.model.HelmChartRepoLocal;
+import com.melahn.util.helm.model.HelmChartReposLocal;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
@@ -42,6 +44,19 @@ public class ChartMapModelTest {
         HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
         hcr.setEntries(e);
         assertSame(e, hcr.getEntries());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void testHelmChartReposLocal() {
+        HelmChartReposLocal hcrl = new HelmChartReposLocal();
+        hcrl.setApiVersion(EXPECTED);
+        assertSame(EXPECTED, hcrl.getApiVersion());
+        hcrl.setGenerated(EXPECTED);
+        assertSame(EXPECTED, hcrl.getGenerated()); 
+        HelmChartRepoLocal[] r = new HelmChartRepoLocal[1]; 
+        hcrl.setRepos(r);
+        assertSame(r, hcrl.getRepositories());     
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
