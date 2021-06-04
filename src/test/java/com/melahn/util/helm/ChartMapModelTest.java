@@ -2,14 +2,16 @@ package com.melahn.util.helm;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
@@ -21,6 +23,7 @@ import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
+import com.melahn.util.helm.model.HelmMaintainer;
 import com.melahn.util.helm.model.HelmRequirement;
 
 public class ChartMapModelTest {
@@ -29,10 +32,81 @@ public class ChartMapModelTest {
     static final String NOTEXPECTED = EXPECTED.concat(EXPECTED);
     
     @Test
+    public void testHelmChart() {
+        HelmChart hc = new HelmChart();
+        hc.setApiVersion(EXPECTED);
+        assertEquals(EXPECTED, hc.getApiVersion());
+        hc.setAppVersion(EXPECTED);
+        assertEquals(EXPECTED, hc.getAppVersion());
+        hc.setCondition(EXPECTED);
+        assertFalse(hc.getCondition());
+        hc.setCondition(EXPECTED.concat(".enabled"));
+        assertTrue(hc.getCondition().booleanValue());
+        hc.setCreated(EXPECTED);
+        assertEquals(EXPECTED, hc.getCreated());
+        HashSet<HelmChart> d = new HashSet<HelmChart>();
+        hc.setDependencies(d);
+        assertSame(d, hc.getDependencies());
+        hc.setDiscoveredDependencies(d);
+        assertSame(d, hc.getDiscoveredDependencies());
+        HashSet<HelmDeploymentTemplate> t = new HashSet<HelmDeploymentTemplate>();
+        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
+        HelmDeploymentSpec hds = new HelmDeploymentSpec();
+        hdt.setSpec(hds);
+        HelmDeploymentSpecTemplate hdst = new HelmDeploymentSpecTemplate();
+        hds.setTemplate(hdst);
+        HelmDeploymentSpecTemplateSpec hdsts = new HelmDeploymentSpecTemplateSpec();
+        hdst.setSpec(hdsts);
+        HelmDeploymentContainer hdc = new HelmDeploymentContainer();
+        hdc.setImage(EXPECTED);
+        hdc.setParent(hc);
+        HelmDeploymentContainer[] c1 = new HelmDeploymentContainer[1];
+        c1[0] = hdc;
+        hdsts.setContainers(c1);
+        t.add(hdt);
+        hc.setDeploymentTemplates(t);
+        HashSet<HelmDeploymentContainer> cs = new HashSet<HelmDeploymentContainer>();
+        cs.add(hdc);
+        assertEquals(cs, hc.getContainers());
+        assertSame(t, hc.getDeploymentTemplates());
+        HelmDeploymentContainer[] c0 = new HelmDeploymentContainer[0];
+        hdsts.setContainers(c0);
+        assertTrue(hc.getContainers().isEmpty());
+        hc.setDescription(EXPECTED);
+        assertEquals(EXPECTED, hc.getDescription());
+        hc.setDigest(EXPECTED);
+        assertEquals(EXPECTED, hc.getDigest());
+        hc.setIcon(EXPECTED);
+        assertEquals(EXPECTED, hc.getIcon());
+        String[] k = new String[1];
+        hc.setKeywords(k);
+        assertSame(k, hc.getKeywords());
+        HelmMaintainer[] m = new HelmMaintainer[1];
+        hc.setMaintainers(m);
+        assertSame(m, hc.getMaintainers());
+        hc.setName(EXPECTED);
+        assertEquals(EXPECTED, hc.getName());
+        hc.setVersion(EXPECTED);
+        assertEquals(EXPECTED, hc.getVersion());
+        assertEquals(EXPECTED.concat(":").concat(EXPECTED), hc.getNameFull());
+        hc.setRepoUrl(EXPECTED);
+        assertEquals(EXPECTED, hc.getRepoUrl());
+        HashMap<String, Object> v = new HashMap<String, Object>();
+        String k1 = EXPECTED.concat("key");
+        String v1 = EXPECTED.concat("value");
+        v.put(k1,v1);
+        hc.setValues(v);
+        assertSame(v, hc.getValues());
+        assertEquals(v1, hc.getValue(k1));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+
+    @Test
     public void testHelmChartLocalCache() {
         HelmChartLocalCache hclc = new HelmChartLocalCache();
         hclc.setApiVersion(EXPECTED);
-        assertSame(EXPECTED, hclc.getApiVersion());
+        assertEquals(EXPECTED, hclc.getApiVersion());
         HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
         hclc.setEntries(e);
         assertSame(e, hclc.getEntries());
@@ -43,9 +117,9 @@ public class ChartMapModelTest {
     public void testHelmChartRepo() {
         HelmChartRepo hcr = new HelmChartRepo();
         hcr.setApiVersion(EXPECTED);
-        assertSame(EXPECTED, hcr.getApiVersion());
+        assertEquals(EXPECTED, hcr.getApiVersion());
         hcr.setGenerated(EXPECTED);
-        assertSame(EXPECTED, hcr.getGenerated());
+        assertEquals(EXPECTED, hcr.getGenerated());
         HashMap<String,HelmChart[]> e = new HashMap<String,HelmChart[]>();
         hcr.setEntries(e);
         assertSame(e, hcr.getEntries());
@@ -56,9 +130,9 @@ public class ChartMapModelTest {
     public void testHelmChartReposLocal() {
         HelmChartReposLocal hcrl = new HelmChartReposLocal();
         hcrl.setApiVersion(EXPECTED);
-        assertSame(EXPECTED, hcrl.getApiVersion());
+        assertEquals(EXPECTED, hcrl.getApiVersion());
         hcrl.setGenerated(EXPECTED);
-        assertSame(EXPECTED, hcrl.getGenerated()); 
+        assertEquals(EXPECTED, hcrl.getGenerated()); 
         HelmChartRepoLocal[] r = new HelmChartRepoLocal[1]; 
         hcrl.setRepos(r);
         assertSame(r, hcrl.getRepositories());     
@@ -69,11 +143,11 @@ public class ChartMapModelTest {
     public void testHelmDeploymentContainer() {
         HelmDeploymentContainer hdc = new HelmDeploymentContainer();
         hdc.setImage(EXPECTED);
-        assertSame(EXPECTED, hdc.getImage());
+        assertEquals(EXPECTED, hdc.getImage());
         hdc.setImagePullPolicy(EXPECTED);
-        assertSame(EXPECTED, hdc.getImagePullPolicy());
+        assertEquals(EXPECTED, hdc.getImagePullPolicy());
         hdc.setName(EXPECTED);
-        assertSame(EXPECTED, hdc.getName());
+        assertEquals(EXPECTED, hdc.getName());
         HelmDeploymentContainer hdc2 = new HelmDeploymentContainer();
         hdc2.setImage(EXPECTED);
         hdc2.setImagePullPolicy(EXPECTED);
@@ -119,7 +193,7 @@ public class ChartMapModelTest {
         hdsts.setContainers(c);
         assertSame(c, hdsts.getContainers());
         hdsts.setHostNetwork(EXPECTED);
-        assertSame(EXPECTED, hdsts.getHostNetwork());
+        assertEquals(EXPECTED, hdsts.getHostNetwork());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -127,11 +201,11 @@ public class ChartMapModelTest {
     public void testHelmDeploymentTemplate() {
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         hdt.setApiVersion(EXPECTED);
-        assertSame(EXPECTED, hdt.getApiVersion());
+        assertEquals(EXPECTED, hdt.getApiVersion());
         hdt.setFileName(EXPECTED);
-        assertSame(EXPECTED, hdt.getFileName());
+        assertEquals(EXPECTED, hdt.getFileName());
         hdt.setKind(EXPECTED);
-        assertSame(EXPECTED, hdt.getKind());
+        assertEquals(EXPECTED, hdt.getKind());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -139,13 +213,13 @@ public class ChartMapModelTest {
     public void testHelmRequirement() {
         HelmRequirement hr = new HelmRequirement();
         hr.setCondition(EXPECTED);
-        assertSame(EXPECTED, hr.getCondition());
+        assertEquals(EXPECTED, hr.getCondition());
         hr.setName(EXPECTED);
-        assertSame(EXPECTED, hr.getName());
+        assertEquals(EXPECTED, hr.getName());
         hr.setRepository(EXPECTED);
-        assertSame(EXPECTED, hr.getRepository());
+        assertEquals(EXPECTED, hr.getRepository());
         hr.setVersion(EXPECTED);
-        assertSame(EXPECTED, hr.getVersion());
+        assertEquals(EXPECTED, hr.getVersion());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
         
