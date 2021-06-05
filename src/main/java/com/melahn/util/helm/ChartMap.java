@@ -243,7 +243,7 @@ public class ChartMap {
      *
      * @throws Exception Throws Exception
      */
-    public void print() throws Exception {
+    public void print() throws ChartMapException {
         createTempDir();
         loadLocalRepos();
         resolveChartDependencies();
@@ -695,7 +695,7 @@ public class ChartMap {
                 it.next();
                 printer.printChart(it.getValue());
             }
-        } catch (IOException e) {
+        } catch (ChartMapException e) {
             logger.error("IOException printing charts: {} ", e.getMessage());
         }
     }
@@ -713,7 +713,7 @@ public class ChartMap {
             } else {
                 logger.error("Chart {} was not found", chartName);
             }
-        } catch (Exception e) {
+        } catch (ChartMapException e) {
             logger.error("Error resolving chart dependencies: {}", e.getMessage());
         }
     }
@@ -1254,12 +1254,13 @@ public class ChartMap {
             int i = 0;
             Yaml yaml = new Yaml();
             InputStream input = new FileInputStream(templateFile);
-            for (Object data : yaml.loadAll(input)) { 
-                /** there may multiple yaml documents in this one document
-                 * inspect the object to see if it is a Deployment or a StatefulSet template
-                 * if it is add to the deploymentTemplates arra
+            for (Object data : yaml.loadAll(input)) {
+                /**
+                 * there may multiple yaml documents in this one document inspect the object to
+                 * see if it is a Deployment or a StatefulSet template if it is add to the
+                 * deploymentTemplates arra
                  */
-                if (data instanceof Map) { 
+                if (data instanceof Map) {
                     Map<String, Object> m = (Map<String, Object>) data;
                     Object o = m.get("kind");
                     if (o instanceof String) {
@@ -1280,13 +1281,12 @@ public class ChartMap {
                                 template.setFileName(b.get(i)); // is this needed?
                                 h.getDeploymentTemplates().add(template);
                             }
-                            /** cases:
-                             * 1. The Chart has a dependency on this template and nothing supercedes it in
-                             * some parent chart
-                             * 2. The Chart has a dependency on this template and a superceding version of
-                             * this template has already been found
-                             * 3. The Chart has a dependency on this template and a superceding version of
-                             * this template will be found later
+                            /**
+                             * cases: 1. The Chart has a dependency on this template and nothing supercedes
+                             * it in some parent chart 2. The Chart has a dependency on this template and a
+                             * superceding version of this template has already been found 3. The Chart has
+                             * a dependency on this template and a superceding version of this template will
+                             * be found later
                              */
                             WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
                             if (weightedTemplate == null) {
@@ -1312,12 +1312,11 @@ public class ChartMap {
                          // of interest for the current chart level
                 }
             }
-        }catch(
+        } catch (
 
-    Exception e)
-    {
-        logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
-    }
+        Exception e) {
+            logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
+        }
     }
 
     /**
@@ -1551,7 +1550,7 @@ public class ChartMap {
     /**
      * Prints the Chart Map
      */
-    private void printMap() throws IOException {
+    private void printMap() throws ChartMapException {
         try {
             if (chart != null) {
                 detectPrintFormat(outputFilename);
@@ -1582,7 +1581,7 @@ public class ChartMap {
                     generateImage(outputFilename);
                 }
             }
-        } catch (IOException e) {
+        } catch (ChartMapException e) {
             logger.error(LOG_FORMAT_2, "Exception printing Map : ", e.getMessage());
             throw e;
         }
@@ -1594,7 +1593,7 @@ public class ChartMap {
      * @param f the puml file
      * @throws IOException if an error occurred generaing the image
      */
-    private void generateImage(String f) throws IOException {
+    private void generateImage(String f) throws ChartMapException {
         /**
          * PlantUML wants the full path of the input file so get the pwd so it can be
          * generated
@@ -1623,6 +1622,7 @@ public class ChartMap {
         } catch (IOException e) {
             logger.error(LOG_FORMAT_9, "Error generating image file", d, "/", i.getFileName(), " from ", d, "/", f,
                     " : ", e);
+            throw new ChartMapException(e.getMessage());
         }
     }
 
@@ -1652,7 +1652,7 @@ public class ChartMap {
                     printChartDependencies(dependent); // recursion
                 }
             }
-        } catch (IOException e) {
+        } catch (ChartMapException e) {
             logger.error(LOG_FORMAT_2, "Error printing chart dependencies: ", e.getMessage());
         }
     }
@@ -1671,7 +1671,7 @@ public class ChartMap {
                     printer.printChartToImageDependency(h, c.getImage());
                 }
             }
-        } catch (IOException e) {
+        } catch (ChartMapException e) {
             logger.error(LOG_FORMAT_2, "Error printing image dependencies: ", e.getMessage());
         }
     }
@@ -1689,7 +1689,7 @@ public class ChartMap {
             for (String s : imagesReferenced) {
                 printer.printImage(s);
             }
-        } catch (IOException e) {
+        } catch (ChartMapException e) {
             logger.error(LOG_FORMAT_2, "Error printing images: ", e.getMessage());
         }
     }
@@ -1754,7 +1754,7 @@ public class ChartMap {
      * Removes the temporary directory created by createTempDir() unless the debug
      * switch was set
      */
-    private void removeTempDir() throws IOException {
+    private void removeTempDir() throws ChartMapException {
         if (isDebug()) {
             logger.log(logLevelDebug, "{} {} was not removed", TEMP_DIR, getTempDirName());
         } else {
@@ -1777,7 +1777,7 @@ public class ChartMap {
             } catch (IOException e) {
                 logger.error(LOG_FORMAT_4, "Error <", e.getMessage(), "> removing temporary directory ",
                         getTempDirName());
-                throw e;
+                throw new ChartMapException(e.getMessage());
             }
         }
     }

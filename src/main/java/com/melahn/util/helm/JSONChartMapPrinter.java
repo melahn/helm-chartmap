@@ -26,7 +26,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      */
-    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart) {
+    public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart)  throws ChartMapException {
         super(chartMap, outputFilename, charts, chart);
      }
 
@@ -36,7 +36,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @throws IOException      IOException
      */
     @Override
-    public void printHeader() throws IOException {
+    public void printHeader() throws ChartMapException {
         /* For JSON there is no header */
     }
 
@@ -46,7 +46,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @throws IOException      IOException
      */
     @Override
-    public void printFooter() throws IOException {
+    public void printFooter() throws ChartMapException {
         /* For JSON there is no footer */
     }
 
@@ -58,7 +58,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @throws  IOException     IOException
      */
     @Override
-     public void printTree(HelmChart c) throws IOException {
+     public void printTree(HelmChart c) throws ChartMapException {
         // create a root JSON object to get started
         JSONObject j = new JSONObject();  // root object
         addChartToObject(c, null, j); // recursively fill out the  rest of the tree
@@ -165,10 +165,13 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *              be written
      * @throws  IOException     IOException
      */
-    private void printObject(JSONObject j) throws IOException {
+    private void printObject(JSONObject j) throws ChartMapException {
         String s = j.toString(indent);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename))) {
             writer.write(s);
+        }
+        catch (IOException e) {
+            throw new ChartMapException(e.getMessage());
         }
     }
 
@@ -208,7 +211,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @throws  IOException     IOException
      */
     @Override
-     public void printSectionHeader(String header) throws IOException {
+     public void printSectionHeader(String header) throws ChartMapException {
        /* For JSON there is no section header */
     }
 

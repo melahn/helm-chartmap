@@ -17,11 +17,12 @@ public class ChartMapPrinter implements IChartMapPrinter {
     ChartKeyMap charts;
     protected ChartMap chartMap;
     protected String outputFilename;
-    protected int indent=2; // indent for tree view
+    protected int indent = 2; // indent for tree view
     protected FileWriter writer;
     private static final String NOT_SPECIFIED = "Not specified";
 
-    ChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart) {
+    ChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart)
+            throws ChartMapException {
         this.outputFilename = outputFilename;
         this.chart = chart;
         this.charts = charts;
@@ -29,51 +30,53 @@ public class ChartMapPrinter implements IChartMapPrinter {
         try {
             writer = new FileWriter(outputFilename);
         } catch (IOException e) {
-            chartMap.logger.error("{}{}{}{}","Error creating FileWriter for file ",outputFilename, " : ", e.getMessage());
+            chartMap.logger.error("{}{}{}{}", "Error creating FileWriter for file ", outputFilename, " : ",
+                    e.getMessage());
+            throw new ChartMapException(e.getMessage());
         }
     }
 
-    void writeLine(String l) throws IOException {
+    void writeLine(String l) throws ChartMapException {
         try {
             writer.write(l + "\n");
             writer.flush();
         } catch (IOException e) {
-            chartMap.logger.error("{}{}","Error writing line to file ",outputFilename);
-            throw (e);
+            chartMap.logger.error("{}{}", "Error writing line to file ", outputFilename);
+            throw new ChartMapException(e.getMessage());
         }
     }
 
     String formatString(String s) {
-        if (s == null || s.trim().isEmpty() ) {
+        if (s == null || s.trim().isEmpty()) {
             return NOT_SPECIFIED;
-        }
-        else {
+        } else {
             return s;
         }
     }
 
-    public void printHeader() throws IOException {
+    public void printHeader() throws ChartMapException  {
         writeLine("Chart Map for " + chart.getNameFull());
     }
 
-    public void printFooter() throws IOException {
+    public void printFooter() throws ChartMapException  {
         writeLine("");
-        writeLine("Generated on " + getCurrentDateTime() + " by " + this.getClass().getCanonicalName() + " (" + getGitHubRepoURL() + ")");
+        writeLine("Generated on " + getCurrentDateTime() + " by " + this.getClass().getCanonicalName() + " ("
+                + getGitHubRepoURL() + ")");
     }
 
     public String getGitHubRepoURL() {
         return "https://github.com/melahn/helm-chartmap";
     }
 
-    public void printChartToChartDependency(HelmChart parentChart, HelmChart dependentChart) throws IOException {
+    public void printChartToChartDependency(HelmChart parentChart, HelmChart dependentChart)  throws ChartMapException {
         writeLine(parentChart.getNameFull() + " depends on " + dependentChart.getNameFull());
     }
 
-    public void printChartToImageDependency(HelmChart chart, String imageName) throws IOException {
+    public void printChartToImageDependency(HelmChart chart, String imageName) throws ChartMapException {
         writeLine(chart.getNameFull() + " uses " + imageName);
     }
 
-    public void printChart(HelmChart chart) throws IOException {
+    public void printChart(HelmChart chart) throws ChartMapException {
         writeLine("Chart: " + chart.getNameFull());
         writeLine("\tapiVersion: " + formatString(chart.getApiVersion()));
         writeLine("\tappVersion: " + formatString(chart.getAppVersion()));
@@ -93,17 +96,17 @@ public class ChartMapPrinter implements IChartMapPrinter {
         writeLine("\tversion: " + formatString(chart.getVersion()));
     }
 
-    public void printImage(String c) throws IOException {
+    public void printImage(String c) throws ChartMapException {
         writeLine("Image: " + c);
     }
 
-    public void printComment(String comment) throws IOException {
+    public void printComment(String comment) throws ChartMapException {
         writeLine(comment);
     }
 
-    public void printSectionHeader(String header) throws IOException {
+    public void printSectionHeader(String header) throws ChartMapException {
         StringBuilder sb = new StringBuilder();
-        for(int c = 1; c <= header.length(); c++){
+        for (int c = 1; c <= header.length(); c++) {
             sb.append('-');
         }
         writeLine("");
@@ -135,13 +138,13 @@ public class ChartMapPrinter implements IChartMapPrinter {
         return chart;
     }
 
-     /**
-     * Helm V3 introduced the library chart type so return 
-     * the value of type if found.
+    /**
+     * Helm V3 introduced the library chart type so return the value of type if
+     * found.
      *
-     * @param   c       a helm chart
-     * @return          the string "library" if this is a library
-     *                  chart, "application" otherwise
+     * @param c a helm chart
+     * @return the string "library" if this is a library chart, "application"
+     *         otherwise
      */
     public String getChartType(HelmChart c) {
         if (c.getType() != null && c.getType().equals("library")) {
@@ -164,23 +167,22 @@ public class ChartMapPrinter implements IChartMapPrinter {
      */
     private String formatArray(String[] a) {
         StringBuilder sb = new StringBuilder("");
-        if (a !=null) {
+        if (a != null) {
             for (int i = 0; i < a.length; i++) {
                 sb.append(a[i]);
                 if (i != a.length - 1) {
                     sb.append(",");
                 }
             }
-        }
-        else {
+        } else {
             sb = sb.append(NOT_SPECIFIED);
         }
         return sb.toString();
     }
 
     /**
-     * Returns a string with the name and email addresses of the maintainers of a Helm Chart
-     * separated by commas
+     * Returns a string with the name and email addresses of the maintainers of a
+     * Helm Chart separated by commas
      *
      * @param m an array of Helm Maintainers
      * @return the string form of the maintainers array
@@ -199,8 +201,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
                     sb.append(",");
                 }
             }
-        }
-        else {
+        } else {
             sb = sb.append((NOT_SPECIFIED));
         }
         return sb.toString();
@@ -225,8 +226,8 @@ public class ChartMapPrinter implements IChartMapPrinter {
         return sb.toString();
     }
 
-    public void printTree(HelmChart c) throws IOException {
-        // see issue #9 
+    public void printTree(HelmChart c) throws ChartMapException {
+        // see issue #9
     }
 
 }

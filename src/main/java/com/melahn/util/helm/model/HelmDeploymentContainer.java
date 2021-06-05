@@ -14,6 +14,14 @@ public class HelmDeploymentContainer {
      */
     private HelmChart parent; // not in the model
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
     public String getImagePullPolicy() {
         return imagePullPolicy;
     }
@@ -30,17 +38,9 @@ public class HelmDeploymentContainer {
         this.name = name;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     /**
      * the equals and hashCode overrides are needed to make comparisons when adding
-     * to arrays thatare used for the chart maps since there are cases where the
+     * to arrays that are used for the chart maps since there are cases where the
      * same container may be used by multiple templates that are used by a helm
      * chart. For an example, see the StateFulSets in wordpress:8.1.2.
      */
