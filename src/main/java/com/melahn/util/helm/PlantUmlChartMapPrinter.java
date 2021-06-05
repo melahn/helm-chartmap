@@ -24,6 +24,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *                       referenced. The map is keyed by Chart Name and Chart
      *                       Version.
      * @param chart          a Helm Chart to be printed in PlantUML format
+     * @throws ChartMapException when an error occurs printing the chart map
      */
     public PlantUmlChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart)
             throws ChartMapException {
@@ -34,7 +35,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
     /**
      * Writes the start of a PlantUML diagram including a title
      *
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the header
      */
     @Override
     public void printHeader() throws ChartMapException {
@@ -53,7 +54,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * Writes a PlantUML footer with a time stamp and a reference to this class and
      * GitHub project
      *
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the footer
      */
     @Override
     public void printFooter() throws ChartMapException {
@@ -68,7 +69,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @param parentChart    the parent Helm Chart
      * @param dependentChart a Helm Chart on which the parent Helm Chart depends
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the dependency
      */
     @Override
     public void printChartToChartDependency(HelmChart parentChart, HelmChart dependentChart) throws ChartMapException {
@@ -81,7 +82,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @param chart     a Helm Chart
      * @param imageName the name of a Docker Image on which the Helm Chart depends
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the dependency
      */
     @Override
     public void printChartToImageDependency(HelmChart chart, String imageName) throws ChartMapException {
@@ -93,7 +94,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * Writes a line to depict a Helm Chart
      *
      * @param chart a Helm Chart
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the chart
      */
     @Override
     public void printChart(HelmChart chart) throws ChartMapException {
@@ -115,7 +116,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * Writes a comment line
      *
      * @param comment the comment to be written
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the comment
      */
     @Override
     public void printComment(String comment) throws ChartMapException {
@@ -126,7 +127,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * Writes a section header
      *
      * @param header the header to be written
-     * @throws IOException IOException
+     * @throws ChartMapException when an error occurs printing the section header
      */
     @Override
     public void printSectionHeader(String header) throws ChartMapException {

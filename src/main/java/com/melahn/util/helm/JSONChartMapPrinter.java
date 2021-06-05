@@ -25,6 +25,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *                          might be referenced.  The map is keyed by
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
+     * @throws ChartMapException when an error occurs printing the chart map
      */
     public JSONChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart)  throws ChartMapException {
         super(chartMap, outputFilename, charts, chart);
@@ -33,7 +34,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
     /**
      * For JSON, there is no header
      *
-     * @throws IOException      IOException
+     * @throws ChartMapException when an error occurs printing the header
      */
     @Override
     public void printHeader() throws ChartMapException {
@@ -43,7 +44,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
     /**
      * For JSON, there is no footer
      *
-     * @throws IOException      IOException
+     * @throws ChartMapException when an error occurs printing the footer
      */
     @Override
     public void printFooter() throws ChartMapException {
@@ -55,7 +56,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * all dependent charts and images
      *
      * @param   c   a Helm chart
-     * @throws  IOException     IOException
+     * @throws  ChartMapException when an error occurs printing the tree     
      */
     @Override
      public void printTree(HelmChart c) throws ChartMapException {
@@ -92,7 +93,6 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   h   a Helm Chart
      * @param   j   a JSONObject to which the properties will
      *              be written
-     * @throws  IOException     IOException
      */
     private void addProperties(HelmChart h, JSONObject j) {
         j.put("name",h.getNameFull());
@@ -119,7 +119,6 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   p   the parent of h
      * @param   a   a JSONArray to which the container
      *              will be added
-     * @throws  IOException     IOException
      */
     private void addContainers(HelmChart h, HelmChart p, JSONArray a) {
         for (HelmDeploymentContainer c : h.getContainers()) {
@@ -148,7 +147,6 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   a   a JSONArray to which the container will
      *              be added, if not already present in the
      *              array
-     * @throws  IOException     IOException
      */
     private void addContainer(String s, JSONArray a) {
         JSONObject c = new JSONObject(); // new child object for the container
@@ -163,7 +161,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *
      * @param   j   a JSONObject to which the properties will
      *              be written
-     * @throws  IOException     IOException
+     * @throws  ChartMapException when an error occurs printing the object   
      */
     private void printObject(JSONObject j) throws ChartMapException {
         String s = j.toString(indent);
@@ -208,7 +206,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * Writes a section header.  Not relevant for JSON
      *
      * @param   header the header to be written
-     * @throws  IOException     IOException
+     * @throws  ChartMapException  when an error occurs printing the section header 
      */
     @Override
      public void printSectionHeader(String header) throws ChartMapException {

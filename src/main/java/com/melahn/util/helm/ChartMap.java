@@ -191,6 +191,7 @@ public class ChartMap {
      *                       Helm repo switches[2] provides a little more
      *                       information as the Chart Map is generated switches[3]
      *                       debug mode ... more info about internals printed
+     * @throws ChartMapException when an error occurs creating the chart map
      **/
 
     public ChartMap(ChartOption option, String chart, String outputFilename, String helmHome, String envFilename,
@@ -241,7 +242,7 @@ public class ChartMap {
      * with charts, resolving the dependencies of the selected chart, printing the
      * Chart Map, then cleans up
      *
-     * @throws Exception Throws Exception
+     * @throws ChartMapException if an error occurs during print
      */
     public void print() throws ChartMapException {
         createTempDir();
@@ -855,7 +856,7 @@ public class ChartMap {
      * user has specified the refresh parameter on the command line or method call
      *
      * @param dirName The name of the directory containing the chart
-     * @throws Exception
+     * @throws ChartMapException if an error occurs updating the local repo
      */
     private void updateLocalRepo(String dirName) throws ChartMapException {
         // if the user wants us to update the Helm dependencies, do so
@@ -993,8 +994,7 @@ public class ChartMap {
             if (h != null && verbose) {
                 logger.log(logLevelVerbose, "Processing Chart {} : {}", h.getName(), h.getVersion());
             }
-            File currentDirectory = new File(chartDirName);
-            String[] directories = currentDirectory.list((c, n) -> new File(c, n).isDirectory());
+            String[] directories = new File(chartDirName).list((c, n) -> new File(c, n).isDirectory());
 
             if (directories != null) {
                 for (String directory : directories) {
@@ -1022,8 +1022,7 @@ public class ChartMap {
                                     currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion()));
                         }
                         // If this is not the root chart, check if there is a condition property in the
-                        // parent Helm Chart
-                        // that corresponds to the current Helm Chart. If found, get the value
+                        // parent Helm Chart that corresponds to the current Helm Chart. If found, get the value
                         Boolean condition = Boolean.TRUE;
                         if (parentHelmChart != null) {
                             String conditionPropertyName = getConditionPropertyName(chartDirName, currentHelmChart);
@@ -1034,33 +1033,45 @@ public class ChartMap {
                                 }
                             }
                         }
-                        // If the Helm Chart wasn't excluded by a condition property in a parent Helm
-                        // Chart, then add it to
-                        // the referenced charts map and attach it as a dependent of the parent
-                        //
-                        // Note that a chart with a false condition property will thus not be printed at
-                        // all
-                        if (Boolean.TRUE.equals(condition)) {
-                            collectValues(chartDirName + File.separator + directory, currentHelmChart);
-                            if (parentHelmChart != null) {
-                                parentHelmChart.getDiscoveredDependencies().add(currentHelmChart); // add this chart as
-                                                                                                   // a dependent
-                            }
-                            chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(),
-                                    currentHelmChart); // may be redundant given we added parent already in an earlier
-                                                       // iteration
-                            renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
-                            File chartsDirectory = new File(
-                                    chartDirName + File.separator + directory + File.separator + CHARTS_DIR_NAME);
-                            if (chartsDirectory.exists()) {
-                                collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart); // recursion
-                            }
-                        }
+                        handleHelmChartCondition(condition, chartDirName, directory, currentHelmChart,
+                                    parentHelmChart);
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | ChartMapException e) {
             logger.error("Exception getting Dependencies: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Handles the case where a HelmChart wasn't excluded by a conditino property in
+     * a parent Helm Chart so it needs to be added to the referenced chart map and
+     * attached as a dependent of the parent
+     * 
+     * Note that charts with false conditinn properties are not printed at all
+     * 
+     * @param condition whether the chart was excluded
+     * @param chartDirName the name of the directory where the chart is found
+     * @param directory a subdirectory of the chartDirName 
+     * @param currentHelmChart the helm chart found in the local charts repo
+     * @param parentHelmChart the parent of the currentHelmChart
+     */
+    private void handleHelmChartCondition(Boolean condition, String chartDirName, String directory,
+            HelmChart currentHelmChart, HelmChart parentHelmChart) throws IOException {
+        if (Boolean.TRUE.equals(condition)) {
+            File currentDirectory = new File(chartDirName);
+            collectValues(chartDirName + File.separator + directory, currentHelmChart);
+            if (parentHelmChart != null) {
+                // add this chart as a dependent
+                parentHelmChart.getDiscoveredDependencies().add(currentHelmChart);
+            }
+            chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(), currentHelmChart);
+            renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
+            File chartsDirectory = new File(
+                    chartDirName + File.separator + directory + File.separator + CHARTS_DIR_NAME);
+            if (chartsDirectory.exists()) {
+                collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart); // recursion
+            }
         }
     }
 
@@ -1261,6 +1272,7 @@ public class ChartMap {
                  * deploymentTemplates arra
                  */
                 if (data instanceof Map) {
+                    @SuppressWarnings("unchecked")
                     Map<String, Object> m = (Map<String, Object>) data;
                     Object o = m.get("kind");
                     if (o instanceof String) {
@@ -1591,7 +1603,7 @@ public class ChartMap {
      * Generates an image from a PUML file
      * 
      * @param f the puml file
-     * @throws IOException if an error occurred generaing the image
+     * @throws ChartMapException if an error occurred generaing the image
      */
     private void generateImage(String f) throws ChartMapException {
         /**
