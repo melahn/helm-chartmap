@@ -1018,7 +1018,7 @@ public class ChartMap {
                                     + "Try running the command again with the '-r' option.",
                                     currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion()));
                         }
-                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart), chartDirName,
+                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart), chartDirName,
                                 directory, currentHelmChart, parentHelmChart);
                     }
                 }
@@ -1035,7 +1035,7 @@ public class ChartMap {
      * @param chartDirName     the name of the directory where the chart is found
      * @param currentHelmChart the helm chart found in the local charts repo
      */
-    private Boolean checkForCondition(String chartDirName, HelmChart currentHelmChart) {
+    private Boolean checkForCondition(String chartDirName, HelmChart currentHelmChart, HelmChart parentHelmChart) {
         Boolean condition = Boolean.TRUE;
         String conditionPropertyName = getConditionPropertyName(chartDirName, currentHelmChart);
         if (conditionPropertyName != null) {
