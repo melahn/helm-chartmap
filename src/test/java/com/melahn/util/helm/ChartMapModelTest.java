@@ -72,6 +72,8 @@ public class ChartMapModelTest {
         HelmDeploymentContainer[] c0 = new HelmDeploymentContainer[0];
         hdsts.setContainers(c0);
         assertTrue(hc.getContainers().isEmpty());
+        hdsts.setContainers(null);
+        assertTrue(hc.getContainers().isEmpty());
         hc.setDescription(EXPECTED);
         assertEquals(EXPECTED, hc.getDescription());
         hc.setDigest(EXPECTED);
@@ -91,6 +93,7 @@ public class ChartMapModelTest {
         assertEquals(EXPECTED.concat(":").concat(EXPECTED), hc.getNameFull());
         hc.setRepoUrl(EXPECTED);
         assertEquals(EXPECTED, hc.getRepoUrl());
+        hdsts.setContainers(null);
         HashMap<String, Object> v = new HashMap<String, Object>();
         String k1 = EXPECTED.concat("key");
         String v1 = EXPECTED.concat("value");
