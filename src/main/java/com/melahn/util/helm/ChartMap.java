@@ -988,25 +988,27 @@ public class ChartMap {
      * @param chartDirName the name of a directory containing a Helm Chart
      * @param h            the Helm Chart on which dependencies will be collected
      */
-    private void collectDependencies(String chartDirName, HelmChart h) {
+    private void collectDependencies(String chartDirName, HelmChart h) { // See issue #8
         HelmChart parentHelmChart = null;
         try {
-            if (h == null) {
-                throw new ChartMapException("Null Chart Map");
+            if (h != null) {
+                logger.log(logLevelVerbose, "Processing Chart {} : {}", h.getName(), h.getVersion());
             }
-            logger.log(logLevelVerbose, "Processing Chart {} : {}", h.getName(), h.getVersion());
-            String[] directories = new File(chartDirName).list((c, n) -> new File(c, n).isDirectory());
+            File currentDirectory = new File(chartDirName);
+            String[] directories = currentDirectory.list((c, n) -> new File(c, n).isDirectory());
 
             if (directories != null) {
                 for (String directory : directories) {
-                    parentHelmChart = charts.get(h.getName(), h.getVersion());
-                    chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
+                    if (h != null) {
+                        parentHelmChart = charts.get(h.getName(), h.getVersion());
+                        chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
+                    }
                     File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
                     if (chartFile.exists()) {
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        // this reference is not in the map
-                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);
+                         // this reference is not in the map
+                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class); 
                         HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
                                 currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
@@ -1018,15 +1020,16 @@ public class ChartMap {
                                     + "Try running the command again with the '-r' option.",
                                     currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion()));
                         }
-                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart), chartDirName,
-                                directory, currentHelmChart, parentHelmChart);
+                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart), chartDirName, directory,
+                           currentHelmChart, parentHelmChart);
                     }
                 }
             }
-        } catch (IOException | ChartMapException e) {
+        } catch (Exception e) {
             logger.error("Exception getting Dependencies: {}", e.getMessage());
         }
     }
+
 
     /**
      * Check if there is a condition property in the parent Helm Chart that
