@@ -10,7 +10,7 @@ title Chart Map for alfresco-identity-service:1.1.1
 
 'There are 2 referenced Helm Charts
 artifact "alfresco-identity-service:1.1.1\n====\n\talfresco-identity-service\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_1_1_1 #Chartreuse
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
+artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
 
 'There is one referenced Docker Image
 usecase "Image\n====\n\tDocker Hub\n====\n\tjboss/keycloak\n====\n\t4.8.3.Final" as jboss_keycloak_4_8_3_Final #LemonChiffon
@@ -19,5 +19,5 @@ usecase "Image\n====\n\tDocker Hub\n====\n\tjboss/keycloak\n====\n\t4.8.3.Final"
 alfresco_identity_service_1_1_1--[#green]-|>keycloak_4_3_0
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2021/03/19 06:10:27 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2021/06/07 10:28:46 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

@@ -9,7 +9,7 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-dbp:1.5.0
 
 'There are 13 referenced Helm Charts
-artifact "postgresql:0.9.3\n====\n\tpostgresql\n====\n\t0.9.3\n====\napplication\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: databus23\n====\n\tKeywords: postgresql\npostgres\ndatabase\nsql" as postgresql_0_9_3 #LightSteelBlue
+artifact "postgresql:0.9.3\n====\n\tpostgresql\n====\n\t0.9.3\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: databus23\n====\n\tKeywords: postgresql\npostgres\ndatabase\nsql" as postgresql_0_9_3 #LightSteelBlue
 artifact "alfresco-process-services:0.2.0\n====\n\talfresco-process-services\n====\n\t0.2.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: " as alfresco_process_services_0_2_0 #Gainsboro
 artifact "alfresco-sync-service:1.1.1\n====\n\talfresco-sync-service\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco Apps Repo Team\n====\n\tKeywords: syncservice\nalfresco\napplication" as alfresco_sync_service_1_1_1 #CadetBlue
 artifact "alfresco-digital-workspace:2.2.0\n====\n\talfresco-digital-workspace\n====\n\t2.2.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: alfresco\ndigital workspace" as alfresco_digital_workspace_2_2_0 #DodgerBlue
@@ -20,8 +20,8 @@ artifact "activemq:1.1.1\n====\n\tactivemq\n====\n\t1.1.1\n====\napplication\n==
 artifact "alfresco-infrastructure:4.1.1\n====\n\talfresco-infrastructure\n====\n\t4.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: " as alfresco_infrastructure_4_1_1 #Cornsilk
 artifact "alfresco-search:1.0.1\n====\n\talfresco-search\n====\n\t1.0.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: search\nsearch services\nalfresco search services\ninsight\ninsight engine\nalfresco insight engine" as alfresco_search_1_0_1 #GhostWhite
 artifact "postgresql:1.0.0\n====\n\tpostgresql\n====\n\t1.0.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: postgresql\ndatabase\nsql\nreplication\ncluster" as postgresql_1_0_0 #LightSteelBlue
-artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: jackzampolin, mgoodness, chancez\n====\n\tKeywords: ingress\nnginx" as nginx_ingress_0_14_0 #DarkSalmon
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://kubernetes-charts.storage.googleapis.com\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
+artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: jackzampolin, mgoodness, chancez\n====\n\tKeywords: ingress\nnginx" as nginx_ingress_0_14_0 #DarkSalmon
+artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_4_3_0 #LightBlue
 
 'There are 21 referenced Docker Images
 usecase "Image\n====\n\tDocker Hub\n====\n\tpostgres\n====\n\t11.4" as postgres_11_4 #Ivory
@@ -47,21 +47,21 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-search-services\n=
 usecase "Image\n====\n\tquay.io\n====\n\talfresco/alfresco-libreoffice:2.0.17\n====\n\t2.0.17" as quay_io_alfresco_alfresco_libreoffice_2_0_17 #Khaki
 
 'Chart Dependencies
-alfresco_dbp_1_5_0--[#green]-|>alfresco_process_services_0_2_0
-alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
-alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
+alfresco_dbp_1_5_0--[#green]-|>alfresco_content_services_2_1_3
+alfresco_content_services_2_1_3--[#green]-|>alfresco_digital_workspace_2_2_0
+alfresco_content_services_2_1_3--[#green]-|>alfresco_sync_service_1_1_1
+alfresco_sync_service_1_1_1--[#green]-|>postgresql_0_9_3
+alfresco_content_services_2_1_3--[#green]-|>postgresql_0_9_3
+alfresco_content_services_2_1_3--[#green]-|>alfresco_infrastructure_4_1_1
 alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
 alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
 alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
-alfresco_dbp_1_5_0--[#green]-|>alfresco_content_services_2_1_3
+alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
 alfresco_content_services_2_1_3--[#green]-|>alfresco_search_1_0_1
-alfresco_content_services_2_1_3--[#green]-|>alfresco_digital_workspace_2_2_0
-alfresco_content_services_2_1_3--[#green]-|>postgresql_0_9_3
-alfresco_content_services_2_1_3--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_content_services_2_1_3--[#green]-|>alfresco_sync_service_1_1_1
-alfresco_sync_service_1_1_1--[#green]-|>postgresql_0_9_3
 alfresco_dbp_1_5_0--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_dbp_1_5_0--[#green]-|>alfresco_process_services_0_2_0
+alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
+alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_admin_1_10_0
@@ -84,5 +84,5 @@ nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2021/03/19 06:09:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2021/06/07 10:28:05 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

@@ -3,19 +3,19 @@ Chart Map for alfresco-identity-service:1.0.0
 There are 2 referenced Helm Charts
 ----------------------------------
 Chart: keycloak:4.0.3
-	apiVersion: Not specified
+	apiVersion: v1
 	appVersion: 4.5.0.Final
-	created: 2018-11-17T11:54:56.076028804Z
+	created: 2020-10-15T15:46:18.448561-04:00
 	dependencies: None
 	description: Open Source Identity and Access Management For Modern Applications and Services
 	digest: 6306b51cf77d56bd6bcbc67bec5647ba2cf6e7a242369f01e6f3222b9d6e1c37
 	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
 	keywords: sso,idm,openid connect,saml,kerberos,ldap
 	maintainers: unguiculus:unguiculus@gmail.com
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.helm.sh/stable
 	name: keycloak
 	sources: https://github.com/jboss-dockerfiles/keycloak
-	urls: https://kubernetes-charts.storage.googleapis.com/keycloak-4.0.3.tgz
+	urls: https://charts.helm.sh/stable/packages/keycloak-4.0.3.tgz
 	version: 4.0.3
 Chart: alfresco-identity-service:1.0.0
 	apiVersion: Not specified
@@ -42,4 +42,4 @@ Chart Dependencies
 alfresco-identity-service:1.0.0 depends on keycloak:4.0.3
 keycloak:4.0.3 uses jboss/keycloak:4.5.0.Final
 
-Generated on 2021/03/19 06:10:05 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2021/06/07 10:28:14 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

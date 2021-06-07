@@ -3,25 +3,25 @@ Chart Map for alfresco-content-services:3.0.8
 There are 10 referenced Helm Charts
 -----------------------------------
 Chart: postgresql:0.9.3
-	apiVersion: Not specified
+	apiVersion: v1
 	appVersion: Not specified
-	created: 2018-03-29T04:56:10.224673062Z
+	created: 2020-10-15T15:46:22.353424-04:00
 	dependencies: None
 	description: Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
 	digest: 828f019164cfbc9d97824fd6ef39748ec8f5677d8267b90de44b6df59ec2cbbc
 	icon: https://www.postgresql.org/media/img/about/press/elephant.png
 	keywords: postgresql,postgres,database,sql
 	maintainers: databus23
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.helm.sh/stable
 	name: postgresql
 	sources: https://github.com/kubernetes/charts,https://github.com/docker-library/postgres
-	urls: https://kubernetes-charts.storage.googleapis.com/postgresql-0.9.3.tgz
+	urls: https://charts.helm.sh/stable/packages/postgresql-0.9.3.tgz
 	version: 0.9.3
 Chart: alfresco-content-services:3.0.8
 	apiVersion: Not specified
 	appVersion: 6.2.0.2
 	created: Not specified
-	dependencies: postgresql:0.9.3, alfresco-search:1.0.3, alfresco-infrastructure:4.1.1, alfresco-digital-workspace:2.2.1, alfresco-sync-service:3.0.2
+	dependencies: postgresql:0.9.3, alfresco-digital-workspace:2.2.1, alfresco-sync-service:3.0.2, alfresco-infrastructure:4.1.1, alfresco-search:1.0.3
 	description: A Helm chart for deploying Alfresco Content Services
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -36,7 +36,7 @@ Chart: alfresco-infrastructure:4.1.1
 	apiVersion: v1
 	appVersion: Not specified
 	created: 2020-07-08T12:03:13.30180831Z
-	dependencies: alfresco-identity-service:1.1.0, activemq:1.1.1, nginx-ingress:0.14.0
+	dependencies: nginx-ingress:0.14.0, activemq:1.1.1, alfresco-identity-service:1.1.0
 	description: A Helm chart Providing the required Alfresco infrastructure for the Digital Business Platform. This includes activemq, alfresco-identity-service, nginx-ingress and a persistent volume to use with the DBP chart.
 	digest: 65bb324a6af05a2b2e87bf3f3817596fbac565a74b47440ad7b0459c30e9b201
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -93,34 +93,34 @@ Chart: alfresco-digital-workspace:2.2.1
 	urls: http://kubernetes-charts.alfresco.com/stable/alfresco-digital-workspace-2.2.1.tgz
 	version: 2.2.1
 Chart: keycloak:4.3.0
-	apiVersion: Not specified
+	apiVersion: v1
 	appVersion: 4.8.3.Final
-	created: 2019-02-07T13:26:11.548377387Z
+	created: 2020-10-15T15:46:18.46301-04:00
 	dependencies: None
 	description: Open Source Identity and Access Management For Modern Applications and Services
 	digest: fc74a8d9172b8b4647f383a8b087c3d27f95b68b587b97088dddacc102d9c5d7
 	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
 	keywords: sso,idm,openid connect,saml,kerberos,ldap
 	maintainers: unguiculus:unguiculus@gmail.com,thomasdarimont:thomas.darimont+github@gmail.com
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.helm.sh/stable
 	name: keycloak
 	sources: https://github.com/jboss-dockerfiles/keycloak
-	urls: https://kubernetes-charts.storage.googleapis.com/keycloak-4.3.0.tgz
+	urls: https://charts.helm.sh/stable/packages/keycloak-4.3.0.tgz
 	version: 4.3.0
 Chart: nginx-ingress:0.14.0
-	apiVersion: Not specified
+	apiVersion: v1
 	appVersion: 0.12.0
-	created: 2018-04-18T21:56:29.224709184Z
+	created: 2020-10-15T15:46:20.507697-04:00
 	dependencies: None
 	description: An nginx Ingress controller that uses ConfigMap to store the nginx configuration.
 	digest: 0beadee0eee1de15580fd741628e0b05de744c6521ebd3884583901a73666346
 	icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
 	keywords: ingress,nginx
 	maintainers: jackzampolin:jack.zampolin@gmail.com,mgoodness:mgoodness@gmail.com,chancez:chance.zibolski@coreos.com
-	repo url: https://kubernetes-charts.storage.googleapis.com
+	repo url: https://charts.helm.sh/stable
 	name: nginx-ingress
 	sources: https://github.com/kubernetes/ingress-nginx
-	urls: https://kubernetes-charts.storage.googleapis.com/nginx-ingress-0.14.0.tgz
+	urls: https://charts.helm.sh/stable/packages/nginx-ingress-0.14.0.tgz
 	version: 0.14.0
 Chart: alfresco-sync-service:3.0.2
 	apiVersion: Not specified
@@ -177,15 +177,15 @@ Image: alfresco/alfresco-tika:2.1.0
 Chart Dependencies
 ------------------
 alfresco-content-services:3.0.8 depends on postgresql:0.9.3
-alfresco-content-services:3.0.8 depends on alfresco-search:1.0.3
-alfresco-content-services:3.0.8 depends on alfresco-infrastructure:4.1.1
-alfresco-infrastructure:4.1.1 depends on alfresco-identity-service:1.1.0
-alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
-alfresco-infrastructure:4.1.1 depends on activemq:1.1.1
-alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
 alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
 alfresco-content-services:3.0.8 depends on alfresco-sync-service:3.0.2
 alfresco-sync-service:3.0.2 depends on postgresql:0.9.3
+alfresco-content-services:3.0.8 depends on alfresco-infrastructure:4.1.1
+alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
+alfresco-infrastructure:4.1.1 depends on activemq:1.1.1
+alfresco-infrastructure:4.1.1 depends on alfresco-identity-service:1.1.0
+alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
+alfresco-content-services:3.0.8 depends on alfresco-search:1.0.3
 postgresql:0.9.3 uses postgres:11.4
 postgresql:0.9.3 uses postgres:10.1
 alfresco-content-services:3.0.8 uses alfresco/alfresco-libreoffice:2.1.0
@@ -205,4 +205,4 @@ nginx-ingress:0.14.0 uses quay.io/kubernetes-ingress-controller/nginx-ingress-co
 alfresco-sync-service:3.0.2 uses quay.io/alfresco/service-sync:3.3.1
 activemq:1.1.1 uses alfresco/alfresco-activemq:5.15.8-java-8-oracle-centos-7-87b15e37ce8b
 
-Generated on 2021/03/19 06:09:19 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2021/06/07 10:27:16 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
