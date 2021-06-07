@@ -3,8 +3,6 @@ package com.melahn.util.helm;
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmMaintainer;
 
-import java.io.IOException;
-
 /**
  * A class that generates a PlantUML file describing a Kubernetes Helm Chart and
  * its dependencies.
