@@ -131,12 +131,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      */
     @Override
     public void printSectionHeader(String header) throws ChartMapException {
-        try {
-            writeLine("");
-            writer.write("'" + header + "\n");
-        } catch (IOException e) {
-            throw new ChartMapException(e.getMessage());
-        }
+        writeLine("");
+        writeLine("'" + header);
     }
 
     /**
