@@ -934,9 +934,7 @@ public class ChartMap {
             // repo)
             if (getChartName() == null || getChartVersion() == null) {
                 String chartFileDir = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-
-                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);
-                
+                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);        
                 if (directories.length > 0) {
                     String chartYamlFilename = directories[0] + File.separator
                             + CHART_YAML;
@@ -1485,32 +1483,16 @@ public class ChartMap {
     private ArrayList<Boolean> getTemplateArray(File f, String chartName) {
         ArrayList<Boolean> a = new ArrayList<>();
         String line = null;
-        try (FileReader fileReader = new FileReader(f);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);) {
-            line = bufferedReader.readLine();
+        try(BufferedReader br = new BufferedReader(new FileReader(f));) {
+            line = br.readLine();
             while (line != null) {
                 if (line.length() > (START_OF_TEMPLATE + chartName).length() && line.charAt(0) == '#') {
                     // a pattern like this <chartName>/templates/... means that this is
                     // a template of immediate interest to the chart e.g.
                     // alfresco-content-services/templates
-                    String[] s = line.split(File.separator, 3);
-                    Boolean b = Boolean.FALSE;
-                    if (s.length > 1 && s[0].equals(START_OF_TEMPLATE + chartName) && s[1].equals("templates")
-                            && !line.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
-                        b = Boolean.TRUE; // the yaml files in this section are ones we care about
-                    }
-                    boolean endOfYamlInFile = false;
-                    while (!endOfYamlInFile) { // read until you find the end of this yaml object
-                        line = bufferedReader.readLine();
-                        // EOF or the start of a new yaml section means the current object is completely
-                        // read
-                        if (line == null || (line.startsWith(START_OF_TEMPLATE))) {
-                            endOfYamlInFile = true;
-                            a.add(b);
-                        }
-                    }
+                    processTemplateYaml(line, br, a);
                 } else {
-                    line = bufferedReader.readLine();
+                    line = br.readLine();
                 }
             }
         } catch (Exception e) {
@@ -1519,6 +1501,32 @@ public class ChartMap {
         return a;
     }
 
+    /**
+     * 
+     * @param l a line if yaml from the template file
+     * @param br a buffered reader to use to read more lines of yaml if needed
+     * @param a a list to which a boolean to signal this is an interesting template can be added
+     * @throws IOException
+     */
+    private void processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a) throws IOException {
+        String[] s = l.split(File.separator, 3);
+        Boolean b = Boolean.FALSE;
+        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE + chartName) && s[1].equals("templates")
+                && !l.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
+            b = Boolean.TRUE; // the yaml files in this section are ones we care about
+        }
+        boolean endOfYamlInFile = false;
+        while (!endOfYamlInFile) { // read until you find the end of this yaml object
+            l = br.readLine();
+            // EOF or the start of a new yaml section means the current object is completely
+            // read
+            if (l == null || (l.startsWith(START_OF_TEMPLATE))) {
+                endOfYamlInFile = true;
+                a.add(b);
+            }
+        }
+    }
+    
     /**
      * Parses a file containing multiple yaml files and returns a array of the file
      * names of those yaml files
