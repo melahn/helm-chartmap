@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -935,15 +934,11 @@ public class ChartMap {
             // repo)
             if (getChartName() == null || getChartVersion() == null) {
                 String chartFileDir = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-                String[] directories = new File(chartFileDir).list(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        File file = new File(chartFileDir + File.separator + name);
-                        return (file.isDirectory());
-                    }
-                });
-                if (directories != null) {
-                    String chartYamlFilename = chartFileDir + File.separator + directories[0] + File.separator
+
+                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);
+                
+                if (directories.length > 0) {
+                    String chartYamlFilename = directories[0] + File.separator
                             + CHART_YAML;
                     File chartYamlFile = new File(chartYamlFilename);
                     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -1007,8 +1002,8 @@ public class ChartMap {
                     if (chartFile.exists()) {
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                         // this reference is not in the map
-                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class); 
+                        // this reference is not in the map
+                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);
                         HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
                                 currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
@@ -1020,8 +1015,8 @@ public class ChartMap {
                                     + "Try running the command again with the '-r' option.",
                                     currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion()));
                         }
-                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart), chartDirName, directory,
-                           currentHelmChart, parentHelmChart);
+                        handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart),
+                                chartDirName, directory, currentHelmChart, parentHelmChart);
                     }
                 }
             }
@@ -1029,7 +1024,6 @@ public class ChartMap {
             logger.error("Exception getting Dependencies: {}", e.getMessage());
         }
     }
-
 
     /**
      * Check if there is a condition property in the parent Helm Chart that
