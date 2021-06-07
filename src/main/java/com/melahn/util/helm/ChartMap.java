@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -934,10 +935,9 @@ public class ChartMap {
             // repo)
             if (getChartName() == null || getChartVersion() == null) {
                 String chartFileDir = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);        
+                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);
                 if (directories.length > 0) {
-                    String chartYamlFilename = directories[0] + File.separator
-                            + CHART_YAML;
+                    String chartYamlFilename = directories[0] + File.separator + CHART_YAML;
                     File chartYamlFile = new File(chartYamlFilename);
                     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -1248,76 +1248,33 @@ public class ChartMap {
      * rendered template is saved in the templates directory of the chart with the
      * name this.getClass().getCanonicalName()_renderedtemplates.yaml
      *
-     * @param dir The directory in which the chart directory exists
+     * @param d   The directory in which the chart directory exists
      * @param h   The Helm Chart containing the templates
      * @param p   The Helm Chart that is the parent of h
      */
-    private void renderTemplates(File dir, HelmChart h, HelmChart p) {
+    private void renderTemplates(File d, HelmChart h, HelmChart p) {
         try {
             if (h.getType() != null && h.getType().equals("library")) {
                 // skip rendering library charts (these were intruduced in Helm V3)
                 return;
             }
-            File templateFile = runTemplateCommand(dir, h);
-            ArrayList<Boolean> a = getTemplateArray(templateFile, h.getName());
-            ArrayList<String> b = getTemplateArray(dir, templateFile);
+            File tf = runTemplateCommand(d, h);
+            ArrayList<Boolean> a = getTemplateArray(tf, h.getName());
+            ArrayList<String> b = getTemplateArray(d, tf);
             int i = 0;
-            Yaml yaml = new Yaml();
-            InputStream input = new FileInputStream(templateFile);
-            for (Object data : yaml.loadAll(input)) {
+            Yaml y = new Yaml();
+            for (Object data : y.loadAll(new FileInputStream(tf))) {
                 /**
                  * there may multiple yaml documents in this one document inspect the object to
                  * see if it is a Deployment or a StatefulSet template if it is add to the
-                 * deploymentTemplates arra
+                 * deploymentTemplates array
                  */
                 if (data instanceof Map) {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> m = (Map<String, Object>) data;
                     Object o = m.get("kind");
                     if (o instanceof String) {
-                        String v = (String) o;
-                        if (v.equals("Deployment") || v.equals("StatefulSet")) {
-                            String s = yaml.dump(m);
-                            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                            HelmDeploymentTemplate template = mapper.readValue(s, HelmDeploymentTemplate.class);
-                            // remember the parent
-                            HelmDeploymentContainer[] containers = template.getSpec().getTemplate().getSpec()
-                                    .getContainers();
-                            for (HelmDeploymentContainer c : containers) {
-                                c.setParent(p);
-                            }
-                            // if this template is a child of this chart remember that fact
-                            if (Boolean.TRUE.equals(a.get(i))) {
-                                template.setFileName(b.get(i)); // is this needed?
-                                h.getDeploymentTemplates().add(template);
-                            }
-                            /**
-                             * cases: 1. The Chart has a dependency on this template and nothing supercedes
-                             * it in some parent chart 2. The Chart has a dependency on this template and a
-                             * superceding version of this template has already been found 3. The Chart has
-                             * a dependency on this template and a superceding version of this template will
-                             * be found later
-                             */
-                            WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
-                            if (weightedTemplate == null) {
-                                weightedTemplate = new WeightedDeploymentTemplate(dir.getAbsolutePath(), template);
-                                deploymentTemplatesReferenced.put(b.get(i), weightedTemplate);
-                            } else {
-                                // remember the parent
-                                containers = weightedTemplate.getTemplate().getSpec().getTemplate().getSpec()
-                                        .getContainers();
-                                for (HelmDeploymentContainer c : containers) {
-                                    c.setParent(p);
-                                }
-                                if (weightedTemplate.getWeight() > getWeight(dir.getAbsolutePath())) {
-                                    // a superceding template was found so replace the template that is referenced
-                                    // in the
-                                    // global list of templates
-                                    weightedTemplate.setTemplate(template);
-                                }
-                            }
-                        }
+                        processTemplate(new Object[] { h, p, d, o, y }, m, a, b, i);
                     }
                     i++; // index to the next element in the array that indicates whether the template is
                          // of interest for the current chart level
@@ -1327,6 +1284,73 @@ public class ChartMap {
 
         Exception e) {
             logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
+        }
+    }
+
+    private void processTemplate(Object[] o, Map<String, Object> m, ArrayList<Boolean> a, ArrayList<String> b, int i)
+            throws JsonProcessingException {
+        // pull the paramateres out of the array for easier reference. They were only passed in an object array
+        // to reduce the size of the parameter list 
+        HelmChart h = (HelmChart) o[0];
+        HelmChart p = (HelmChart) o[1];
+        File d = (File) o[2];
+        String v = (String) o[3];
+        Yaml y = (Yaml) o[4];
+        if (v.equals("Deployment") || v.equals("StatefulSet")) {
+            String s = y.dump(m);
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            HelmDeploymentTemplate t = mapper.readValue(s, HelmDeploymentTemplate.class);
+            // remember the parent
+            HelmDeploymentContainer[] containers = t.getSpec().getTemplate().getSpec().getContainers();
+            for (HelmDeploymentContainer c : containers) {
+                c.setParent(p);
+            }
+            // if this template is a child of this chart remember that fact
+            if (Boolean.TRUE.equals(a.get(i))) {
+                t.setFileName(b.get(i));
+                h.getDeploymentTemplates().add(t);
+            }
+            processWeights(t, p, d, b, i);
+        }
+    }
+
+    /**
+     * Process the weights of the templates previously found against this template.
+     * We have the following cases:
+     * 
+     * 1. The Chart has a dependency on this template and nothing supercedes it in
+     * some parent chart
+     * 
+     * 2. The Chart has a dependency on this template and a superceding version of
+     * this template has already been found
+     * 
+     * 3. The Chart has a dependency on this template and a superceding version of
+     * this template will be found laterbe found later
+     * 
+     * @param t the template currently being processed
+     * @param p the parent of the template
+     * @param d the directory of the template
+     * @param b the array in which the weights are kept
+     * @param i the index of the template in the array
+     */
+    private void processWeights(HelmDeploymentTemplate t, HelmChart p, File d, ArrayList<String> b, int i) {
+        WeightedDeploymentTemplate weightedTemplate = deploymentTemplatesReferenced.get(b.get(i));
+        if (weightedTemplate == null) {
+            weightedTemplate = new WeightedDeploymentTemplate(d.getAbsolutePath(), t);
+            deploymentTemplatesReferenced.put(b.get(i), weightedTemplate);
+        } else {
+            // remember the parent
+            HelmDeploymentContainer[] containers = weightedTemplate.getTemplate().getSpec().getTemplate().getSpec()
+                    .getContainers();
+            for (HelmDeploymentContainer c : containers) {
+                c.setParent(p);
+            }
+            if (weightedTemplate.getWeight() > getWeight(d.getAbsolutePath())) {
+                // a superceding template was found so replace the template that is referenced
+                // in the global list of templates
+                weightedTemplate.setTemplate(t);
+            }
         }
     }
 
@@ -1475,22 +1499,22 @@ public class ChartMap {
      * mentioned in that file pertain to the chart at this level so we can draw the
      * right arrows later.
      *
-     * @param f         the file containing all the rendered templates
-     * @param chartName the name of the chart we are interested in at the moment
+     * @param f the file containing all the rendered templates
+     * @param c the name of the chart we are interested in at the moment
      * @return an array with True object if the corresponding template is one that
      *         pertains to the chart
      */
-    private ArrayList<Boolean> getTemplateArray(File f, String chartName) {
+    private ArrayList<Boolean> getTemplateArray(File f, String c) {
         ArrayList<Boolean> a = new ArrayList<>();
         String line = null;
-        try(BufferedReader br = new BufferedReader(new FileReader(f));) {
+        try (BufferedReader br = new BufferedReader(new FileReader(f));) {
             line = br.readLine();
             while (line != null) {
-                if (line.length() > (START_OF_TEMPLATE + chartName).length() && line.charAt(0) == '#') {
+                if (line.length() > (START_OF_TEMPLATE + c).length() && line.charAt(0) == '#') {
                     // a pattern like this <chartName>/templates/... means that this is
                     // a template of immediate interest to the chart e.g.
                     // alfresco-content-services/templates
-                    processTemplateYaml(line, br, a);
+                    line = processTemplateYaml(line, br, a, c);
                 } else {
                     line = br.readLine();
                 }
@@ -1503,15 +1527,18 @@ public class ChartMap {
 
     /**
      * 
-     * @param l a line if yaml from the template file
+     * @param l  a line if yaml from the template file
      * @param br a buffered reader to use to read more lines of yaml if needed
-     * @param a a list to which a boolean to signal this is an interesting template can be added
+     * @param a  a list to which a boolean to signal this is an interesting template
+     *           can be added
+     * @param c  the name of the current Helm chart being processed
+     * @return the line last read
      * @throws IOException
      */
-    private void processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a) throws IOException {
+    private String processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a, String c) throws IOException {
         String[] s = l.split(File.separator, 3);
         Boolean b = Boolean.FALSE;
-        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE + chartName) && s[1].equals("templates")
+        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE + c) && s[1].equals("templates")
                 && !l.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
             b = Boolean.TRUE; // the yaml files in this section are ones we care about
         }
@@ -1525,8 +1552,9 @@ public class ChartMap {
                 a.add(b);
             }
         }
+        return l;
     }
-    
+
     /**
      * Parses a file containing multiple yaml files and returns a array of the file
      * names of those yaml files
