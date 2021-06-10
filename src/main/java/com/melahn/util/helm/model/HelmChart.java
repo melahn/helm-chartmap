@@ -163,9 +163,13 @@ public class HelmChart {
         name = n;
     }
 
-    public String getRepoUrl() { return repoUrl; }
+    public String getRepoUrl() { 
+        return repoUrl; 
+    }
 
-    public void setRepoUrl(String repoUrl) { this.repoUrl = repoUrl; }
+    public void setRepoUrl(String repoUrl) { 
+        this.repoUrl = repoUrl; 
+    }
 
     public String[] getSources() {
         return sources;

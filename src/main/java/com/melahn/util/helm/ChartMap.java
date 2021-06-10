@@ -75,7 +75,7 @@ public class ChartMap {
     private String chartVersion;
     private String chartUrl;
     HashSet<String> chartsDependenciesPrinted;
-    private ChartKeyMap chartsReferenced;
+    protected ChartKeyMap chartsReferenced;
     private boolean debug;
     private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced;
     private String envFilename;
@@ -89,7 +89,7 @@ public class ChartMap {
         V2, V3, UNKNOWN
     }
 
-    private HashSet<String> imagesReferenced;
+    protected HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     protected final Logger logger = LogManager.getLogger(ChartMap.class);
     protected Level logLevelDebug;
@@ -476,9 +476,9 @@ public class ChartMap {
      * calls a method to load all the charts found in that cache into the charts map
      * where they are raw material for use later.
      * 
-     * @return void
+     * @throws ChartMapException when an error occurs loading repos
      */
-    private void loadLocalRepos() throws ChartMapException {
+    protected void loadLocalRepos() throws ChartMapException {
         try {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -705,7 +705,7 @@ public class ChartMap {
      * Resolves a charts dependencies by getting the chart and then finding the
      * charts dependencies.
      */
-    private void resolveChartDependencies() {
+    protected void resolveChartDependencies() {
         try {
             String chartDirName = getChart();
             if (chart != null) {
@@ -1248,9 +1248,9 @@ public class ChartMap {
      * rendered template is saved in the templates directory of the chart with the
      * name this.getClass().getCanonicalName()_renderedtemplates.yaml
      *
-     * @param d   The directory in which the chart directory exists
-     * @param h   The Helm Chart containing the templates
-     * @param p   The Helm Chart that is the parent of h
+     * @param d The directory in which the chart directory exists
+     * @param h The Helm Chart containing the templates
+     * @param p The Helm Chart that is the parent of h
      */
     private void renderTemplates(File d, HelmChart h, HelmChart p) {
         try {
@@ -1598,8 +1598,10 @@ public class ChartMap {
 
     /**
      * Prints the Chart Map
+     * 
+     * @throws ChartMapException when an error occurs printing the chart map
      */
-    private void printMap() throws ChartMapException {
+    protected void printMap() throws ChartMapException {
         try {
             if (chart != null) {
                 detectPrintFormat(outputFilename);
@@ -1784,8 +1786,10 @@ public class ChartMap {
 
     /**
      * Creates a temporary used to download and expand the Helm Chart
+     * 
+     * @throws ChartMapException when an error occurs creating the temp dir
      */
-    private void createTempDir() throws ChartMapException {
+    protected void createTempDir() throws ChartMapException {
         try {
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions
                     .asFileAttribute(PosixFilePermissions.fromString("rwxr-----"));

@@ -147,9 +147,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         body += getSeparator();
         body += getChartType(chart);
         body += getSeparator();
-        if (chart.getRepoUrl() != null) {
-            body += "\\t" + chart.getRepoUrl();
-        }
+        body += "\\t" + (chart.getRepoUrl()==null? "Unknown Repo URL":chart.getRepoUrl());
         body += getSeparator();
         body += "\\t" + getMaintainers(chart.getMaintainers());
         body += getSeparator();
@@ -170,10 +168,8 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         String repoHost = "Docker Hub";
         String s = i;
         int count = s.length() - s.replace("/", "").length();
-        if (count == 0) { // e.g. postgres:9.6.2
-            imageName = i.substring(0, i.indexOf(':'));
-        } else if (count == 1) { // e.g. : alfresco/process-services:1.8.0
-            imageName = i.substring(0, i.indexOf(':'));
+        if (count < 2) { // e.g. postgres:9.6.2 or alfresco/process-services:1.8.0
+            imageName = i.contains(":")? i.substring(0, i.indexOf(':')) : i;
         } else { // e.g. quay.io/alfresco/service:1.0.0
             repoHost = i.substring(0, i.indexOf('/'));
             imageName = i.substring(i.indexOf('/') + 1, i.length());
@@ -182,10 +178,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         body += getSeparator();
         body += "\\t" + imageName;
         body += getSeparator();
-        String version = "?";
-        if (i.contains(":")) {
-            version = i.substring(i.indexOf(':') + 1, i.length());
-        }
+        String version = i.contains(":")?i.substring(i.indexOf(':') + 1, i.length()) : "?";
         body += "\\t" + version;
         return body;
     }
