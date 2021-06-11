@@ -34,10 +34,10 @@ public class ChartMapTest {
     private static Path testOutputTextFilePathNRV = Paths.get("target/test/testChartFileNRV.txt");
     private static Path testOutputTextFilePathRNV = Paths.get("target/test/testChartFileRNV.txt");
     private static Path testOutputTextFilePathNRNV = Paths.get("target/test/testChartFileNRNV.txt");
-    private static Path testOutputImageRV = Paths.get("target/test/testChartFileRV.png");
-    private static Path testOutputImageNRV = Paths.get("target/test/testChartFileNRV.png");
-    private static Path testOutputImageRNV = Paths.get("target/test/testChartFileRNV.png");
-    private static Path testOutputImageNRNV = Paths.get("target/test/testChartFileNRNV.png");
+    private static Path testOutputJSONFilePathRV = Paths.get("target/test/testChartFileRV.json");
+    private static Path testOutputJSONFilePathNRV = Paths.get("target/test/testChartFileNRV.json");
+    private static Path testOutputJSONFilePathRNV = Paths.get("target/test/testChartFileRNV.json");
+    private static Path testOutputJSONFilePathNRNV = Paths.get("target/test/testChartFileNRNV.json");
     private static Path testInputFilePath = Paths.get("src/test/resource/test-chart-file.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
 
@@ -69,18 +69,7 @@ public class ChartMapTest {
     private static void deleteCreatedFiles() {
         try {
             System.out.println("Deleting any previously created files");
-            Files.deleteIfExists(testOutputPumlFilePathRV);
-            Files.deleteIfExists(testOutputPumlFilePathNRV);
-            Files.deleteIfExists(testOutputPumlFilePathRNV);
-            Files.deleteIfExists(testOutputPumlFilePathNRNV);
-            Files.deleteIfExists(testOutputTextFilePathRV);
-            Files.deleteIfExists(testOutputTextFilePathNRV);
-            Files.deleteIfExists(testOutputTextFilePathRNV);
-            Files.deleteIfExists(testOutputTextFilePathNRNV);
-            Files.deleteIfExists(testOutputImageRV);
-            Files.deleteIfExists(testOutputImageNRV);
-            Files.deleteIfExists(testOutputImageRNV);
-            Files.deleteIfExists(testOutputImageNRNV);
+            Files.walk(Paths.get("./target/test/"),1).filter(Files::isRegularFile).forEach(p->p.toFile().delete());
         } catch (IOException e) {
             System.out.println("Error deleting created files: " + e.getMessage());
         }
@@ -200,6 +189,64 @@ public class ChartMapTest {
             // result for a better test
         } catch (Exception e) {
             fail("printTestTextChartNRefreshNoVerbose failed:" + e.getMessage());
+        }
+    }
+
+    @Test
+    public void printTestJSONChartRefreshVerbose() {
+        try {
+            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRV, true,
+                    true, true);
+            if (testMap != null) {
+                testMap.print();
+            }
+            Assert.assertTrue(Files.exists(testOutputJSONFilePathRV));
+            //Assert.assertTrue(fileContains(testOutputJSONFilePathRV,
+              //      "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
+        } catch (Exception e) {
+            fail("printTestJSONChartRefreshVerbose failed:" + e.getMessage());
+        }
+    }
+
+    @Test
+    public void printTestJSONChartNoRefreshVerbose() {
+        try {
+            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRV, true,
+                    false, true);
+            if (testMap != null) {
+                testMap.print();
+            }
+            Assert.assertTrue(Files.exists(testOutputJSONFilePathNRV));
+        } catch (Exception e) {
+            fail("printTestJSONChartNoRefreshVerbose failed:" + e.getMessage());
+        }
+    }
+
+    @Test
+    public void printTestJSONChartRefreshNoVerbose() {
+        try {
+            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRNV, true,
+                    true, false);
+            if (testMap != null) {
+                testMap.print();
+            }
+            Assert.assertTrue(Files.exists(testOutputJSONFilePathRNV));
+        } catch (Exception e) {
+            fail("printTestJSONChartRefreshNoVerbose failed:" + e.getMessage());
+        }
+    }
+
+    @Test
+    public void printTestJSONChartNoRefreshNoVerbose() {
+        try {
+            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRNV, true,
+                    false, false);
+            if (testMap != null) {
+                testMap.print();
+            }
+            Assert.assertTrue(Files.exists(testOutputJSONFilePathNRNV));
+        } catch (Exception e) {
+            fail("printTestJSONChartNRefreshNoVerbose failed:" + e.getMessage());
         }
     }
 
