@@ -201,8 +201,6 @@ public class ChartMapTest {
                 testMap.print();
             }
             Assert.assertTrue(Files.exists(testOutputJSONFilePathRV));
-            //Assert.assertTrue(fileContains(testOutputJSONFilePathRV,
-              //      "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
         } catch (Exception e) {
             fail("printTestJSONChartRefreshVerbose failed:" + e.getMessage());
         }
