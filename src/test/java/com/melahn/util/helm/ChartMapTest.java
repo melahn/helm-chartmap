@@ -327,7 +327,7 @@ public class ChartMapTest {
             boolean refresh, boolean verbose) throws Exception {
         ChartMap testMap = null;
         boolean[] switches;
-        boolean debug = true;
+        boolean debug = false;
         switches = new boolean[] { generateImage, refresh, verbose, debug };
         try {
             testMap = new ChartMap(option, inputPath.toAbsolutePath().toString(),
