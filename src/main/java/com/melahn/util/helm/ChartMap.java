@@ -11,18 +11,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,6 +107,7 @@ public class ChartMap {
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
+    private static final String LOG_FORMAT_5 = "{}{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
     private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
     private static final int GENERATE_SWITCH = 0;
@@ -119,6 +118,7 @@ public class ChartMap {
     private static final String CHARTS_DIR_NAME = "charts";
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     private static final String TEMP_DIR_ERROR = "Error creating temp directory: ";
+    private static final String ERROR_WING = "Error <";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -1289,8 +1289,9 @@ public class ChartMap {
 
     private void processTemplate(Object[] o, Map<String, Object> m, ArrayList<Boolean> a, ArrayList<String> b, int i)
             throws JsonProcessingException {
-        // pull the paramateres out of the array for easier reference. They were only passed in an object array
-        // to reduce the size of the parameter list 
+        // pull the paramateres out of the array for easier reference. They were only
+        // passed in an object array
+        // to reduce the size of the parameter list
         HelmChart h = (HelmChart) o[0];
         HelmChart p = (HelmChart) o[1];
         File d = (File) o[2];
@@ -1811,27 +1812,21 @@ public class ChartMap {
         if (isDebug()) {
             logger.log(logLevelDebug, "{} {} was not removed", TEMP_DIR, getTempDirName());
         } else {
-            Path directory = Paths.get(getTempDirName());
-            try {
-                Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                    @Override
-                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
+            try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()))) {
+                s.sorted(Comparator.reverseOrder()).forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary item ",
+                                p.getFileName());
                     }
                 });
-                logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
             } catch (IOException e) {
-                logger.error(LOG_FORMAT_4, "Error <", e.getMessage(), "> removing temporary directory ",
+                logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary directory ",
                         getTempDirName());
                 throw new ChartMapException(e.getMessage());
             }
+            logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
         }
     }
 
