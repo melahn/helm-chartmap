@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.melahn.util.helm.model.HelmChart;
@@ -292,6 +293,16 @@ public class ChartMapTest {
         assertNull(ChartUtil.getValue(".", hm));
         assertNull(ChartUtil.getValue(null, hm));
         assertNull(ChartUtil.getValue("fookey2.fookey6", hm));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test 
+    public void ChartMapExceptionTest() {
+        long a = ChartMapException.serialVersionUID;
+        assertEquals(UUID.fromString("5a8dba66-71e1-492c-bf3b-53cceb67b785").getLeastSignificantBits(),a);
+        ChartMapException cme = new ChartMapException("test");
+        assertEquals("test", cme.getMessage());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
