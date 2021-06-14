@@ -30,7 +30,7 @@ public final class ChartUtil {
             for (Map.Entry<String, Object> entry : values.entrySet()) {
                 if (head.equals(entry.getKey()) && !(entry.getValue() instanceof Map)) {
                     return entry.getValue(); // end the recursion
-                } else if ((head.equals(entry.getKey()) && !tail.isEmpty() && entry.getValue() instanceof Map)) {
+                } else if (head.equals(entry.getKey()) && !tail.isEmpty()) {
                     return getValue(tail, (Map<String, Object>) entry.getValue()); // continue the recursion
                 }
             }

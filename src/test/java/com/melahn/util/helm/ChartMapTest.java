@@ -277,14 +277,21 @@ public class ChartMapTest {
             {
                 put("fookey3", "foovalue3");
                 put("fookey4", "foovalue4");
+                put("fookey5", " ");
+                put("fookey6", new HashMap<String, Object>() {{
+                    put("fookey7", "foovalue7");
+                    put("fookey8", "foovalue8");
+                }});
             }
         });
         assertEquals("foovalue1", ChartUtil.getValue("fookey1", hm));
         assertEquals("foovalue3", ChartUtil.getValue("fookey2.fookey3", hm));
+        assertEquals(" ", ChartUtil.getValue("fookey2.fookey5", hm));
         assertNull(ChartUtil.getValue("fookey", null));
         assertNull(ChartUtil.getValue("", hm));
         assertNull(ChartUtil.getValue(".", hm));
         assertNull(ChartUtil.getValue(null, hm));
+        assertNull(ChartUtil.getValue("fookey2.fookey6", hm));
     }
 
     @Test
