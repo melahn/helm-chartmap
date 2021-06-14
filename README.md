@@ -22,7 +22,7 @@ The PlantUML file can be turned into an image.  You can see an example of that h
 For more information about PlantUML, see <http://plantuml.com/>.  
 
 The text file provides a simple text summary of the charts and images used, and the dependencies.  It also
-detects anomolies such as a stable chart depending on an incubator chart.
+detects anomalies such as a stable chart depending on an incubator chart.
 You can see an example of a text file generated from Chart Map here &#8594; <https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt>.
 
 ## Maven Central
