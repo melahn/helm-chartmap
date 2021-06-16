@@ -314,7 +314,58 @@ public class ChartMapTest {
     }
 
     @Test
-    public void plantUMLPrintTest() throws Exception {
+    public void ChartMapPrinterTest() throws Exception {
+        Path d = Paths.get("./target/test/printer");
+        Files.createDirectories(d);
+        Path f = Paths.get(d.toString(), "test.txt");
+        Files.deleteIfExists(f);
+        Files.createFile(f);
+        ChartMapPrinter cmp = null;
+        try {
+            cmp = new ChartMapPrinter(createTestMap(ChartOption.FILENAME, testInputFilePath, f, true, true, true), "/",
+                    null, null);
+        } catch (ChartMapException e) {
+            System.out.println("First ChartMapException expected and thrown");
+            assertFalse(false);
+        }
+        cmp = new ChartMapPrinter(createTestMap(ChartOption.FILENAME, testInputFilePath, f, true, true, true),
+                f.toString(), null, null);
+        assertEquals(ChartMapPrinter.NOT_SPECIFIED, cmp.formatString(" "));
+        assertEquals(ChartMapPrinter.NOT_SPECIFIED, cmp.formatString(null));
+        HelmChart h = new HelmChart();
+        h.setRepoUrl(null);
+        cmp.printChart(h);
+        assertFalse(fileContains(f, "repo url"));
+        final String OUTPUTFILENAME = "fooout";
+        cmp.setOutputFilename(OUTPUTFILENAME);
+        assertEquals(OUTPUTFILENAME, cmp.getOutputFilename());
+        final int INDENT = 666;
+        cmp.setIndent(INDENT);
+        assertEquals(INDENT, cmp.getIndent());
+        final HelmChart CHART = new HelmChart();
+        cmp.setChart(CHART);
+        assertEquals(CHART, cmp.getChart());
+        final String CHARTTYPELIBRARY = "library";
+        h.setType(CHARTTYPELIBRARY);
+        assertEquals(CHARTTYPELIBRARY, cmp.getChartType(h));
+        final String CHARTTYPEAPPLICATION = "application";
+        h.setType(CHARTTYPEAPPLICATION);
+        assertEquals(CHARTTYPEAPPLICATION, cmp.getChartType(h));
+        h.setType(null);
+        assertEquals(CHARTTYPEAPPLICATION, cmp.getChartType(h));
+        cmp.printTree(h);
+        try {
+            cmp.writer.close();
+            cmp.writeLine("foo");
+        } catch (ChartMapException e) {
+            System.out.println("Second ChartMapException expected and thrown");
+            assertFalse(false);
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void PlantUMLChartMapPrinterTest() throws Exception {
         ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
                 false, false);
         testMap.createTempDir();
@@ -365,7 +416,7 @@ public class ChartMapTest {
         jcmp.printSectionHeader("foo");
         HelmChart h = new HelmChart();
         Set<HelmDeploymentTemplate> templates = new HashSet<HelmDeploymentTemplate>();
-        HelmDeploymentContainer c = new HelmDeploymentContainer ();
+        HelmDeploymentContainer c = new HelmDeploymentContainer();
         c.setImage("image");
         c.setParent(null);
         HelmDeploymentContainer[] hdc = new HelmDeploymentContainer[1];
@@ -380,7 +431,7 @@ public class ChartMapTest {
         hdt.setSpec(hds);
         templates.add(hdt);
         h.setDeploymentTemplates(templates);
-        jcmp.addContainers(h, null, new JSONArray());            
+        jcmp.addContainers(h, null, new JSONArray());
         JSONObject jo = new JSONObject("{foo: bar}\n");
         jcmp.addImageDetails("foo", jo);
         // Force an exception to complete the test coverage

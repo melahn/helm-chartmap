@@ -19,7 +19,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
     protected String outputFilename;
     protected int indent = 2; // indent for tree view
     protected FileWriter writer;
-    private static final String NOT_SPECIFIED = "Not specified";
+    protected static final String NOT_SPECIFIED = "Not specified";
 
     ChartMapPrinter(ChartMap chartMap, String outputFilename, ChartKeyMap charts, HelmChart chart)
             throws ChartMapException {
@@ -36,7 +36,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
         }
     }
 
-    void writeLine(String l) throws ChartMapException {
+    protected void writeLine(String l) throws ChartMapException {
         try {
             writer.write(l + "\n");
             writer.flush();
@@ -46,7 +46,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
         }
     }
 
-    String formatString(String s) {
+    protected String formatString(String s) {
         if (s == null || s.trim().isEmpty()) {
             return NOT_SPECIFIED;
         } else {
@@ -154,7 +154,7 @@ public class ChartMapPrinter implements IChartMapPrinter {
         }
     }
 
-    String getCurrentDateTime() {
+    protected String getCurrentDateTime() {
         DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         return (f.format(LocalDateTime.now()));
     }
