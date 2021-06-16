@@ -166,8 +166,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         String body = "Image";
         body += getSeparator();
         String repoHost = "Docker Hub";
-        String s = i;
-        int count = s.length() - s.replace("/", "").length();
+        int count = i.length() - i.replace("/", "").length();
         if (count < 2) { // e.g. postgres:9.6.2 or alfresco/process-services:1.8.0
             imageName = i.contains(":")? i.substring(0, i.indexOf(':')) : i;
         } else { // e.g. quay.io/alfresco/service:1.0.0
