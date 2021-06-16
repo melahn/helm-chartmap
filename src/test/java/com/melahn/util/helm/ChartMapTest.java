@@ -12,14 +12,20 @@ import java.util.stream.Stream;
 
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
+import com.melahn.util.helm.model.HelmDeploymentSpec;
+import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
+import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 
 import org.junit.Test;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -70,7 +76,7 @@ public class ChartMapTest {
     private static void deleteCreatedFiles() {
         try {
             System.out.println("Deleting any previously created files");
-            Files.walk(Paths.get("./target/test/"),1).filter(Files::isRegularFile).forEach(p->p.toFile().delete());
+            Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
         } catch (IOException e) {
             System.out.println("Error deleting created files: " + e.getMessage());
         }
@@ -279,10 +285,12 @@ public class ChartMapTest {
                 put("fookey3", "foovalue3");
                 put("fookey4", "foovalue4");
                 put("fookey5", " ");
-                put("fookey6", new HashMap<String, Object>() {{
-                    put("fookey7", "foovalue7");
-                    put("fookey8", "foovalue8");
-                }});
+                put("fookey6", new HashMap<String, Object>() {
+                    {
+                        put("fookey7", "foovalue7");
+                        put("fookey8", "foovalue8");
+                    }
+                });
             }
         });
         assertEquals("foovalue1", ChartUtil.getValue("fookey1", hm));
@@ -296,10 +304,10 @@ public class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
-    @Test 
+    @Test
     public void ChartMapExceptionTest() {
         long a = ChartMapException.serialVersionUID;
-        assertEquals(UUID.fromString("5a8dba66-71e1-492c-bf3b-53cceb67b785").getLeastSignificantBits(),a);
+        assertEquals(UUID.fromString("5a8dba66-71e1-492c-bf3b-53cceb67b785").getLeastSignificantBits(), a);
         ChartMapException cme = new ChartMapException("test");
         assertEquals("test", cme.getMessage());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -338,6 +346,52 @@ public class ChartMapTest {
         testMap.printMap();
         Assert.assertTrue(fileContains(testOutputPumlFilePathNRNV, "Unknown Repo URL"));
         Assert.assertTrue(fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX1_2"));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void JSONChartMapPrinterTest() throws ChartMapException, FileNotFoundException, IOException {
+        final Path jsonDir = Paths.get("target/test/json/");
+        final Path jsonFile = Paths.get(jsonDir.toString(), "test.json");
+        if (!Files.exists(jsonDir)) {
+            Files.createDirectories(jsonDir);
+        }
+        if (Files.exists(jsonFile)) {
+            Files.delete(jsonFile);
+        }
+        JSONChartMapPrinter jcmp = new JSONChartMapPrinter(null, "target/test/json/test.json", null, null);
+        jcmp.printHeader();
+        jcmp.printFooter();
+        jcmp.printSectionHeader("foo");
+        HelmChart h = new HelmChart();
+        Set<HelmDeploymentTemplate> templates = new HashSet<HelmDeploymentTemplate>();
+        HelmDeploymentContainer c = new HelmDeploymentContainer ();
+        c.setImage("image");
+        c.setParent(null);
+        HelmDeploymentContainer[] hdc = new HelmDeploymentContainer[1];
+        hdc[0] = c;
+        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
+        HelmDeploymentSpecTemplateSpec hdsts = new HelmDeploymentSpecTemplateSpec();
+        hdsts.setContainers(hdc);
+        HelmDeploymentSpecTemplate hdst = new HelmDeploymentSpecTemplate();
+        hdst.setSpec(hdsts);
+        HelmDeploymentSpec hds = new HelmDeploymentSpec();
+        hds.setTemplate(hdst);
+        hdt.setSpec(hds);
+        templates.add(hdt);
+        h.setDeploymentTemplates(templates);
+        jcmp.addContainers(h, null, new JSONArray());            
+        JSONObject jo = new JSONObject("{foo: bar}\n");
+        jcmp.addImageDetails("foo", jo);
+        // Force an exception to complete the test coverage
+        Files.deleteIfExists(jsonFile);
+        Files.deleteIfExists(Paths.get("target/test/json"));
+        try {
+            jcmp.printObject(jo);
+        } catch (ChartMapException e) {
+            System.out.println("ChartMapException expected and thrown");
+            assertFalse(Files.exists(jsonFile));
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -381,5 +435,4 @@ public class ChartMapTest {
     private boolean getFound() {
         return found;
     }
-
 }

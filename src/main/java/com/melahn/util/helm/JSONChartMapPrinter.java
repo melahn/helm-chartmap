@@ -120,7 +120,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   a   a JSONArray to which the container
      *              will be added
      */
-    private void addContainers(HelmChart h, HelmChart p, JSONArray a) {
+    protected void addContainers(HelmChart h, HelmChart p, JSONArray a) {
         for (HelmDeploymentContainer c : h.getContainers()) {
             String ignf = "";
             String pgnf = "";
@@ -163,7 +163,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      *              be written
      * @throws  ChartMapException when an error occurs printing the object   
      */
-    private void printObject(JSONObject j) throws ChartMapException {
+    protected void printObject(JSONObject j) throws ChartMapException {
         String s = j.toString(indent);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename))) {
             writer.write(s);
@@ -181,22 +181,17 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      */
     public void addImageDetails(String i, JSONObject j) {
         //     image: "quay.io/alfresco/service-sync:2.2-SNAPSHOT"
-        String repoHost="Docker Hub";
-        String imageName;
-        String version="not specified";
+        String repoHost = "Docker Hub";
+        String imageName = null;
+
         int count = i.length() - i.replace("/", "").length();
-        if (count == 0) { // e.g. postgres:9.6.2
-            imageName = i.substring(0,i.indexOf(':'));
-        }
-        else if (count == 1) { // e.g. : alfresco/process-services:1.8.0
-            imageName = i.substring(0,i.indexOf(':'));
+        if (count < 2) { // e.g. postgres:9.6.2 or alfresco/process-services:1.8.0
+            imageName = i.contains(":")? i.substring(0, i.indexOf(':')) : i;
         } else { // e.g. quay.io/alfresco/service:1.0.0
-            repoHost = i.substring(0,i.indexOf('/'));
-            imageName = i.substring(i.indexOf('/')+1, i.indexOf(':'));
+            repoHost = i.substring(0, i.indexOf('/'));
+            imageName = i.substring(i.indexOf('/') + 1, i.length());
         }
-        if (i.contains(":")) {
-            version = i.substring(i.indexOf(':')+1,i.length());
-        }
+        String version = i.contains(":")?i.substring(i.indexOf(':') + 1, i.length()) : "not specified";
         j.put("name", imageName);
         j.put("repoHost", repoHost);
         j.put("version", version);
