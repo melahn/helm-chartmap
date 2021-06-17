@@ -102,7 +102,7 @@ public class ChartMap {
     private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of
                                                                                     // the file we use to hold the
                                                                                     // rendered templates
-    private static final int MAX_WEIGHT = 100;
+    protected static final int MAX_WEIGHT = 100;
     private static final String TEMP_DIR = "Temporary Directory ";
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
@@ -126,30 +126,24 @@ public class ChartMap {
      * template of the lowest weight is used to determine which containers will be
      * referenced.
      */
-    private class WeightedDeploymentTemplate {
+    protected class WeightedDeploymentTemplate {
         private int weight;
         private HelmDeploymentTemplate template;
 
         WeightedDeploymentTemplate(String fileName, HelmDeploymentTemplate t) {
-            weight = MAX_WEIGHT;
-            if (fileName != null) {
-                String[] segments = fileName.split(File.separator);
-                if (weight > 0) {
-                    weight = segments.length;
-                }
-            }
+            weight = (fileName != null)? fileName.split(File.separator).length :  MAX_WEIGHT;
             template = t;
         }
 
-        private int getWeight() {
+        protected int getWeight() {
             return weight;
         }
 
-        private void setTemplate(HelmDeploymentTemplate t) {
+        protected void setTemplate(HelmDeploymentTemplate t) {
             template = t;
         }
 
-        private HelmDeploymentTemplate getTemplate() {
+        protected HelmDeploymentTemplate getTemplate() {
             return template;
         }
     }
@@ -1484,12 +1478,7 @@ public class ChartMap {
      * @return the calculated weight
      */
     private int getWeight(String s) {
-        int weight = MAX_WEIGHT;
-        if (s != null) {
-            String[] segments = s.split(File.separator);
-            weight = segments.length;
-        }
-        return weight;
+        return (s != null)? s.split(File.separator).length :  MAX_WEIGHT;
     }
 
     /**

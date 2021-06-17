@@ -28,23 +28,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 public class ChartMapTest {
 
-    private static Path testOutputPumlFilePathRV = Paths.get("target/test/testChartFileRV.puml");
-    private static Path testOutputPumlFilePathNRV = Paths.get("target/test/testChartFileNRV.puml");
-    private static Path testOutputPumlFilePathRNV = Paths.get("target/test/testChartFileRNV.puml");
-    private static Path testOutputPumlFilePathNRNV = Paths.get("target/test/testChartFileNRNV.puml");
-    private static Path testOutputPngFilePathNRNV = Paths.get("target/test/testChartFileNRNV.png");
-    private static Path testOutputTextFilePathRV = Paths.get("target/test/testChartFileRV.txt");
-    private static Path testOutputTextFilePathNRV = Paths.get("target/test/testChartFileNRV.txt");
-    private static Path testOutputTextFilePathRNV = Paths.get("target/test/testChartFileRNV.txt");
-    private static Path testOutputTextFilePathNRNV = Paths.get("target/test/testChartFileNRNV.txt");
-    private static Path testOutputJSONFilePathRV = Paths.get("target/test/testChartFileRV.json");
-    private static Path testOutputJSONFilePathNRV = Paths.get("target/test/testChartFileNRV.json");
-    private static Path testOutputJSONFilePathRNV = Paths.get("target/test/testChartFileRNV.json");
-    private static Path testOutputJSONFilePathNRNV = Paths.get("target/test/testChartFileNRNV.json");
+    private static String TARGETTESTDIRECTORY = Paths.get("./target/test").toAbsolutePath().toString();
+    private static Path testOutputPumlFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.puml");
+    private static Path testOutputPumlFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.puml");
+    private static Path testOutputPumlFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.puml");
+    private static Path testOutputPumlFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.puml");
+    private static Path testOutputPngFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.png");
+    private static Path testOutputTextFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.txt");
+    private static Path testOutputTextFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.txt");
+    private static Path testOutputTextFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.txt");
+    private static Path testOutputTextFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.txt");
+    private static Path testOutputJSONFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.json");
+    private static Path testOutputJSONFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.json");
+    private static Path testOutputJSONFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.json");
+    private static Path testOutputJSONFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.json");
     private static Path testInputFilePath = Paths.get("src/test/resource/test-chart-file.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
 
@@ -55,8 +57,7 @@ public class ChartMapTest {
          * might be handy to have around to diagnose issues in test failures. They are
          * deleted anyway when the test is next run.
          */
-        System.out.println("Test complete.  Any generated file can be found in "
-                + testOutputPumlFilePathRV.getParent().toAbsolutePath().toString());
+        System.out.println("Test complete.  Any generated file can be found in ".concat(TARGETTESTDIRECTORY));
     }
 
     @BeforeClass
@@ -73,17 +74,25 @@ public class ChartMapTest {
         }
     }
 
-    private static void deleteCreatedFiles() {
-        try {
-            System.out.println("Deleting any previously created files");
-            Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
-        } catch (IOException e) {
-            System.out.println("Error deleting created files: " + e.getMessage());
-        }
+    @Test
+    public void WeightedDeploymentTemplateTest() throws ChartMapException {
+        ChartMap cm = new ChartMap(ChartOption.FILENAME, testOutputTextFilePathNRNV.toString(),
+                testInputFilePath.toString(), System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, false });
+        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
+        ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
+        wdt.setTemplate(hdt);
+        assertSame(hdt,wdt.getTemplate());
+        assertEquals(5,wdt.getWeight());
+        ChartMap.WeightedDeploymentTemplate wdt2 = cm.new WeightedDeploymentTemplate("", hdt);
+        assertEquals(1,wdt2.getWeight());
+        ChartMap.WeightedDeploymentTemplate wdt3 = cm.new WeightedDeploymentTemplate(null, hdt);
+        assertEquals(ChartMap.MAX_WEIGHT,wdt3.getWeight());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
-    public void printTestPumlChartRefreshVerbose() {
+    public void pumlChartRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRV, true,
                     true, true);
@@ -97,7 +106,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestPumlChartNoRefreshVerbose() {
+    public void pumlChartNoRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRV, true,
                     false, true);
@@ -111,7 +120,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestPumlChartRefreshNoVerbose() {
+    public void pumlChartRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRNV, true,
                     true, false);
@@ -125,7 +134,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestPumlChartNoRefreshNoVerbose() {
+    public void pumlChartNoRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
                     false, false);
@@ -140,7 +149,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestTextChartRefreshVerbose() {
+    public void textChartRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRV, true,
                     true, true);
@@ -156,7 +165,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestTextChartNoRefreshVerbose() {
+    public void textChartNoRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRV, true,
                     false, true);
@@ -170,7 +179,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestTextChartRefreshNoVerbose() {
+    public void textChartRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRNV, true,
                     true, false);
@@ -184,7 +193,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestTextChartNoRefreshNoVerbose() {
+    public void textChartNoRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRNV, true,
                     false, false);
@@ -200,7 +209,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestJSONChartRefreshVerbose() {
+    public void JSONChartRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRV, true,
                     true, true);
@@ -214,7 +223,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestJSONChartNoRefreshVerbose() {
+    public void JSONChartNoRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRV, true,
                     false, true);
@@ -228,7 +237,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestJSONChartRefreshNoVerbose() {
+    public void JSONChartRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRNV, true,
                     true, false);
@@ -242,7 +251,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void printTestJSONChartNoRefreshNoVerbose() {
+    public void JSONChartNoRefreshNoVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRNV, true,
                     false, false);
@@ -256,7 +265,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void testHelp() {
+    public void helpTest() {
         String helpTextExpected = "\nUsage:\n\n".concat("java -jar helm-chartmap-1.0.2.jar\n").concat("\nFlags:\n")
                 .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
@@ -462,7 +471,14 @@ public class ChartMapTest {
         return testMap;
     }
 
-    boolean found = false;
+    private static void deleteCreatedFiles() {
+        try {
+            System.out.println("Deleting any previously created files");
+            Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+        } catch (IOException e) {
+            System.out.println("Error deleting created files: " + e.getMessage());
+        }
+    }
 
     private boolean fileContains(Path p, String s) {
         setFound(false);
@@ -478,6 +494,8 @@ public class ChartMapTest {
         }
         return getFound();
     }
+
+    boolean found = false; // used by Lambda in fileContains
 
     private void setFound(boolean f) {
         found = f;
