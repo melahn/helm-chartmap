@@ -1283,9 +1283,8 @@ public class ChartMap {
 
     private void processTemplate(Object[] o, Map<String, Object> m, ArrayList<Boolean> a, ArrayList<String> b, int i)
             throws JsonProcessingException {
-        // pull the paramateres out of the array for easier reference. They were only
-        // passed in an object array
-        // to reduce the size of the parameter list
+        // pull the parameters out of the array for easier reference. They were only
+        // passed in an object array to reduce the size of the parameter list
         HelmChart h = (HelmChart) o[0];
         HelmChart p = (HelmChart) o[1];
         File d = (File) o[2];

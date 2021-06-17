@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import com.melahn.util.helm.model.HelmChart;
@@ -66,12 +67,45 @@ public class ChartMapTest {
             if (!Files.exists(testInputFilePath)) {
                 throw new Exception("test Input File " + testInputFilePath.toAbsolutePath() + " does not exist");
             }
-            deleteCreatedFiles();
+            deletePreviouslyCreatedFiles();
             Files.createDirectories(testOutputPumlFilePathRV.getParent());
             assertNotNull(System.getenv("HELM_HOME"));
         } catch (Exception e) {
             fail("Test setup failed: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void chartMapMainTest() throws IOException, InterruptedException {
+        final String OUTPUTFILE="testChartFileRV.txt";
+        String c[] = new String[11];
+        c[0] = "java";
+        c[1] = "-jar";
+        c[2] = "../helm-chartmap-1.0.3-SNAPSHOT.jar";
+        c[3] = "-f";
+        c[4] = "../../".concat(testInputFilePath.toString());
+        c[5] = "-d";
+        c[6] = System.getenv("HELM_HOME");
+        c[7] = "-e";
+        c[8] = testEnvFilePath.toString();
+        c[9] = "-o";
+        c[10] = OUTPUTFILE;
+        Process p = Runtime.getRuntime().exec(c, null, new File(TARGETTESTDIRECTORY.toString()));
+        p.waitFor(30000, TimeUnit.MILLISECONDS);
+        assertEquals(0, p.exitValue());
+        assert(Files.exists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE)));
+        Files.deleteIfExists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE));
+        String[] a = new String[c.length-3];
+        a[0] = "-f";
+        a[1] = testInputFilePath.toString();
+        a[2] = "-d";
+        a[3] = System.getenv("HELM_HOME");
+        a[4] = "-e";
+        a[5] = testEnvFilePath.toString();
+        a[6] = "-o";
+        a[7] = Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE).toString();
+        ChartMap.main(a);
+        assert(Files.exists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE)));
     }
 
     @Test
@@ -82,12 +116,12 @@ public class ChartMapTest {
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
-        assertSame(hdt,wdt.getTemplate());
-        assertEquals(5,wdt.getWeight());
+        assertSame(hdt, wdt.getTemplate());
+        assertEquals(5, wdt.getWeight());
         ChartMap.WeightedDeploymentTemplate wdt2 = cm.new WeightedDeploymentTemplate("", hdt);
-        assertEquals(1,wdt2.getWeight());
+        assertEquals(1, wdt2.getWeight());
         ChartMap.WeightedDeploymentTemplate wdt3 = cm.new WeightedDeploymentTemplate(null, hdt);
-        assertEquals(ChartMap.MAX_WEIGHT,wdt3.getWeight());
+        assertEquals(ChartMap.MAX_WEIGHT, wdt3.getWeight());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -471,10 +505,17 @@ public class ChartMapTest {
         return testMap;
     }
 
-    private static void deleteCreatedFiles() {
+    private static void deletePreviouslyCreatedFiles() {
         try {
             System.out.println("Deleting any previously created files");
-            Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+            if (Files.exists(Paths.get("./target/test/printer"))) {
+                Files.walk(Paths.get("./target/test/printer"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+                Files.delete(Paths.get("./target/test/printer"));
+            }
+            if (Files.exists(Paths.get("./target/test"))) {
+                Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+                Files.deleteIfExists(Paths.get("./target/test"));
+            }
         } catch (IOException e) {
             System.out.println("Error deleting created files: " + e.getMessage());
         }
