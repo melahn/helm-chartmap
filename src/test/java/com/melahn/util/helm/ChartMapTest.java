@@ -136,6 +136,14 @@ public class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    @Test 
+    public void utilityMethodsTest() throws IOException {
+        Path d = Paths.get("./target");
+        String b = ChartMap.getBaseName(d.toString());
+        assertEquals(null, b);
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
     @Test
     public void pumlChartRefreshVerboseTest() {
         try {

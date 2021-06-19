@@ -918,7 +918,7 @@ public class ChartMap {
      *         /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
      * @throws ChartMapException if an error occurs processing the chart
      */
-    private String unpackChart(String chartFilename) throws ChartMapException {
+    protected String unpackChart(String chartFilename) throws ChartMapException {
         try {
             new ArchiveExtract().extract(chartFilename, Paths.get(tempDirName));
             // If the Chart Name or Version were not yet extracted, such as would happen if
@@ -957,7 +957,7 @@ public class ChartMap {
      * @return the single base name found, null otherwise
      * @throws IOException if an exception occurs listing the directory
      */
-    private String getBaseName(String d) throws IOException {
+    protected static String getBaseName(String d) throws IOException {
         Stream<Path> s = Files.list(Paths.get(d));
         List<Path> l = s.filter(p -> p.toFile().isDirectory()).collect(Collectors.toList());
         s.close();
