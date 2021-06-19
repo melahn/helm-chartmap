@@ -353,7 +353,7 @@ public class ChartMap {
             setOutputFilename(cmd.getOptionValue("o"));
         }
         if (cmd.hasOption("u")) { // e.g.
-                                  // https://alfresco.github.io/charts/incubator/alfresco-content-services-0.0.1.tgz
+                                  // https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz
             setChartUrl(cmd.getOptionValue("u"));
             count++;
         }

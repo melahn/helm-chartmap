@@ -30,6 +30,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ChartMapTest {
@@ -77,7 +78,7 @@ public class ChartMapTest {
 
     @Test
     public void chartMapMainTest() throws IOException, InterruptedException {
-        final String OUTPUTFILE="testChartFileRV.txt";
+        final String OUTPUTFILE = "testChartFileRV.txt";
         String c[] = new String[11];
         c[0] = "java";
         c[1] = "-jar";
@@ -93,9 +94,9 @@ public class ChartMapTest {
         Process p = Runtime.getRuntime().exec(c, null, new File(TARGETTESTDIRECTORY.toString()));
         p.waitFor(30000, TimeUnit.MILLISECONDS);
         assertEquals(0, p.exitValue());
-        assert(Files.exists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE)));
-        Files.deleteIfExists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE));
-        String[] a = new String[c.length-3];
+        assert (Files.exists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE)));
+        Files.deleteIfExists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE));
+        String[] a = new String[c.length - 3];
         a[0] = "-f";
         a[1] = testInputFilePath.toString();
         a[2] = "-d";
@@ -103,15 +104,15 @@ public class ChartMapTest {
         a[4] = "-e";
         a[5] = testEnvFilePath.toString();
         a[6] = "-o";
-        a[7] = Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE).toString();
+        a[7] = Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE).toString();
         ChartMap.main(a);
-        assert(Files.exists(Paths.get(TARGETTESTDIRECTORY,OUTPUTFILE)));
+        assert (Files.exists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE)));
     }
 
     @Test
     public void WeightedDeploymentTemplateTest() throws ChartMapException {
-        ChartMap cm = new ChartMap(ChartOption.FILENAME, testOutputTextFilePathNRNV.toString(),
-                testInputFilePath.toString(), System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
+        ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV.toString(),
+                System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
                 new boolean[] { false, false, false, false });
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
@@ -122,6 +123,16 @@ public class ChartMapTest {
         assertEquals(1, wdt2.getWeight());
         ChartMap.WeightedDeploymentTemplate wdt3 = cm.new WeightedDeploymentTemplate(null, hdt);
         assertEquals(ChartMap.MAX_WEIGHT, wdt3.getWeight());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    public void urlOptionTest() throws ChartMapException {
+        String url = "https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz";
+        ChartMap cm = new ChartMap(ChartOption.URL, url, testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, false });
+        cm.print();
+        assertTrue(Files.exists(testOutputTextFilePathNRNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -509,11 +520,13 @@ public class ChartMapTest {
         try {
             System.out.println("Deleting any previously created files");
             if (Files.exists(Paths.get("./target/test/printer"))) {
-                Files.walk(Paths.get("./target/test/printer"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+                Files.walk(Paths.get("./target/test/printer"), 1).filter(Files::isRegularFile)
+                        .forEach(p -> p.toFile().delete());
                 Files.delete(Paths.get("./target/test/printer"));
             }
             if (Files.exists(Paths.get("./target/test"))) {
-                Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
+                Files.walk(Paths.get("./target/test/"), 1).filter(Files::isRegularFile)
+                        .forEach(p -> p.toFile().delete());
                 Files.deleteIfExists(Paths.get("./target/test"));
             }
         } catch (IOException e) {
