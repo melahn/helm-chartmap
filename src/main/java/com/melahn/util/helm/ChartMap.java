@@ -89,7 +89,9 @@ public class ChartMap {
 
     protected HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
-    protected final Logger logger = LogManager.getLogger(ChartMap.class);
+    private static final String CHARTMAP_DEBUG = "CHARTMAP_DEBUG";
+    private static final String CHARTMAP_VERBOSE = "CHARTMAP_VERBOSE";
+    protected final Logger logger = LogManager.getLogger("chartmap");
     protected Level logLevelDebug;
     protected Level logLevelVerbose;
     private String outputFilename;
@@ -131,7 +133,7 @@ public class ChartMap {
         private HelmDeploymentTemplate template;
 
         WeightedDeploymentTemplate(String fileName, HelmDeploymentTemplate t) {
-            weight = (fileName != null)? fileName.split(File.separator).length :  MAX_WEIGHT;
+            weight = (fileName != null) ? fileName.split(File.separator).length : MAX_WEIGHT;
             template = t;
         }
 
@@ -388,24 +390,27 @@ public class ChartMap {
      * If the user has specified the debug flag, set the log level so it has a
      * higher priority (ie. a lower level value) than the logger configured in
      * log4j2.xml, which is INFO (level 400). Otherwise set it to a higher level
-     * number so verbose log entries will be ignored.
+     * number so debug log entries will be ignored.
      * 
      * If the user has specified the verbose flag, set the log level so it has a
      * higher priority (ie. a lower level value) than the logger configured in
      * log4j2.xml, which is INFO (level 400). Otherwise set it to a higher level
      * number so verbose log entries will be ignored.
      * 
+     * Note that log4j will ignore the integer values if the level already exists so
+     * there is no point in calling this method twice or initiatializing the Levels
+     * when they are declared
      */
-    private void setLogLevel() {
+    protected void setLogLevel() {
         if (isDebug()) {
-            logLevelDebug = Level.forName("CHARTMAP_DEBUG", 350); // higher priority than INFO
+            logLevelDebug = Level.forName(CHARTMAP_DEBUG, 350); // higher priority than INFO
         } else {
-            logLevelDebug = Level.forName("CHARTMAP_DEBUG", 450); // off
+            logLevelDebug = Level.forName(CHARTMAP_DEBUG, 450); // lower priority than INFO
         }
         if (isVerbose()) {
-            logLevelVerbose = Level.forName("CHARTMAP_VERBOSE", 350); // higher priority than INFO
+            logLevelVerbose = Level.forName(CHARTMAP_VERBOSE, 350); // higher priority than INFO
         } else {
-            logLevelVerbose = Level.forName("CHARTMAP_VERBOSE", 450); // lower priority than INFO
+            logLevelVerbose = Level.forName(CHARTMAP_VERBOSE, 450); // lower priority than INFO
         }
     }
 
@@ -919,6 +924,11 @@ public class ChartMap {
      * @throws ChartMapException if an error occurs processing the chart
      */
     protected String unpackChart(String chartFilename) throws ChartMapException {
+        if (chartFilename == null || tempDirName == null) {
+            String m = String.format("chartFilename = %s tempDirName = %s",
+                    (chartFilename == null) ? "null" : chartFilename, (tempDirName == null) ? "null" : tempDirName);
+            throw new ChartMapException(m);
+        }
         try {
             new ArchiveExtract().extract(chartFilename, Paths.get(tempDirName));
             // If the Chart Name or Version were not yet extracted, such as would happen if
@@ -945,8 +955,9 @@ public class ChartMap {
             }
             return getBaseName(tempDirName);
         } catch (IOException | IllegalArgumentException e) {
-            throw new ChartMapException(
-                    String.format("Exception %s unpacking helm chart: %s", e.getClass(), e.getMessage()));
+            String m = String.format("Exception %s unpacking helm chart: %s", e.getClass(), e.getMessage());
+            logger.error(m);
+            throw new ChartMapException(m);
         }
     }
 
@@ -1477,7 +1488,7 @@ public class ChartMap {
      * @return the calculated weight
      */
     private int getWeight(String s) {
-        return (s != null)? s.split(File.separator).length :  MAX_WEIGHT;
+        return (s != null) ? s.split(File.separator).length : MAX_WEIGHT;
     }
 
     /**
@@ -1832,7 +1843,7 @@ public class ChartMap {
         return DEFAULT_OUTPUT_FILENAME;
     }
 
-    private void setChartName(String chartName) {
+    protected void setChartName(String chartName) {
         this.chartName = chartName;
     }
 
@@ -1840,7 +1851,7 @@ public class ChartMap {
         return chartName;
     }
 
-    private void setChartVersion(String chartVersion) {
+    protected void setChartVersion(String chartVersion) {
         this.chartVersion = chartVersion;
     }
 
@@ -1856,19 +1867,19 @@ public class ChartMap {
         this.chartUrl = chartUrl;
     }
 
-    private boolean isVerbose() {
+    protected boolean isVerbose() {
         return verbose;
     }
 
-    private void setVerbose(boolean verbose) {
+    protected void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
-    private boolean isDebug() {
+    protected boolean isDebug() {
         return debug;
     }
 
-    private void setDebug(boolean debug) {
+    protected void setDebug(boolean debug) {
         this.debug = debug;
     }
 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration name="chartmap">
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
+    <!-- 'follow' is set to allow System.setOut to capture output for junit test cases -->
+    <Console name="Console" target="SYSTEM_OUT" follow="true">
         <PatternLayout pattern="%msg%n"/>
     </Console>
   </Appenders>
