@@ -39,7 +39,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ChartMapTest {
-    private static String VERSIONSUFFIX = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this from the pom instead
+    private static String VERSIONSUFFIX = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this
+                                                             // from the pom instead
     private static String TARGETTESTDIRECTORY = Paths.get("target/test").toString();
     private static Path testOutputPumlFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.puml");
     private static Path testOutputPumlFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.puml");
@@ -66,7 +67,8 @@ public class ChartMapTest {
          * might be handy to have around to diagnose issues in test failures. They are
          * deleted anyway when the test is next run.
          */
-        System.out.println("Test complete.  Any generated file can be found in ".concat(Paths.get(TARGETTESTDIRECTORY).toAbsolutePath().toString()));
+        System.out.println("Test complete.  Any generated file can be found in "
+                .concat(Paths.get(TARGETTESTDIRECTORY).toAbsolutePath().toString()));
     }
 
     @BeforeAll
@@ -87,13 +89,17 @@ public class ChartMapTest {
     @Test
     void chartMapMainTest() throws IOException, InterruptedException {
         final String OUTPUTFILE = "testChartFileRV.txt";
-        if (Files.notExists(Paths.get("./target/test"))) { Files.createDirectories(Paths.get("./target/test"));}
+        if (Files.notExists(Paths.get("./target/test"))) {
+            Files.createDirectories(Paths.get("./target/test"));
+        }
         String c[] = new String[12];
         c[0] = "java";
         c[1] = "-cp";
-        // I use the previulsy generated shaded jar just to resolve the third party dependencies. This could miss a bug
-        // introduced by a third party dependency upgrade though it would be caught on the next test because the shaded
-        // jar would have this updated dependency.  Perhaps there is a better way
+        // I use the previulsy generated shaded jar just to resolve the third party
+        // dependencies. This could miss a bug
+        // introduced by a third party dependency upgrade though it would be caught on
+        // the next test because the shaded
+        // jar would have this updated dependency. Perhaps there is a better way
         c[2] = ".:../../resource/jar/helm-chartmap".concat(VERSIONSUFFIX).concat(".jar");
         c[3] = "com.melahn.util.helm.ChartMap";
         c[4] = "-f";
@@ -124,9 +130,9 @@ public class ChartMapTest {
 
     @Test
     public void WeightedDeploymentTemplateTest() throws ChartMapException {
-        ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV.toString(),
-                System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
-                new boolean[] { false, false, false, false });
+        ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
+                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, false });
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
@@ -142,8 +148,9 @@ public class ChartMapTest {
     @Test
     public void urlOptionTest() throws ChartMapException {
         String url = "https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz";
-        ChartMap cm = new ChartMap(ChartOption.URL, url, testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, false });
+        ChartMap cm = new ChartMap(ChartOption.URL, url, testOutputTextFilePathNRNV.toString(),
+                System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, false });
         cm.print();
         assertTrue(Files.exists(testOutputTextFilePathNRNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -151,67 +158,64 @@ public class ChartMapTest {
 
     /**
      * Tests the protected method ChartMap.unpackTestChart
+     * 
      * @throws ChartMapException
      * @throws IOException
      */
-   @Test
-   void unpackChartTest() throws ChartMapException, IOException {
+    @Test
+    void unpackChartTest() throws ChartMapException, IOException {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
-        ByteArrayOutputStream urlUnpackCharttestOut = new ByteArrayOutputStream();
-        ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-        testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true }); //debug switch is on so I check for certain log entries
-        System.setOut(new PrintStream(urlUnpackCharttestOut));
-        assertThrows(ChartMapException.class, () -> cm.unpackChart(testInputFilePath.toString()));
-        cm.setChartName("foo");
-        cm.setChartVersion("bar");
-        assertThrows(ChartMapException.class, () -> cm.unpackChart(testInputFilePath.toString()));
-        cm.setChartName(null);
-        cm.setChartVersion("bar");
-        assertThrows(ChartMapException.class, () -> cm.unpackChart(testInputFilePath.toString()));
-        cm.setChartName("foo");
-        cm.setChartVersion(null);
-        assertThrows(ChartMapException.class, () -> cm.unpackChart(testInputFilePath.toString()));
-        cm.setChartName(null);
-        cm.setChartVersion(null);
-        cm.createTempDir();
-        cm.unpackChart(testOneFileZipPath.toString());
-        cm.print();
-        Path t = Paths.get(TARGETTESTDIRECTORY,"unpack.tgz");
-        Files.copy(testInputFilePath, t);
-        cm.unpackChart(t.toString());
-        assertTrue(!Files.exists(Paths.get(t.toString(),"alfresco-identity-service")));
-        assertThrows(ChartMapException.class, () -> cm.unpackChart(null));
-        int n = cm.chartsReferenced.size();
-        assertEquals(n, cm.chartsReferenced.size());
-        try {
-            System.setOut(new PrintStream(urlUnpackCharttestOut));
-            cm.unpackChart("foo");
-        }
-        catch (ChartMapException e) {
-            assertTrue(logContains(urlUnpackCharttestOut, "unpacking helm chart:"));
-        }
+        ByteArrayOutputStream unpackCharttestOut = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(unpackCharttestOut));
+        // force IOException -> ChartMapException path
+        ChartMap cm1 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
+                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+        cm1.setChartName("foo");
+        cm1.createTempDir();
+        assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
+        // force ChartMapException path when no temp dir
+        ChartMap cm2 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
+                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+        cm2.setChartName("foo");
+        assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
+        // force ChartMapException path when null chartmap passed
+        cm2.createTempDir();
+        assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
+        // test when the tgz has no directory
+        ChartMap cm3 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
+                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+        cm3.setChartName(null);
+        cm3.setChartVersion(null);
+        cm3.createTempDir();
+        assertThrows(ChartMapException.class, () -> cm3.unpackChart(testOneFileZipPath.toString()));
+        assertTrue(logContains(unpackCharttestOut, "Archive content does not appear to be valid"));
         System.setOut(initialOut);
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+
     /**
      * Tests some utility methods in ChartMap
+     * 
      * @throws IOException
      * @throws ChartMapException
      */
 
-    @Test 
+    @Test
     void utilityMethodsTest() throws IOException, ChartMapException {
         Path d = Paths.get("./target");
         String b = ChartMap.getBaseName(d.toString());
         assertEquals(null, b);
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
-    
+
     @Test
     void pumlChartRefreshVerboseTest() {
         try {
             ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRV, true,
-            true, true);
+                    true, true);
             if (testMap != null) {
                 testMap.print();
             }
@@ -281,16 +285,16 @@ public class ChartMapTest {
     }
 
     @Test
-    void textChartNoRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRV, true,
-                    false, true);
-            if (testMap != null) {
-                testMap.print();
-            }
+    void textChartNoRefreshVerboseTest() throws Exception {
+        // try {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRV, true,
+                false, true);
+        if (testMap != null) {
+            testMap.print();
+            // }
             assertTrue(Files.exists(testOutputTextFilePathNRV));
-        } catch (Exception e) {
-            fail("printTestTextChartNoRefreshVerbose failed:" + e.getMessage());
+            // } catch (Exception e) {
+            // fail("printTestTextChartNoRefreshVerbose failed:" + e.getMessage());
         }
     }
 
@@ -581,7 +585,6 @@ public class ChartMapTest {
             testMap = new ChartMap(option, inputPath.toAbsolutePath().toString(),
                     outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
                     testEnvFilePath.toAbsolutePath().toString(), switches);
-                    System.err.println(String.format("*** logger in Test = %s", testMap.logger));
         } catch (Exception e) {
             System.out.println("Exception createTestMap: " + e.getMessage());
         }
@@ -630,7 +633,6 @@ public class ChartMapTest {
     private boolean getFound() {
         return found;
     }
-
 
     /**
      * Answers true if the log contains a particular entry
