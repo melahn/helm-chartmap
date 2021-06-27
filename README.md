@@ -3,7 +3,7 @@
 ![version](https://img.shields.io/badge/version-1.0.2-green)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=helm-chartmap)](https://sonarcloud.io/dashboard?id=helm-chartmap)
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/)
 
