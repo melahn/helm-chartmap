@@ -773,22 +773,22 @@ public class ChartMap {
      * Downloads a chart using appr into the temp directory
      *
      * @param apprSpec a string specifying the location of the chart
-     * @return the name of the directory where the chart was downloaded into e.g.
-     *         /temp/alfresco_alfresco-dbp_0.2.0/alfresco-dbp
+     * @return the name of the directory into which the chart was downloaded e.g.
+     *         /temp/melahn_helm-chartmap-test-chart_1.0.0/helm-chartmap-test-chart
      */
     private String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
         try {
-            // the chart name should be of the form <repo>/<org>/<chartname>@<version> e.g.
-            // quay.io/alfresco/alfresco-dbp@1.5.0
+            // the chart name should be of the form
+            // <registry>/<namespace>/<chartname>@<version> e.g.
+            // quay.io/melahn/helm-chartmap-test-chart@1.0.0
             if (apprSpec == null || (apprSpec.indexOf('/') == -1) || (apprSpec.indexOf('@') == -1)) {
                 throw new ChartMapException("appr specification invalid: " + apprSpec
-                        + " .  I was expecting something like quay.io/alfresco/alfresco-dbp@1.5.0");
+                        + " .  I was expecting something like quay.io/melahn/helm-chartmap-test-chart@1.0.0");
             }
-            String command = "helm registry pull ";
-            command += apprSpec + " -t helm ";
+            String command = "helm quay pull ".concat(apprSpec);
             Process p = Runtime.getRuntime().exec(command, null, new File(getTempDirName()));
-            p.waitFor(30000, TimeUnit.MILLISECONDS);
+            p.waitFor(50000, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode == 0) {
                 chartDirName = getTempDirName() + apprSpec.substring(apprSpec.indexOf('/') + 1, apprSpec.length())
@@ -864,7 +864,7 @@ public class ChartMap {
             int exitCode = -1;
             try {
                 Process p = Runtime.getRuntime().exec(command, null, new File(dirName));
-                p.waitFor(30000, TimeUnit.MILLISECONDS);
+                p.waitFor(50000, TimeUnit.MILLISECONDS);
                 exitCode = p.exitValue();
             } catch (IOException e) {
                 throw new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage()));
@@ -938,23 +938,27 @@ public class ChartMap {
             // if it is not already there (such as would happen if the chart was in an appr
             // repo)
             if (getChartName() == null || getChartVersion() == null) {
-                String chartFileDir = chartFilename.substring(0, chartFilename.lastIndexOf(File.separator));
-                File[] directories = new File(chartFileDir).listFiles(File::isDirectory);
-                if (directories.length > 0) {
-                    String chartYamlFilename = directories[0] + File.separator + CHART_YAML;
-                    File chartYamlFile = new File(chartYamlFilename);
-                    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    HelmChart h = mapper.readValue(chartYamlFile, HelmChart.class);
-                    chartName = h.getName();
-                    chartVersion = h.getVersion();
-                    if (charts.get(chartName, chartVersion) == null) {
-                        charts.put(chartName, chartVersion, h);
+                    File[] directories = new File(tempDirName).listFiles(File::isDirectory);
+                    if (directories.length > 0) {
+                        String chartYamlFilename = directories[0] + File.separator + CHART_YAML;
+                        File chartYamlFile = new File(chartYamlFilename);
+                        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        HelmChart h = mapper.readValue(chartYamlFile, HelmChart.class);
+                        chartName = h.getName();
+                        chartVersion = h.getVersion();
+                        if (charts.get(chartName, chartVersion) == null) {
+                            charts.put(chartName, chartVersion, h);
+                        }
                     }
-                }
+                    else {
+                        String m = "Archive content does not appear to be valid. No chart found.";
+                        logger.error(m);
+                        throw new ChartMapException(m);
+                    }
             }
             return getBaseName(tempDirName);
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException e) {
             String m = String.format("Exception %s unpacking helm chart: %s", e.getClass(), e.getMessage());
             logger.error(m);
             throw new ChartMapException(m);
@@ -1419,7 +1423,7 @@ public class ChartMap {
             while ((len = bis.read(bytes)) > 0) {
                 bos.write(bytes, 0, len);
             }
-            p.waitFor(30000, TimeUnit.MILLISECONDS);
+            p.waitFor(50000, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode != 0) {
                 String message;
