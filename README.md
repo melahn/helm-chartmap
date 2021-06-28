@@ -143,7 +143,7 @@ java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/melahn/
 
 ```
 
-Note in this example, the chart is stored as a quay.io application file and contains, for illustrative purposes, several subcharts, *nginx* and *memchached* from the bitnami charts repo.
+Note in this example, the chart is stored as a quay.io application file and contains, for illustrative purposes, several subcharts, *nginx* and *memcached* from the bitnami charts repo.
 
 ### Java Methods
 
