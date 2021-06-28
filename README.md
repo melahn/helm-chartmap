@@ -139,9 +139,11 @@ Note in this example, the *-g* flag is set to automatically generate the image f
 ##### Generating a Chartmap using an appr specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/alfresco/alfresco-dbp@1.5.0" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
 
 ```
+
+Note in this example, the chart is stored as a quay.io application file and contains, for illustrative purposes, several subcharts, *nginx* and *memchached* from the bitnami charts repo.
 
 ### Java Methods
 
