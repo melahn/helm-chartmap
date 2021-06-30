@@ -344,7 +344,7 @@ public class ChartMap {
     private int parseOptions(CommandLine cmd) throws ChartMapException {
         int count = 0; // note these are exclusive options
         if (cmd.hasOption("a")) { // e.g. quay.io/melahn/helm-chartmap-test-chart@1.0.0
-            parseApprSpec(cmd.getOptionValue("a"));                                                                
+            parseApprSpec(cmd.getOptionValue("a"));
             count++;
         }
         if (cmd.hasOption("c")) { // e.g. alfresco-dbp:0.2.0
@@ -370,8 +370,9 @@ public class ChartMap {
             count++;
         }
         if (count > 1) {
-            String m = String.format("count of options found is expected to be 0 or 1.  %d options were found instead.", count);
-            logger.log(logLevelDebug,m);
+            String m = String.format("count of options found is expected to be 0 or 1.  %d options were found instead.",
+                    count);
+            logger.log(logLevelDebug, m);
             throw new ChartMapException(m);
         }
         return count;
@@ -430,15 +431,15 @@ public class ChartMap {
      * <chart-repp>/<org>/<chart-name>@<chart-version> and sets the values chartName
      * and chartVersion
      * 
-     * Note: I base chart name part of the regular expression on the Chart name rules described in 
-     * https://helm.sh/docs/chart_best_practices/conventions/
-     * I don't enforce semver in the version portion
+     * Note: I base chart name part of the regular expression on the Chart name
+     * rules described in https://helm.sh/docs/chart_best_practices/conventions/ I
+     * don't enforce semver in the version portion
      *
      * @param a an APPR specification
      * @throws ChartMapException if the APPR specification was malformed
      */
     private void parseApprSpec(String a) throws ChartMapException {
-        if (!a.matches("[a-z][.a-z0-9]+/[-a-z0-9]+/[-a-z0-9]+@[._-a-zA-Z0-9]+")) { 
+        if (!a.matches("[a-z][.a-z0-9]+/[-a-z0-9]+/[-a-z0-9]+@[._-a-zA-Z0-9]+")) {
             throw new ChartMapException("App Registry specification invalid: " + a
                     + ". I was expecting something like quay.io/melahn/helm-chartmap-test-chart@1.0.0");
         }
@@ -452,17 +453,17 @@ public class ChartMap {
      * Parses a Chart Name of the format <chart-name><chart version> and sets the
      * values of chartName and chartVersion
      * 
-     * Note: I base the regular expression on the Chart name rules described in 
-     * https://helm.sh/docs/chart_best_practices/conventions/
-     * I don't enforce semver in the version portion
+     * Note: I base the regular expression on the Chart name rules described in
+     * https://helm.sh/docs/chart_best_practices/conventions/ I don't enforce semver
+     * in the version portion
      *
      * @param c the Chart Name
      * @throws ChartMapException if the Chart Name was malformed
      */
     private void parseChartName(String c) throws ChartMapException {
-        if (!c.matches("[a-z][-a-z0-9]+:[._-a-zA-Z0-9]+")) { 
-            throw new ChartMapException("Chart Name invalid: " + c
-                    + ". I was expecting something like helm-test-chart:1.0.2");
+        if (!c.matches("[a-z][-a-z0-9]+:[._-a-zA-Z0-9]+")) {
+            throw new ChartMapException(
+                    "Chart Name invalid: " + c + ". I was expecting something like helm-test-chart:1.0.2");
         }
         String[] chartNameParts = c.split(":");
         if (chartNameParts.length == 2) {
@@ -725,7 +726,8 @@ public class ChartMap {
      * Resolves a charts dependencies by getting the chart and then finding the
      * charts dependencies.
      * 
-     * @throws ChartMapException if an error collecting dependencies or applying templates
+     * @throws ChartMapException if an error collecting dependencies or applying
+     *                           templates
      */
     protected void resolveChartDependencies() throws ChartMapException {
         try {
@@ -840,8 +842,9 @@ public class ChartMap {
             try {
                 throwingConsumer.accept(x);
             } catch (Exception e) {
-                throw new RuntimeException(e); // must generate a runtime exception here or we have yet another try
-                                               // catch block needed, etc etc
+                throw new RuntimeException(e); // using a generic exception is a code smell but there is no avoiding
+                                               // because of labda functions poor exception handling ... look at 
+                                               // removing the lambda
             }
         };
     }
