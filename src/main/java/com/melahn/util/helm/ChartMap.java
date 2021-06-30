@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -121,6 +122,7 @@ public class ChartMap {
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     private static final String TEMP_DIR_ERROR = "Error creating temp directory: ";
     private static final String ERROR_WING = "Error <";
+    private static final int PROCESS_TIMEOUT = 100000;
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -230,6 +232,11 @@ public class ChartMap {
         if (helmHome == null) {
             throw new ChartMapException("HELM HOME is not set");
         }
+        for (String a : args) {
+            if (a == null) {
+                throw new ChartMapException("Null parameter");
+            }
+        }
         parseArgs(args.toArray(new String[args.size()]));
     }
 
@@ -332,13 +339,16 @@ public class ChartMap {
      * 
      * @param cmd the command line
      * @return a count of the options found
+     * @throws ChartMapException if a parsing error occurs
      */
-    private int parseOptions(CommandLine cmd) {
+    private int parseOptions(CommandLine cmd) throws ChartMapException {
         int count = 0; // note these are exclusive options
-        if (cmd.hasOption("a") && parseApprSpec(cmd.getOptionValue("a"))) { // e.g. quay.io/alfresco/alfresco-dbp@0.2.0
+        if (cmd.hasOption("a")) { // e.g. quay.io/melahn/helm-chartmap-test-chart@1.0.0
+            parseApprSpec(cmd.getOptionValue("a"));                                                                
             count++;
         }
-        if (cmd.hasOption("c") && parseChartName(cmd.getOptionValue("c"))) { // e.g. alfresco-dbp:0.2.0
+        if (cmd.hasOption("c")) { // e.g. alfresco-dbp:0.2.0
+            parseChartName(cmd.getOptionValue("c"));
             count++;
         }
         if (cmd.hasOption("d")) {
@@ -360,8 +370,9 @@ public class ChartMap {
             count++;
         }
         if (count > 1) {
-            logger.log(logLevelDebug,
-                    "count of options found is expected to be 0 or 1.  {} options were found instead.", count);
+            String m = String.format("count of options found is expected to be 0 or 1.  %d options were found instead.", count);
+            logger.log(logLevelDebug,m);
+            throw new ChartMapException(m);
         }
         return count;
     }
@@ -415,39 +426,49 @@ public class ChartMap {
     }
 
     /**
-     * Parses a Appr Specification of the format
+     * Parses an App Registry (APPR) Specification of the expected format
      * <chart-repp>/<org>/<chart-name>@<chart-version> and sets the values chartName
      * and chartVersion
+     * 
+     * Note: I base chart name part of the regular expression on the Chart name rules described in 
+     * https://helm.sh/docs/chart_best_practices/conventions/
+     * I don't enforce semver in the version portion
      *
-     * @param a the Appr Specification
-     * @return true if a valid Appr Specification was passed
+     * @param a an APPR specification
+     * @throws ChartMapException if the APPR specification was malformed
      */
-    private boolean parseApprSpec(String a) {
-        String[] apprSpecParts = a.split("@");
-        if (apprSpecParts.length == 2) {
-            setChartName(apprSpecParts[0].substring(apprSpecParts[0].lastIndexOf('/') + 1, apprSpecParts[0].length()));
-            setChartVersion(apprSpecParts[1]);
-            return true;
+    private void parseApprSpec(String a) throws ChartMapException {
+        if (!a.matches("[a-z][.a-z0-9]+/[-a-z0-9]+/[-a-z0-9]+@[._-a-zA-Z0-9]+")) { 
+            throw new ChartMapException("App Registry specification invalid: " + a
+                    + ". I was expecting something like quay.io/melahn/helm-chartmap-test-chart@1.0.0");
         }
-        return false;
+        String[] apprSpecParts = a.split("@");
+        setChartName(apprSpecParts[0].substring(apprSpecParts[0].lastIndexOf('/') + 1, apprSpecParts[0].length()));
+        setChartVersion(apprSpecParts[1]);
+        apprSpec = a;
     }
 
     /**
      * Parses a Chart Name of the format <chart-name><chart version> and sets the
      * values of chartName and chartVersion
+     * 
+     * Note: I base the regular expression on the Chart name rules described in 
+     * https://helm.sh/docs/chart_best_practices/conventions/
+     * I don't enforce semver in the version portion
      *
      * @param c the Chart Name
-     * @return true if a valid Chart Name was passed
+     * @throws ChartMapException if the Chart Name was malformed
      */
-    private boolean parseChartName(String c) {
-        // e.g. content-services:0.0.1
+    private void parseChartName(String c) throws ChartMapException {
+        if (!c.matches("[a-z][-a-z0-9]+:[._-a-zA-Z0-9]+")) { 
+            throw new ChartMapException("Chart Name invalid: " + c
+                    + ". I was expecting something like helm-test-chart:1.0.2");
+        }
         String[] chartNameParts = c.split(":");
         if (chartNameParts.length == 2) {
             setChartName(chartNameParts[0]);
             setChartVersion(chartNameParts[1]);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -540,7 +561,7 @@ public class ChartMap {
         try {
             Process p = Runtime.getRuntime().exec(cmdArray);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            p.waitFor(30000, TimeUnit.MILLISECONDS);
+            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode == 0) {
                 String o = br.readLine();
@@ -703,8 +724,10 @@ public class ChartMap {
     /**
      * Resolves a charts dependencies by getting the chart and then finding the
      * charts dependencies.
+     * 
+     * @throws ChartMapException if an error collecting dependencies or applying templates
      */
-    protected void resolveChartDependencies() {
+    protected void resolveChartDependencies() throws ChartMapException {
         try {
             String chartDirName = getChart();
             if (chart != null) {
@@ -715,6 +738,7 @@ public class ChartMap {
             }
         } catch (ChartMapException e) {
             logger.error("Error resolving chart dependencies: {}", e.getMessage());
+            throw e;
         }
     }
 
@@ -779,24 +803,15 @@ public class ChartMap {
     private String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
         try {
-            // the chart name should be of the form
-            // <registry>/<namespace>/<chartname>@<version> e.g.
-            // quay.io/melahn/helm-chartmap-test-chart@1.0.0
-            if (apprSpec == null || (apprSpec.indexOf('/') == -1) || (apprSpec.indexOf('@') == -1)) {
-                throw new ChartMapException("appr specification invalid: " + apprSpec
-                        + " .  I was expecting something like quay.io/melahn/helm-chartmap-test-chart@1.0.0");
-            }
             String command = "helm quay pull ".concat(apprSpec);
             Process p = Runtime.getRuntime().exec(command, null, new File(getTempDirName()));
-            p.waitFor(50000, TimeUnit.MILLISECONDS);
+            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode == 0) {
                 chartDirName = getTempDirName() + apprSpec.substring(apprSpec.indexOf('/') + 1, apprSpec.length())
                         .replace('@', '_').replace('/', '_') + File.separator + chartName;
                 createChart(chartDirName);
-                new ArchiveExtract().extract(
-                        apprSpec.substring(apprSpec.lastIndexOf('/'), apprSpec.indexOf('@')).concat(".tgz"),
-                        Paths.get(tempDirName));
+                extractEmbeddedCharts(chartDirName);
             } else {
                 throw new ChartMapException(
                         String.format("Error Code: %c executing command \"%s\"", exitCode, command));
@@ -807,10 +822,49 @@ public class ChartMap {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
-        } catch (ChartMapException e) {
-            throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
         }
         return chartDirName;
+    }
+
+    /**
+     * This interface and its implementation is an attempt to simplify the exception
+     * handling when using lambda functions, which is notoriously bad
+     */
+    @FunctionalInterface
+    public interface LambdaConsumer<T, E extends Exception> {
+        void accept(T t) throws E;
+    }
+
+    static <T> Consumer<T> lambdaExceptionWrapper(LambdaConsumer<T, Exception> throwingConsumer) {
+        return x -> {
+            try {
+                throwingConsumer.accept(x);
+            } catch (Exception e) {
+                throw new RuntimeException(e); // must generate a runtime exception here or we have yet another try
+                                               // catch block needed, etc etc
+            }
+        };
+    }
+
+    /**
+     * Extracts embedded charts found in a chart directory
+     * 
+     * @param d A directory containing a chart
+     * @return
+     * @throws ChartMapException if an exception occurs extracting the embedded
+     *                           archives
+     */
+    private void extractEmbeddedCharts(String d) throws ChartMapException {
+        final int MAXDEPTH = 5;
+        try (Stream<Path> walk = Files.walk(Paths.get(d), MAXDEPTH)) {
+            walk.filter(Files::isRegularFile).filter(p -> p.getFileName().toString().endsWith(".tgz"))
+                    .collect(Collectors.toList()).forEach(lambdaExceptionWrapper(
+                            p -> new ArchiveExtract().extract(p.toString(), Paths.get(d, CHARTS_DIR_NAME))));
+        } catch (IOException e) {
+            String m = String.format("IO Exception extracting embedded charts from %s: %s", d, e.getMessage());
+            logger.error(m);
+            throw new ChartMapException(m);
+        }
     }
 
     /**
@@ -821,7 +875,6 @@ public class ChartMap {
      * @return the name of the directory where the chart was pulled into e.g.
      *         /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
      */
-
     private String downloadChart(String u) {
         String chartDirName = null;
         String tgzFileName = tempDirName + this.getClass().getCanonicalName() + "_chart.tgz";
@@ -864,7 +917,7 @@ public class ChartMap {
             int exitCode = -1;
             try {
                 Process p = Runtime.getRuntime().exec(command, null, new File(dirName));
-                p.waitFor(50000, TimeUnit.MILLISECONDS);
+                p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
                 exitCode = p.exitValue();
             } catch (IOException e) {
                 throw new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage()));
@@ -938,24 +991,23 @@ public class ChartMap {
             // if it is not already there (such as would happen if the chart was in an appr
             // repo)
             if (getChartName() == null || getChartVersion() == null) {
-                    File[] directories = new File(tempDirName).listFiles(File::isDirectory);
-                    if (directories.length > 0) {
-                        String chartYamlFilename = directories[0] + File.separator + CHART_YAML;
-                        File chartYamlFile = new File(chartYamlFilename);
-                        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        HelmChart h = mapper.readValue(chartYamlFile, HelmChart.class);
-                        chartName = h.getName();
-                        chartVersion = h.getVersion();
-                        if (charts.get(chartName, chartVersion) == null) {
-                            charts.put(chartName, chartVersion, h);
-                        }
+                File[] directories = new File(tempDirName).listFiles(File::isDirectory);
+                if (directories.length > 0) {
+                    String chartYamlFilename = directories[0] + File.separator + CHART_YAML;
+                    File chartYamlFile = new File(chartYamlFilename);
+                    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    HelmChart h = mapper.readValue(chartYamlFile, HelmChart.class);
+                    chartName = h.getName();
+                    chartVersion = h.getVersion();
+                    if (charts.get(chartName, chartVersion) == null) {
+                        charts.put(chartName, chartVersion, h);
                     }
-                    else {
-                        String m = "Archive content does not appear to be valid. No chart found.";
-                        logger.error(m);
-                        throw new ChartMapException(m);
-                    }
+                } else {
+                    String m = "Archive content does not appear to be valid. No chart found.";
+                    logger.error(m);
+                    throw new ChartMapException(m);
+                }
             }
             return getBaseName(tempDirName);
         } catch (IOException e) {
@@ -1423,7 +1475,7 @@ public class ChartMap {
             while ((len = bis.read(bytes)) > 0) {
                 bos.write(bytes, 0, len);
             }
-            p.waitFor(50000, TimeUnit.MILLISECONDS);
+            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode != 0) {
                 String message;

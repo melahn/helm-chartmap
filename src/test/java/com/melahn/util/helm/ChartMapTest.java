@@ -55,9 +55,16 @@ public class ChartMapTest {
     private static Path testOutputJSONFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.json");
     private static Path testOutputJSONFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.json");
     private static Path testOutputJSONFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.json");
-    private static Path testInputFilePath = Paths.get("src/test/resource/test-chart-file.tgz");
+    private static String APPRBASENAME = "helm-chartmap-test-chart";
+    private static Path testOutputAPPRPumlPath = Paths.get(TARGETTESTDIRECTORY, APPRBASENAME.concat(".puml"));
+    private static Path testOutputAPPRPngPath = Paths.get(TARGETTESTDIRECTORY, APPRBASENAME.concat(".png"));
+    private static String testInputFilePath = "src/test/resource/test-chart-file.tgz";
     private static Path testOneFileZipPath = Paths.get("src/test/resource/test-onefile.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
+    private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
+    private static Path testAPPROutputPath = Paths.get(TARGETTESTDIRECTORY, "helm-chartmap-test-chart.puml");
+    private static Path testChartNamePumlPath = Paths.get(TARGETTESTDIRECTORY, "nginx:9.3.0.puml");
+    private static Path testChartNamePngPath = Paths.get(TARGETTESTDIRECTORY, "nginx:9.3.0.png");
     private final PrintStream initialOut = System.out;
 
     @AfterAll
@@ -74,8 +81,8 @@ public class ChartMapTest {
     @BeforeAll
     public static void setUp() {
         try {
-            if (!Files.exists(testInputFilePath)) {
-                throw new Exception("test Input File " + testInputFilePath.toAbsolutePath() + " does not exist");
+            if (!Files.exists(Paths.get(".", testInputFilePath))) {
+                throw new Exception(String.format("test Input File %s does not exist", testInputFilePath));
             }
             deletePreviouslyCreatedFiles();
             Files.createDirectories(testOutputPumlFilePathRV.getParent());
@@ -129,7 +136,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void WeightedDeploymentTemplateTest() throws ChartMapException {
+    void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
                 testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
                 testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, false });
@@ -146,7 +153,7 @@ public class ChartMapTest {
     }
 
     @Test
-    public void urlOptionTest() throws ChartMapException {
+    void urlOptionTest() throws ChartMapException {
         String url = "https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz";
         ChartMap cm = new ChartMap(ChartOption.URL, url, testOutputTextFilePathNRNV.toString(),
                 System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
@@ -212,176 +219,137 @@ public class ChartMapTest {
     }
 
     @Test
-    void pumlChartRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRV, true,
-                    true, true);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputPumlFilePathRV));
-        } catch (Exception e) {
-            fail("printTestPumlChartRefreshVerbose failed:" + e.getMessage());
-        }
+    void pumlChartRefreshVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRV, true, true,
+                true);
+        testMap.print();
+        assertTrue(Files.exists(testOutputPumlFilePathRV));
     }
 
     @Test
-    void pumlChartNoRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRV, true,
-                    false, true);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputPumlFilePathNRV));
-        } catch (Exception e) {
-            fail("printTestPumlChartNoRefreshVerbose failed:" + e.getMessage());
-        }
+    void pumlChartNoRefreshVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRV, true,
+                false, true);
+        testMap.print();
+        assertTrue(Files.exists(testOutputPumlFilePathNRV));
     }
 
     @Test
-    void pumlChartRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRNV, true,
-                    true, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputPumlFilePathRNV));
-        } catch (Exception e) {
-            fail("printTestPumlChartRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void pumlChartRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathRNV, true, true,
+                false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputPumlFilePathRNV));
     }
 
     @Test
-    void pumlChartNoRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
-                    false, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputPumlFilePathNRNV));
-            assertTrue(Files.exists(testOutputPngFilePathNRNV));
-        } catch (Exception e) {
-            fail("printTestPumlChartNoRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void pumlChartNoRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
+                false, false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputPumlFilePathNRNV));
+        assertTrue(Files.exists(testOutputPngFilePathNRNV));
     }
 
     @Test
-    void textChartRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRV, true,
-                    true, true);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputTextFilePathRV));
-            assertTrue(fileContains(testOutputTextFilePathRV,
-                    "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
-        } catch (Exception e) {
-            fail("printTestTextChartRefreshVerbose failed:" + e.getMessage());
-        }
+    void textChartRefreshVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRV, true, true,
+                true);
+        testMap.print();
+        assertTrue(Files.exists(testOutputTextFilePathRV));
+        assertTrue(fileContains(testOutputTextFilePathRV,
+                "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
     }
 
     @Test
-    void textChartNoRefreshVerboseTest() throws Exception {
-        // try {
+    void textChartNoRefreshVerboseTest() throws ChartMapException {
         ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRV, true,
                 false, true);
-        if (testMap != null) {
-            testMap.print();
-            // }
-            assertTrue(Files.exists(testOutputTextFilePathNRV));
-            // } catch (Exception e) {
-            // fail("printTestTextChartNoRefreshVerbose failed:" + e.getMessage());
-        }
+        testMap.print();
+        assertTrue(Files.exists(testOutputTextFilePathNRV));
     }
 
     @Test
-    void textChartRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRNV, true,
-                    true, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputTextFilePathRNV));
-        } catch (Exception e) {
-            fail("printTestTextChartRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void textChartRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRNV, true, true,
+                false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputTextFilePathRNV));
     }
 
     @Test
-    void textChartNoRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRNV, true,
-                    false, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputTextFilePathNRNV));
-            // todo compare NR generated files with time stamp removed with a known good
-            // result for a better test
-        } catch (Exception e) {
-            fail("printTestTextChartNRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void textChartNoRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathNRNV, true,
+                false, false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputTextFilePathNRNV));
+        // todo compare NR generated files with time stamp removed with a known good
+        // result for a better test
     }
 
     @Test
-    void JSONChartRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRV, true,
-                    true, true);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputJSONFilePathRV));
-        } catch (Exception e) {
-            fail("printTestJSONChartRefreshVerbose failed:" + e.getMessage());
-        }
+    void JSONChartRefreshVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRV, true, true,
+                true);
+        testMap.print();
+        assertTrue(Files.exists(testOutputJSONFilePathRV));
+
     }
 
     @Test
-    void JSONChartNoRefreshVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRV, true,
-                    false, true);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputJSONFilePathNRV));
-        } catch (Exception e) {
-            fail("printTestJSONChartNoRefreshVerbose failed:" + e.getMessage());
-        }
+    void JSONChartNoRefreshVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRV, true,
+                false, true);
+        testMap.print();
+        assertTrue(Files.exists(testOutputJSONFilePathNRV));
+
     }
 
     @Test
-    void JSONChartRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRNV, true,
-                    true, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputJSONFilePathRNV));
-        } catch (Exception e) {
-            fail("printTestJSONChartRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void JSONChartRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathRNV, true, true,
+                false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputJSONFilePathRNV));
     }
 
     @Test
-    void JSONChartNoRefreshNoVerboseTest() {
-        try {
-            ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRNV, true,
-                    false, false);
-            if (testMap != null) {
-                testMap.print();
-            }
-            assertTrue(Files.exists(testOutputJSONFilePathNRNV));
-        } catch (Exception e) {
-            fail("printTestJSONChartNRefreshNoVerbose failed:" + e.getMessage());
-        }
+    void JSONChartNoRefreshNoVerboseTest() throws ChartMapException {
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputJSONFilePathNRNV, true,
+                false, false);
+        testMap.print();
+        assertTrue(Files.exists(testOutputJSONFilePathNRNV));
+    }
+
+    @Test
+    void APPRTest() throws Exception {
+        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testAPPROutputPath, true, false, false);
+        cm1.print();
+        assertTrue(Files.exists(testOutputAPPRPumlPath));
+        assertTrue(Files.exists(testOutputAPPRPngPath));
+        assertThrows(ChartMapException.class,
+                () -> createTestMap(ChartOption.APPRSPEC, null, testAPPROutputPath, true, false, false));
+        assertThrows(ChartMapException.class,
+                () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat", testAPPROutputPath, true, false, false));
+        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
+                testAPPROutputPath, true, false, false));
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/nu-such-chart@1.0.0", testAPPROutputPath,
+                true, false, false);
+        assertThrows(ChartMapException.class, () -> cm2.print());
+
+    }
+
+    @Test
+    void chartNameTest() throws Exception {
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, "nginx:9.3.0", testChartNamePumlPath, true, false, false);
+        cm1.print();
+        assertTrue(Files.exists(testChartNamePumlPath));
+        assertTrue(Files.exists(testChartNamePngPath));
+        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.CHARTNAME, "badchartname-noversion",
+                testChartNamePumlPath, true, false, false));
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testChartNamePumlPath, true, false,
+                false);
+        assertThrows(ChartMapException.class, () -> cm2.print());
     }
 
     @Test
@@ -575,19 +543,14 @@ public class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
-    private ChartMap createTestMap(ChartOption option, Path inputPath, Path outputPath, boolean generateImage,
-            boolean refresh, boolean verbose) throws Exception {
+    private ChartMap createTestMap(ChartOption option, String input, Path outputPath, boolean generateImage,
+            boolean refresh, boolean verbose) throws ChartMapException {
         ChartMap testMap = null;
         boolean[] switches;
         boolean debug = false; // less noisy but be careful of any tests that depend on debug entries
         switches = new boolean[] { generateImage, refresh, verbose, debug };
-        try {
-            testMap = new ChartMap(option, inputPath.toAbsolutePath().toString(),
-                    outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
-                    testEnvFilePath.toAbsolutePath().toString(), switches);
-        } catch (Exception e) {
-            System.out.println("Exception createTestMap: " + e.getMessage());
-        }
+        testMap = new ChartMap(option, input, outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
+                testEnvFilePath.toAbsolutePath().toString(), switches);
         return testMap;
     }
 
