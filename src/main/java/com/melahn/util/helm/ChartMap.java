@@ -157,15 +157,14 @@ public class ChartMap {
      *
      * @param arg The command line args
      */
-    public static void main(String[] arg) {
+    public static void main(String[] arg) throws ChartMapException {
         ChartMap chartMap = new ChartMap();
         try {
             chartMap.parseArgs(arg);
             chartMap.print();
         } catch (ChartMapException e) {
             chartMap.logger.error("ChartMapException:".concat(e.getMessage()));
-        } catch (Exception e) {
-            chartMap.logger.error("IOException:".concat(e.getMessage()));
+            throw e;
         }
     }
 
@@ -195,15 +194,14 @@ public class ChartMap {
     public ChartMap(ChartOption option, String chart, String outputFilename, String helmHome, String envFilename,
             boolean[] switches) throws ChartMapException {
         initialize();
-
         ArrayList<String> args = new ArrayList<>();
-        if (option.equals(ChartOption.APPRSPEC)) {
+        if (option!=null && option.equals(ChartOption.APPRSPEC)) {
             args.add("-a");
-        } else if (option.equals(ChartOption.CHARTNAME)) {
+        } else if (option!=null && option.equals(ChartOption.CHARTNAME)) {
             args.add("-c");
-        } else if (option.equals(ChartOption.FILENAME)) {
+        } else if (option!=null && option.equals(ChartOption.FILENAME)) {
             args.add("-f");
-        } else if (option.equals(ChartOption.URL)) {
+        } else if (option!=null && option.equals(ChartOption.URL)) {
             args.add("-u");
         } else {
             throw new ChartMapException("Invalid Option Specification");
@@ -213,18 +211,7 @@ public class ChartMap {
             args.add("-e");
             args.add(envFilename);
         }
-        if (switches[GENERATE_SWITCH]) {
-            args.add("-g");
-        }
-        if (switches[REFRESH_SWITCH]) {
-            args.add("-r");
-        }
-        if (switches[VERBOSE_SWITCH]) {
-            args.add("-v");
-        }
-        if (switches[DEBUG_SWITCH]) {
-            args.add("-z");
-        }
+        parseSwitches(args, switches);
         args.add("-o");
         args.add(outputFilename);
         args.add("-d");
@@ -238,6 +225,29 @@ public class ChartMap {
             }
         }
         parseArgs(args.toArray(new String[args.size()]));
+    }
+
+    /**
+     * Parses the command line switches and sets args
+     * @param args
+     * @param switches
+     */
+    private void parseSwitches (ArrayList<String> args, boolean[] switches) throws ChartMapException {
+        if (switches.length != 4) {
+            throw new ChartMapException("Switches are invalid. There should be four of them.");
+        }
+        if (switches[GENERATE_SWITCH]) {
+            args.add("-g");
+        }
+        if (switches[REFRESH_SWITCH]) {
+            args.add("-r");
+        }
+        if (switches[VERBOSE_SWITCH]) {
+            args.add("-v");
+        }
+        if (switches[DEBUG_SWITCH]) {
+            args.add("-z");
+        }
     }
 
     /**
@@ -842,8 +852,8 @@ public class ChartMap {
             } catch (Exception e) {
                 throw new RuntimeException(e); // NOSONAR
                                                // using a generic exception is a code smell but there is no avoiding
-                                               // because of labda functions poor exception handling ... look at 
-                                               // removing the lambda 
+                                               // because of labda functions poor exception handling ... look at
+                                               // removing the lambda
             }
         };
     }
@@ -1043,8 +1053,10 @@ public class ChartMap {
      *
      * @param chartDirName the name of a directory containing a Helm Chart
      * @param h            the Helm Chart on which dependencies will be collected
+     * 
+     * @throws ChartMapException when an error occurs collecting dependencies
      */
-    private void collectDependencies(String chartDirName, HelmChart h) { // See issue #8
+    private void collectDependencies(String chartDirName, HelmChart h) throws ChartMapException { // See issue #8
         HelmChart parentHelmChart = null;
         try {
             if (h != null) {
@@ -1082,7 +1094,7 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            logger.error("Exception getting Dependencies: {}", e.getMessage());
+            logErrorAndThrow(String.format("Exception getting Dependencies: %s", e.getMessage()));
         }
     }
 
@@ -1117,24 +1129,31 @@ public class ChartMap {
      * @param directory        a subdirectory of the chartDirName
      * @param currentHelmChart the helm chart found in the local charts repo
      * @param parentHelmChart  the parent of the currentHelmChart
+     * 
+     * @throws ChartMapException when an error occurs rendering templates or collecting values
      */
     private void handleHelmChartCondition(Boolean condition, String chartDirName, String directory,
-            HelmChart currentHelmChart, HelmChart parentHelmChart) throws IOException {
-        if (Boolean.TRUE.equals(condition)) {
-            File currentDirectory = new File(chartDirName);
-            collectValues(chartDirName + File.separator + directory, currentHelmChart);
-            if (parentHelmChart != null) {
-                // add this chart as a dependent
-                parentHelmChart.getDiscoveredDependencies().add(currentHelmChart);
+            HelmChart currentHelmChart, HelmChart parentHelmChart) throws ChartMapException {
+        try {
+            if (Boolean.TRUE.equals(condition)) {
+                File currentDirectory = new File(chartDirName);
+                collectValues(chartDirName + File.separator + directory, currentHelmChart);
+                if (parentHelmChart != null) {
+                    // add this chart as a dependent
+                    parentHelmChart.getDiscoveredDependencies().add(currentHelmChart);
+                }
+                chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(), currentHelmChart);
+                renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
+                File chartsDirectory = new File(
+                        chartDirName + File.separator + directory + File.separator + CHARTS_DIR_NAME);
+                if (chartsDirectory.exists()) {
+                    collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart); // recursion
+                }
             }
-            chartsReferenced.put(currentHelmChart.getName(), currentHelmChart.getVersion(), currentHelmChart);
-            renderTemplates(currentDirectory, currentHelmChart, parentHelmChart);
-            File chartsDirectory = new File(
-                    chartDirName + File.separator + directory + File.separator + CHARTS_DIR_NAME);
-            if (chartsDirectory.exists()) {
-                collectDependencies(chartsDirectory.getAbsolutePath(), currentHelmChart); // recursion
-            }
+        } catch (IOException e) {
+            logErrorAndThrow("IOException collecting values in handleHelmChartCondition");
         }
+
     }
 
     /**
@@ -1314,8 +1333,10 @@ public class ChartMap {
      * @param d The directory in which the chart directory exists
      * @param h The Helm Chart containing the templates
      * @param p The Helm Chart that is the parent of h
+     * 
+     * @throws ChartMapException when an error occurs rendering template
      */
-    private void renderTemplates(File d, HelmChart h, HelmChart p) {
+    private void renderTemplates(File d, HelmChart h, HelmChart p) throws ChartMapException {
         try {
             if (h.getType() != null && h.getType().equals("library")) {
                 // skip rendering library charts (these were intruduced in Helm V3)
@@ -1346,7 +1367,9 @@ public class ChartMap {
         } catch (
 
         Exception e) {
-            logger.error(LOG_FORMAT_4, "Exception rendering template for ", h.getNameFull(), " : ", e.getMessage());
+            String m = String.format("Exception rendering template for %s : %s", h.getNameFull(), e.getMessage());
+            logger.error(m);
+            throw new ChartMapException(m);
         }
     }
 
@@ -1885,6 +1908,17 @@ public class ChartMap {
             }
             logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
         }
+    }
+
+    /**
+     * Logs an error and throws a ChartMapException
+     * 
+     * @param m The error to log
+     * @throws ChartMapException
+     */
+    private void logErrorAndThrow(String m) throws ChartMapException {
+        logger.error(m);
+        throw new ChartMapException(m);
     }
 
     // Getters and Setters

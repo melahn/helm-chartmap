@@ -66,6 +66,7 @@ public class ChartMapTest {
     private static Path testOneFileZipPath = Paths.get("src/test/resource/test-onefile.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
     private static String testInputFilePath = "src/test/resource/test-chart-file.tgz";
+    private static String testChartName = "nginx:9.3.0";
     private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
     private static String testChartUrl = "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz";
     private final PrintStream initialOut = System.out;
@@ -97,7 +98,7 @@ public class ChartMapTest {
     }
 
     @Test
-    void chartMapMainTest() throws IOException, InterruptedException {
+    void chartMapMainTest() throws ChartMapException, IOException, InterruptedException {
         String OutputFile = "testChartFileRV.txt";
         if (Files.notExists(Paths.get("./target/test"))) {
             Files.createDirectories(Paths.get("./target/test"));
@@ -136,6 +137,13 @@ public class ChartMapTest {
         a[7] = Paths.get(TargetTestDirectory, OutputFile).toString();
         ChartMap.main(a);
         assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
+        // bad env filename to force main exception handling
+        a[5] = "nofilehere.yaml";
+        assertThrows(ChartMapException.class, () -> ChartMap.main(a));
+        a[5] = testEnvFilePath.toString();
+        // test bad options
+        a[0] = "-B";
+        assertThrows(ChartMapException.class, () -> ChartMap.main(a));
     }
 
     @Test
@@ -152,17 +160,6 @@ public class ChartMapTest {
         assertEquals(1, wdt2.getWeight());
         ChartMap.WeightedDeploymentTemplate wdt3 = cm.new WeightedDeploymentTemplate(null, hdt);
         assertEquals(ChartMap.MAX_WEIGHT, wdt3.getWeight());
-        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
-    }
-
-    @Test
-    void urlOptionTest() throws ChartMapException {
-        String url = "https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz";
-        ChartMap cm = new ChartMap(ChartOption.URL, url, testOutputTextFilePathNRNV.toString(),
-                System.getenv("HELM_HOME"), testEnvFilePath.toAbsolutePath().toString(),
-                new boolean[] { false, false, false, false });
-        cm.print();
-        assertTrue(Files.exists(testOutputTextFilePathNRNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -218,6 +215,10 @@ public class ChartMapTest {
         Path d = Paths.get("./target");
         String b = ChartMap.getBaseName(d.toString());
         assertEquals(null, b);
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        cm.print();
+        assertEquals(PrintFormat.PLANTUML, cm.getPrintFormat());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -358,10 +359,12 @@ public class ChartMapTest {
     }
 
     @Test
-    void chartNameTest() throws Exception {
-        // test normal path
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, "nginx:9.3.0", testOutputChartNamePumlPath, true, false,
-                false);
+    void chartNameTest() throws ChartMapException {
+        // test normal path without using createTestMap utility function because I want
+        // null env var file
+        boolean[] switches = { true, false, false, false };
+        ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, testChartName,
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null, switches);
         cm1.print();
         assertTrue(Files.exists(testOutputChartNamePumlPath));
         assertTrue(Files.exists(testOutputChartNamePngPath));
@@ -372,6 +375,18 @@ public class ChartMapTest {
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testOutputChartNamePumlPath, true,
                 false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
+    }
+
+    @Test
+    void optionsTest() throws ChartMapException {
+        boolean[] switches = { true, false, false, false };
+        // test that the options are right
+        assertThrows(ChartMapException.class, () -> new ChartMap(null, testChartName,
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null, switches));
+        // test that a bad switches array is used
+        assertThrows(ChartMapException.class,
+                () -> new ChartMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath.toAbsolutePath().toString(),
+                        System.getenv("HELM_HOME"), null, new boolean[3]));
     }
 
     @Test
