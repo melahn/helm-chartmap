@@ -39,32 +39,35 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ChartMapTest {
-    private static String VERSIONSUFFIX = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this
+    private static String VersionSuffix = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this
                                                              // from the pom instead
-    private static String TARGETTESTDIRECTORY = Paths.get("target/test").toString();
-    private static Path testOutputPumlFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.puml");
-    private static Path testOutputPumlFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.puml");
-    private static Path testOutputPumlFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.puml");
-    private static Path testOutputPumlFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.puml");
-    private static Path testOutputPngFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.png");
-    private static Path testOutputTextFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.txt");
-    private static Path testOutputTextFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.txt");
-    private static Path testOutputTextFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.txt");
-    private static Path testOutputTextFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.txt");
-    private static Path testOutputJSONFilePathRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRV.json");
-    private static Path testOutputJSONFilePathNRV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRV.json");
-    private static Path testOutputJSONFilePathRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileRNV.json");
-    private static Path testOutputJSONFilePathNRNV = Paths.get(TARGETTESTDIRECTORY, "testChartFileNRNV.json");
-    private static String APPRBASENAME = "helm-chartmap-test-chart";
-    private static Path testOutputAPPRPumlPath = Paths.get(TARGETTESTDIRECTORY, APPRBASENAME.concat(".puml"));
-    private static Path testOutputAPPRPngPath = Paths.get(TARGETTESTDIRECTORY, APPRBASENAME.concat(".png"));
-    private static String testInputFilePath = "src/test/resource/test-chart-file.tgz";
+    private static String TargetTestDirectory = Paths.get("target/test").toString();
+    private static String APPRBaseName = "helm-chartmap-test-chart";
+    private static String UrlBaseName = "test-chart-file";
+    private static Path testOutputPumlFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.puml");
+    private static Path testOutputPumlFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.puml");
+    private static Path testOutputPumlFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.puml");
+    private static Path testOutputPumlFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.puml");
+    private static Path testOutputPngFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.png");
+    private static Path testOutputTextFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.txt");
+    private static Path testOutputTextFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.txt");
+    private static Path testOutputTextFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.txt");
+    private static Path testOutputTextFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.txt");
+    private static Path testOutputJSONFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.json");
+    private static Path testOutputJSONFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.json");
+    private static Path testOutputJSONFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.json");
+    private static Path testOutputJSONFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.json");
+    private static Path testOutputAPPRPumlPath = Paths.get(TargetTestDirectory, APPRBaseName.concat(".puml"));
+    private static Path testOutputAPPRPngPath = Paths.get(TargetTestDirectory, APPRBaseName.concat(".png"));
+    private static Path testOutputChartNamePumlPath = Paths.get(TargetTestDirectory, "nginx:9.3.0.puml");
+    private static Path testOutputChartNamePngPath = Paths.get(TargetTestDirectory, "nginx:9.3.0.png");
+    private static Path testOutputChartUrlPumlPath = Paths.get(TargetTestDirectory, UrlBaseName.concat(".puml"));
+    private static Path testOutputChartUrlPngPath = Paths.get(TargetTestDirectory, UrlBaseName.concat(".png"));
     private static Path testOneFileZipPath = Paths.get("src/test/resource/test-onefile.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
+    private static String testInputFilePath = "src/test/resource/test-chart-file.tgz";
     private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
-    private static Path testAPPROutputPath = Paths.get(TARGETTESTDIRECTORY, "helm-chartmap-test-chart.puml");
-    private static Path testChartNamePumlPath = Paths.get(TARGETTESTDIRECTORY, "nginx:9.3.0.puml");
-    private static Path testChartNamePngPath = Paths.get(TARGETTESTDIRECTORY, "nginx:9.3.0.png");
+    private static String testChartUrl = "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz";
     private final PrintStream initialOut = System.out;
 
     @AfterAll
@@ -75,7 +78,7 @@ public class ChartMapTest {
          * deleted anyway when the test is next run.
          */
         System.out.println("Test complete.  Any generated file can be found in "
-                .concat(Paths.get(TARGETTESTDIRECTORY).toAbsolutePath().toString()));
+                .concat(Paths.get(TargetTestDirectory).toAbsolutePath().toString()));
     }
 
     @BeforeAll
@@ -95,7 +98,7 @@ public class ChartMapTest {
 
     @Test
     void chartMapMainTest() throws IOException, InterruptedException {
-        final String OUTPUTFILE = "testChartFileRV.txt";
+        String OutputFile = "testChartFileRV.txt";
         if (Files.notExists(Paths.get("./target/test"))) {
             Files.createDirectories(Paths.get("./target/test"));
         }
@@ -107,7 +110,7 @@ public class ChartMapTest {
         // introduced by a third party dependency upgrade though it would be caught on
         // the next test because the shaded
         // jar would have this updated dependency. Perhaps there is a better way
-        c[2] = ".:../../resource/jar/helm-chartmap".concat(VERSIONSUFFIX).concat(".jar");
+        c[2] = ".:../../resource/jar/helm-chartmap".concat(VersionSuffix).concat(".jar");
         c[3] = "com.melahn.util.helm.ChartMap";
         c[4] = "-f";
         c[5] = "../../".concat(testInputFilePath.toString());
@@ -116,12 +119,12 @@ public class ChartMapTest {
         c[8] = "-e";
         c[9] = "../../".concat(testEnvFilePath.toString());
         c[10] = "-o";
-        c[11] = OUTPUTFILE;
-        Process p = Runtime.getRuntime().exec(c, null, new File(TARGETTESTDIRECTORY.toString()));
+        c[11] = OutputFile;
+        Process p = Runtime.getRuntime().exec(c, null, new File(TargetTestDirectory.toString()));
         p.waitFor(30000, TimeUnit.MILLISECONDS);
         assertEquals(0, p.exitValue());
-        assertTrue(Files.exists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE)));
-        Files.deleteIfExists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE));
+        assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
+        Files.deleteIfExists(Paths.get(TargetTestDirectory, OutputFile));
         String[] a = new String[8];
         a[0] = "-f";
         a[1] = testInputFilePath.toString();
@@ -130,9 +133,9 @@ public class ChartMapTest {
         a[4] = "-e";
         a[5] = testEnvFilePath.toString();
         a[6] = "-o";
-        a[7] = Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE).toString();
+        a[7] = Paths.get(TargetTestDirectory, OutputFile).toString();
         ChartMap.main(a);
-        assertTrue(Files.exists(Paths.get(TARGETTESTDIRECTORY, OUTPUTFILE)));
+        assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
     }
 
     @Test
@@ -322,33 +325,52 @@ public class ChartMapTest {
     }
 
     @Test
-    void APPRTest() throws Exception {
-        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testAPPROutputPath, true, false, false);
+    void APPRTest() throws ChartMapException {
+        // test normal path
+        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
         cm1.print();
         assertTrue(Files.exists(testOutputAPPRPumlPath));
         assertTrue(Files.exists(testOutputAPPRPngPath));
+        // test null appr spec
         assertThrows(ChartMapException.class,
-                () -> createTestMap(ChartOption.APPRSPEC, null, testAPPROutputPath, true, false, false));
-        assertThrows(ChartMapException.class,
-                () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat", testAPPROutputPath, true, false, false));
+                () -> createTestMap(ChartOption.APPRSPEC, null, testOutputAPPRPumlPath, true, false, false));
+        // test malformed appr specs
+        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat",
+                testOutputAPPRPumlPath, true, false, false));
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
-                testAPPROutputPath, true, false, false));
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/nu-such-chart@1.0.0", testAPPROutputPath,
+                testOutputAPPRPumlPath, true, false, false));
+        // test chart not found in app repo
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/nu-such-chart@1.0.0", testOutputAPPRPumlPath,
                 true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
+    }
 
+    @Test
+    void UrlTest() throws ChartMapException {
+        // test normal path
+        ChartMap cm1 = createTestMap(ChartOption.URL, testChartUrl, testOutputChartUrlPumlPath, true, false, false);
+        cm1.print();
+        assertTrue(Files.exists(testOutputChartUrlPumlPath));
+        assertTrue(Files.exists(testOutputChartUrlPngPath));
+        // test null chart name
+        assertThrows(ChartMapException.class,
+                () -> createTestMap(ChartOption.URL, null, testOutputChartUrlPumlPath, true, false, false));
     }
 
     @Test
     void chartNameTest() throws Exception {
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, "nginx:9.3.0", testChartNamePumlPath, true, false, false);
-        cm1.print();
-        assertTrue(Files.exists(testChartNamePumlPath));
-        assertTrue(Files.exists(testChartNamePngPath));
-        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.CHARTNAME, "badchartname-noversion",
-                testChartNamePumlPath, true, false, false));
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testChartNamePumlPath, true, false,
+        // test normal path
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, "nginx:9.3.0", testOutputChartNamePumlPath, true, false,
                 false);
+        cm1.print();
+        assertTrue(Files.exists(testOutputChartNamePumlPath));
+        assertTrue(Files.exists(testOutputChartNamePngPath));
+        // test missing version in chartname
+        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.CHARTNAME, "badchartname-noversion",
+                testOutputChartNamePumlPath, true, false, false));
+        // test chart not found
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testOutputChartNamePumlPath, true,
+                false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
     }
 

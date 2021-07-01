@@ -466,10 +466,8 @@ public class ChartMap {
                     "Chart Name invalid: " + c + ". I was expecting something like helm-test-chart:1.0.2");
         }
         String[] chartNameParts = c.split(":");
-        if (chartNameParts.length == 2) {
-            setChartName(chartNameParts[0]);
-            setChartVersion(chartNameParts[1]);
-        }
+        setChartName(chartNameParts[0]);
+        setChartVersion(chartNameParts[1]);
     }
 
     /**
@@ -842,9 +840,10 @@ public class ChartMap {
             try {
                 throwingConsumer.accept(x);
             } catch (Exception e) {
-                throw new RuntimeException(e); // using a generic exception is a code smell but there is no avoiding
+                throw new RuntimeException(e); // NOSONAR
+                                               // using a generic exception is a code smell but there is no avoiding
                                                // because of labda functions poor exception handling ... look at 
-                                               // removing the lambda
+                                               // removing the lambda 
             }
         };
     }
