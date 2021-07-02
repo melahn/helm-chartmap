@@ -160,8 +160,9 @@ public class ChartMap {
     public static void main(String[] arg) throws ChartMapException {
         ChartMap chartMap = new ChartMap();
         try {
-            chartMap.parseArgs(arg);
-            chartMap.print();
+            if (chartMap.parseArgs(arg)) {
+                chartMap.print();
+            }
         } catch (ChartMapException e) {
             chartMap.logger.error("ChartMapException:".concat(e.getMessage()));
             throw e;
@@ -195,13 +196,13 @@ public class ChartMap {
             boolean[] switches) throws ChartMapException {
         initialize();
         ArrayList<String> args = new ArrayList<>();
-        if (option!=null && option.equals(ChartOption.APPRSPEC)) {
+        if (option != null && option.equals(ChartOption.APPRSPEC)) {
             args.add("-a");
-        } else if (option!=null && option.equals(ChartOption.CHARTNAME)) {
+        } else if (option != null && option.equals(ChartOption.CHARTNAME)) {
             args.add("-c");
-        } else if (option!=null && option.equals(ChartOption.FILENAME)) {
+        } else if (option != null && option.equals(ChartOption.FILENAME)) {
             args.add("-f");
-        } else if (option!=null && option.equals(ChartOption.URL)) {
+        } else if (option != null && option.equals(ChartOption.URL)) {
             args.add("-u");
         } else {
             throw new ChartMapException("Invalid Option Specification");
@@ -229,10 +230,11 @@ public class ChartMap {
 
     /**
      * Parses the command line switches and sets args
+     * 
      * @param args
      * @param switches
      */
-    private void parseSwitches (ArrayList<String> args, boolean[] switches) throws ChartMapException {
+    private void parseSwitches(ArrayList<String> args, boolean[] switches) throws ChartMapException {
         if (switches.length != 4) {
             throw new ChartMapException("Switches are invalid. There should be four of them.");
         }
@@ -273,49 +275,47 @@ public class ChartMap {
      * Initializes the instance variables
      */
     private void initialize() {
-        try {
-            setChartName(null);
-            setOutputFilename(getDefaultOutputFilename());
-            setChartFilename(null);
-            setChartUrl(null);
-            setVerbose(false);
-            setHelmHome(getDefaultHelmHome());
-            setEnvFilename(null);
-            setTempDirName(null);
-            setPrintFormat(PrintFormat.TEXT);
-            setGenerateImage(false);
-            setRefreshLocalRepo(false);
-            charts = new ChartKeyMap();
-            chartsDependenciesPrinted = new HashSet<>();
-            chartsReferenced = new ChartKeyMap();
-            env = new HashSet<>();
-            imagesReferenced = new HashSet<>();
-            deploymentTemplatesReferenced = new HashMap<>();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+        setChartName(null);
+        setOutputFilename(getDefaultOutputFilename());
+        setChartFilename(null);
+        setChartUrl(null);
+        setVerbose(false);
+        setHelmHome(getDefaultHelmHome());
+        setEnvFilename(null);
+        setTempDirName(null);
+        setPrintFormat(PrintFormat.TEXT);
+        setGenerateImage(false);
+        setRefreshLocalRepo(false);
+        charts = new ChartKeyMap();
+        chartsDependenciesPrinted = new HashSet<>();
+        chartsReferenced = new ChartKeyMap();
+        env = new HashSet<>();
+        imagesReferenced = new HashSet<>();
+        deploymentTemplatesReferenced = new HashMap<>();
     }
 
     /**
      * Parse the command line args
      *
      * @param args command line args
+     * @return boolean true if processing should continue, false otherwise
+     * @throws ChartMapException should a parse error occur
      */
-    private void parseArgs(String[] args) throws ChartMapException {
+    private boolean parseArgs(String[] args) throws ChartMapException {
         Options options = setOptions();
         CommandLineParser parser = new DefaultParser();
-        int count = 0;
         try {
             CommandLine cmd = parser.parse(options, args);
-            count = parseOptions(cmd);
+            int count = parseOptions(cmd);
             parseSwitches(cmd);
-            if (args.length == 0 || cmd.hasOption("h") || count != 1) {
+            if (args.length == 0 || cmd.hasOption("h") || count == 0) {
                 logger.info(ChartMap.getHelp());
-                System.exit(0);
+                return false;
             }
             setLogLevel();
             helmCommand = getHelmCommand();
             helmMajorVersionUsed = getHelmVersion();
+            return true;
         } catch (ParseException e) {
             logger.error(e.getMessage());
             throw new ChartMapException(String.format("Parse Exception: %s", e.getMessage()));
@@ -1130,7 +1130,8 @@ public class ChartMap {
      * @param currentHelmChart the helm chart found in the local charts repo
      * @param parentHelmChart  the parent of the currentHelmChart
      * 
-     * @throws ChartMapException when an error occurs rendering templates or collecting values
+     * @throws ChartMapException when an error occurs rendering templates or
+     *                           collecting values
      */
     private void handleHelmChartCondition(Boolean condition, String chartDirName, String directory,
             HelmChart currentHelmChart, HelmChart parentHelmChart) throws ChartMapException {
