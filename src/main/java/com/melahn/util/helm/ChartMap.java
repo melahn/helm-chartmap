@@ -373,7 +373,7 @@ public class ChartMap {
             parseApprSpec(cmd.getOptionValue("a"));
             count++;
         }
-        if (cmd.hasOption("c")) { // e.g. alfresco-dbp:0.2.0
+        if (cmd.hasOption("c")) { // e.g. nginx:9.3.0
             parseChartName(cmd.getOptionValue("c"));
             count++;
         }
@@ -383,7 +383,7 @@ public class ChartMap {
         if (cmd.hasOption("e")) {
             setEnvFilename(cmd.getOptionValue("e"));
         }
-        if (cmd.hasOption("f")) { // e.g. /Users/johndoe/alfresco-content-services-0.0.1.tgz
+        if (cmd.hasOption("f")) { // e.g. ./src/test/resource/test-chart-file.tgz
             setChartFilename(cmd.getOptionValue("f"));
             count++;
         }
@@ -391,7 +391,7 @@ public class ChartMap {
             setOutputFilename(cmd.getOptionValue("o"));
         }
         if (cmd.hasOption("u")) { // e.g.
-                                  // https://kubernetes-charts.alfresco.com/stable/alfresco-identity-service-3.0.0.tgz
+                                  // https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz
             setChartUrl(cmd.getOptionValue("u"));
             count++;
         }
@@ -895,7 +895,7 @@ public class ChartMap {
      *
      * @param u A string holding the url of the Helm Chart to be downloaded
      * @return the name of the directory where the chart was pulled into e.g.
-     *         /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
+     *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
      */
     private String downloadChart(String u) {
         String chartDirName = null;
@@ -995,7 +995,7 @@ public class ChartMap {
      *
      * @param chartFilename The name of the tgz file containing the chart
      * @return the name of the directory in which the chart was unpacked e.g.
-     *         /temp/alfresco_alfresco-dbp_1.5.0/alfresco-dbp
+     *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
      * @throws ChartMapException if an error occurs processing the chart
      */
     protected String unpackChart(String chartFilename) throws ChartMapException {
@@ -1605,7 +1605,7 @@ public class ChartMap {
                 if (line.length() > (START_OF_TEMPLATE + c).length() && line.charAt(0) == '#') {
                     // a pattern like this <chartName>/templates/... means that this is
                     // a template of immediate interest to the chart e.g.
-                    // alfresco-content-services/templates
+                    // helm-chartmap-test-chart/templates
                     line = processTemplateYaml(line, br, a, c);
                 } else {
                     line = br.readLine();
@@ -1653,7 +1653,7 @@ public class ChartMap {
      *
      * @param f A yaml file containing multiple yaml files, each such file preceded
      *          by a comment of the form "# Source <filename>" e.g. # Source:
-     *          alfresco-dbp/charts/alfresco-process-services/charts/postgresql/templates/deployment.yaml
+     *          helm-chartmap-test-chart/charts/helm-chartmap-test-subchart/charts/postgresql/templates/deployment.yaml
      * @return an array containing the fully qualified file names of all the
      *         deployment templates mentioned in the yaml file
      */

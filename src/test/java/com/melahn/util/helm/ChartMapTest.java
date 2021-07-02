@@ -363,7 +363,7 @@ public class ChartMapTest {
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
                 testOutputAPPRPumlPath, true, false, false));
         // test chart not found in app repo
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/nu-such-chart@1.0.0", testOutputAPPRPumlPath,
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0", testOutputAPPRPumlPath,
                 true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
     }
