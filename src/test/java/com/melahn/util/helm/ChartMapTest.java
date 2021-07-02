@@ -132,8 +132,9 @@ public class ChartMapTest {
                 testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(d));
         // test two options
-        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() }; 
+        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-d",
+                System.getenv("HELM_HOME"), "-e", testEnvFilePath.toString(), "-o",
+                Paths.get(TargetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             assertThrows(ChartMapException.class, () -> ChartMap.main(e));
@@ -401,14 +402,19 @@ public class ChartMapTest {
     @Test
     void optionsTest() throws ChartMapException {
         boolean[] switches = { true, false, false, false };
-        // test that the options are right
+        // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null, switches));
-        // test that a bad switches array is used
+        // test a bad switches array
         assertThrows(ChartMapException.class,
                 () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
                         testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null,
                         new boolean[3]));
+        // test a missing helm directory
+        assertThrows(ChartMapException.class,
+                () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
+                        testOutputChartNamePumlPath.toAbsolutePath().toString(), null,
+                        testEnvFilePath.toAbsolutePath().toString(), switches));
     }
 
     @Test

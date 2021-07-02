@@ -196,36 +196,52 @@ public class ChartMap {
             boolean[] switches) throws ChartMapException {
         initialize();
         ArrayList<String> args = new ArrayList<>();
-        if (option != null && option.equals(ChartOption.APPRSPEC)) {
-            args.add("-a");
-        } else if (option != null && option.equals(ChartOption.CHARTNAME)) {
-            args.add("-c");
-        } else if (option != null && option.equals(ChartOption.FILENAME)) {
-            args.add("-f");
-        } else if (option != null && option.equals(ChartOption.URL)) {
-            args.add("-u");
-        } else {
-            throw new ChartMapException("Invalid Option Specification");
-        }
+        parseOption(args, option);
         args.add(chart);
         if (envFilename != null) {
             args.add("-e");
             args.add(envFilename);
         }
-        parseSwitches(args, switches);
         args.add("-o");
         args.add(outputFilename);
+        if (helmHome == null) {
+            throw new ChartMapException("HELM HOME option is not set");
+        }
         args.add("-d");
         args.add(helmHome);
-        if (helmHome == null) {
-            throw new ChartMapException("HELM HOME is not set");
-        }
         for (String a : args) {
             if (a == null) {
                 throw new ChartMapException("Null parameter");
             }
         }
+        parseSwitches(args, switches);
         parseArgs(args.toArray(new String[args.size()]));
+    }
+
+    /**
+     * sets the value of the chart option in the array list
+     * 
+     * @param a the array list
+     * @param o the chart option (e.g. APPRSPEC)
+     * @throws ChartMapException if a null is passed as the option
+     */
+    private void parseOption(ArrayList<String> a, ChartOption o) throws ChartMapException {
+
+        if (o == null) {
+            throw new ChartMapException("Invalid Option Specification");
+        }
+        else if (o == ChartOption.APPRSPEC ) {
+            a.add("-a");
+        }
+        else if (o == ChartOption.CHARTNAME ) {
+            a.add("-c");
+        }
+        else if (o == ChartOption.FILENAME ) {
+            a.add("-f");
+        }
+        else {
+            a.add("-u");
+        }
     }
 
     /**
@@ -234,21 +250,21 @@ public class ChartMap {
      * @param args
      * @param switches
      */
-    private void parseSwitches(ArrayList<String> args, boolean[] switches) throws ChartMapException {
-        if (switches.length != 4) {
+    private void parseSwitches(ArrayList<String> a, boolean[] s) throws ChartMapException {
+        if (s.length != 4) {
             throw new ChartMapException("Switches are invalid. There should be four of them.");
         }
-        if (switches[GENERATE_SWITCH]) {
-            args.add("-g");
+        if (s[GENERATE_SWITCH]) {
+            a.add("-g");
         }
-        if (switches[REFRESH_SWITCH]) {
-            args.add("-r");
+        if (s[REFRESH_SWITCH]) {
+            a.add("-r");
         }
-        if (switches[VERBOSE_SWITCH]) {
-            args.add("-v");
+        if (s[VERBOSE_SWITCH]) {
+            a.add("-v");
         }
-        if (switches[DEBUG_SWITCH]) {
-            args.add("-z");
+        if (s[DEBUG_SWITCH]) {
+            a.add("-z");
         }
     }
 
