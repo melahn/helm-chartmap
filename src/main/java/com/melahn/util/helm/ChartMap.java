@@ -379,12 +379,6 @@ public class ChartMap {
             setChartUrl(cmd.getOptionValue("u"));
             count++;
         }
-        if (count > 1) {
-            String m = String.format("count of options found is expected to be 0 or 1.  %d options were found instead.",
-                    count);
-            logger.log(logLevelDebug, m);
-            throw new ChartMapException(m);
-        }
         return count;
     }
 

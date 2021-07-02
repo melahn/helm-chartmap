@@ -132,12 +132,17 @@ public class ChartMapTest {
                 testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(d));
         // test two options
-        String[] e = new String[] { "-f", "-a", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
-        assertThrows(ChartMapException.class, () -> ChartMap.main(e));
+        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
+                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() }; 
+        try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(mainTestOut));
+            assertThrows(ChartMapException.class, () -> ChartMap.main(e));
+            assertTrue(logContains(mainTestOut, "Parse Exception"));
+            System.setOut(new PrintStream(initialOut));
+        }
         // test missing option
         String[] f = new String[] { testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString(), "-z" };
+                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             ChartMap.main(f);
@@ -599,13 +604,11 @@ public class ChartMapTest {
 
     private ChartMap createTestMap(ChartOption option, String input, Path outputPath, boolean generateImage,
             boolean refresh, boolean verbose) throws ChartMapException {
-        ChartMap testMap = null;
-        boolean[] switches;
-        boolean debug = false; // less noisy but be careful of any tests that depend on debug entries
-        switches = new boolean[] { generateImage, refresh, verbose, debug };
-        testMap = new ChartMap(option, input, outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
+        // debug off makes it less noisy but be careful of any tests that depend on
+        // debug entries
+        boolean[] switches = new boolean[] { generateImage, refresh, verbose, false };
+        return new ChartMap(option, input, outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
                 testEnvFilePath.toAbsolutePath().toString(), switches);
-        return testMap;
     }
 
     private static void deletePreviouslyCreatedFiles() {
