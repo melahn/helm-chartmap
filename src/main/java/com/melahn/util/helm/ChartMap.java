@@ -81,13 +81,8 @@ public class ChartMap {
     HashSet<String> env;
     private boolean generateImage;
     private String helmCommand;
-    private String helmHome;
-    private helmMajorVersion helmMajorVersionUsed;
-
-    private enum helmMajorVersion {
-        V2, V3, UNKNOWN
-    }
-
+    private String helmCachePath;
+    private String helmConfigPath;
     protected HashSet<String> imagesReferenced;
     private HelmChartReposLocal localRepos;
     private static final String CHARTMAP_DEBUG = "CHARTMAP_DEBUG";
@@ -180,9 +175,6 @@ public class ChartMap {
      * @param envFilename    The name of a yaml file that contains a set of
      *                       environment variables which may influence the way the
      *                       charts are rendered by helm.
-     * @param helmHome       The location of the user helm directory. This is needed
-     *                       to find the local cache of index files downloaded from
-     *                       the Helm Chart repos.
      * @param switches       An array containing a list of boolean values as follows
      *                       when true switches[0] generates an image from the
      *                       PlantUML file (if any) switches[1] refresh the local
@@ -192,7 +184,7 @@ public class ChartMap {
      * @throws ChartMapException when an error occurs creating the chart map
      **/
 
-    public ChartMap(ChartOption option, String chart, String outputFilename, String helmHome, String envFilename,
+    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename,
             boolean[] switches) throws ChartMapException {
         initialize();
         ArrayList<String> args = new ArrayList<>();
@@ -204,11 +196,6 @@ public class ChartMap {
         }
         args.add("-o");
         args.add(outputFilename);
-        if (helmHome == null) {
-            throw new ChartMapException("HELM HOME option is not set");
-        }
-        args.add("-d");
-        args.add(helmHome);
         for (String a : args) {
             if (a == null) {
                 throw new ChartMapException("Null parameter");
@@ -229,17 +216,13 @@ public class ChartMap {
 
         if (o == null) {
             throw new ChartMapException("Invalid Option Specification");
-        }
-        else if (o == ChartOption.APPRSPEC ) {
+        } else if (o == ChartOption.APPRSPEC) {
             a.add("-a");
-        }
-        else if (o == ChartOption.CHARTNAME ) {
+        } else if (o == ChartOption.CHARTNAME) {
             a.add("-c");
-        }
-        else if (o == ChartOption.FILENAME ) {
+        } else if (o == ChartOption.FILENAME) {
             a.add("-f");
-        }
-        else {
+        } else {
             a.add("-u");
         }
     }
@@ -283,20 +266,24 @@ public class ChartMap {
         removeTempDir();
     }
 
-    private ChartMap() {
+    private ChartMap() throws ChartMapException {
         initialize();
     }
 
     /**
      * Initializes the instance variables
+     * 
+     * @throws ChartMapException if the helm version is not supported
      */
-    private void initialize() {
+    private void initialize() throws ChartMapException {
         setChartName(null);
         setOutputFilename(getDefaultOutputFilename());
         setChartFilename(null);
         setChartUrl(null);
         setVerbose(false);
-        setHelmHome(getDefaultHelmHome());
+        helmCommand = getHelmCommand();
+        checkHelmVersion();
+        getHelmPaths();
         setEnvFilename(null);
         setTempDirName(null);
         setPrintFormat(PrintFormat.TEXT);
@@ -329,8 +316,6 @@ public class ChartMap {
                 return false;
             }
             setLogLevel();
-            helmCommand = getHelmCommand();
-            helmMajorVersionUsed = getHelmVersion();
             return true;
         } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -347,7 +332,6 @@ public class ChartMap {
         Options options = new Options();
         options.addOption("a", true, "The appr chart location");
         options.addOption("c", true, "The Chart Name");
-        options.addOption("d", true, "Directory for Helm Home");
         options.addOption("e", true, "Environment Variable Filename");
         options.addOption("f", true, "Helm Chart File Name");
         options.addOption("g", false, "Generate Image from PlantUML file");
@@ -376,9 +360,6 @@ public class ChartMap {
         if (cmd.hasOption("c")) { // e.g. nginx:9.3.0
             parseChartName(cmd.getOptionValue("c"));
             count++;
-        }
-        if (cmd.hasOption("d")) {
-            setHelmHome(cmd.getOptionValue("d"));
         }
         if (cmd.hasOption("e")) {
             setEnvFilename(cmd.getOptionValue("e"));
@@ -501,7 +482,6 @@ public class ChartMap {
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
                 .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
                 .concat("\t-u\t<url>\t\tA url for a Helm Chart\n")
-                .concat("\t-d\t<directoryname>\tThe file system location of HELM_HOME\n")
                 .concat("\t-o\t<filename>\tA name and version of the chart as an appr specification\n")
                 .concat("\t-e\t<filename>\tThe location of an Environment Specification\n")
                 .concat("\t-g\t\t\tGenerate image from PlantUML file\n").concat("\t-r\t\t\tRefresh\n")
@@ -519,45 +499,21 @@ public class ChartMap {
      */
     protected void loadLocalRepos() throws ChartMapException {
         try {
+            // in v2 all the repos were nicely collected into a single yaml file in helm
+            // home but in v3 the location of the repo list is now os dependent
+            String helmRepoFilename = helmConfigPath.concat("/repositories.yaml");
+
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            String helmRepoFilename = "";
-            if (helmMajorVersionUsed == helmMajorVersion.V2) {
-                // in v2 all the repos were nicely collected into a single yaml file in helm
-                // home
-                helmRepoFilename = helmHome.concat("/repository/repositories.yaml");
-            } else if (helmMajorVersionUsed == helmMajorVersion.V3) {
-                // in v3 the location of the repo list is os dependent
-                String repositoriesDirname = null;
-                if (SystemUtils.IS_OS_MAC_OSX) {
-                    repositoriesDirname = System.getenv("HOME").concat("/Library/Preferences/helm");
-                } else if (SystemUtils.IS_OS_LINUX) {
-                    repositoriesDirname = System.getenv("HOME").concat("/.config/helm");
-                } else if (SystemUtils.IS_OS_WINDOWS) {
-                    repositoriesDirname = System.getenv("APPDATA").concat("/helm");
-                } else {
-                    throw (new ChartMapException("unknown OS"));
-                }
-                helmRepoFilename = repositoriesDirname.concat("/repositories.yaml");
-            }
             File reposYamlFile = new File(helmRepoFilename);
+
             localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
-            // in helm v2, the cache location was set. In v3, it must be synthesized from
+            // in helm v2, the cache location was set but in v3, it must be synthesized from
             // an OS specific location
-            if (helmMajorVersionUsed == helmMajorVersion.V3) {
-                HelmChartRepoLocal[] repos = localRepos.getRepositories();
-                String cacheDirname = "";
-                if (SystemUtils.IS_OS_MAC_OSX) {
-                    cacheDirname = System.getenv("HOME").concat("/Library/Caches/helm");
-                } else if (SystemUtils.IS_OS_LINUX) {
-                    cacheDirname = System.getenv("HOME").concat("/.cache/helm");
-                } else if (SystemUtils.IS_OS_WINDOWS) {
-                    cacheDirname = System.getenv("TEMP").concat("/helm");
-                }
-                cacheDirname = cacheDirname.concat("/repository/");
-                for (HelmChartRepoLocal r : repos) {
-                    r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
-                }
+            HelmChartRepoLocal[] repos = localRepos.getRepositories();
+            String cacheDirname = helmCachePath.concat("/repository/");
+            for (HelmChartRepoLocal r : repos) {
+               r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
             }
             printLocalRepos();
             loadLocalCharts();
@@ -572,10 +528,10 @@ public class ChartMap {
      * The helm version command offers templated output using go template syntax but
      * the values were not designed to be forward or backward compatible (!) hence
      * the tortured logic here
-     * 
-     * @return helmMajorVersion
+
+     * @throws ChartMapException if a version other than V3 is found
      */
-    private helmMajorVersion getHelmVersion() throws ChartMapException {
+    private void checkHelmVersion() throws ChartMapException {
         String[] cmdArray = { helmCommand, "version", "--template", "{{ .Version }}" };
         try {
             Process p = Runtime.getRuntime().exec(cmdArray);
@@ -584,23 +540,47 @@ public class ChartMap {
             int exitCode = p.exitValue();
             if (exitCode == 0) {
                 String o = br.readLine();
-                if (o != null && o.length() > 1) {
-                    return parseHelmMajorVersionOutput(o);
+                if (o != null && o.length() > 1 && o.charAt(1) == '3') {
+                    logger.log(logLevelDebug, "Helm Version 3 detected");
+                    return;
                 }
-                throw new ChartMapException("Unsupported Helm Version"); // we found neither V2 nor V3
+                throw new ChartMapException("Unsupported Helm Version. Please upgrade to helm V3 or use a previous version of ChartMap.");
             } else { // we could not even execute the helm command
                 throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0]
                         + cmdArray[1] + cmdArray[2] + cmdArray[3]);
             }
         } catch (IOException e) {
+            // we could not get the output of the helm command
             throw new ChartMapException(
-                    String.format("Exception trying to discover Helm Version: %s ", e.getMessage())); // we could not
-                                                                                                      // get the output
-                                                                                                      // of the helm
-                                                                                                      // command
+                    String.format("Exception trying to discover Helm Version: %s ", e.getMessage())); 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
+        }
+    }
+
+    /**
+     * Finds the helm cache and configuration paths. 
+     * 
+     * The logic for finding the paths is derived from the rules explained in
+     * https://helm.sh/docs/helm/helm/
+     */
+    private void getHelmPaths() {
+
+        // If a HELM_*_HOME environment variable is set, it will be used
+        // Otherwise, the XDG variables will be used 
+        helmCachePath = System.getenv("HELM_CACHE_HOME")!=null?System.getenv("HELM_CACHE_HOME"):System.getenv("XDG_CACHE_HOME");
+        helmConfigPath = System.getenv("HELM_CONFIG_HOME")!=null?System.getenv("HELM_CONFIG_HOME"):System.getenv("XDG_CONFIG_HOME");
+          // When no other location is set a default location will be used based on the operating system
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            helmCachePath = System.getenv("HOME").concat("/Library/Caches/helm");
+            helmConfigPath = System.getenv("HOME").concat("/Library/Preferences/helm");
+         } else if (SystemUtils.IS_OS_LINUX) {
+            helmCachePath = System.getenv("HOME").concat(".cache/helm");
+            helmConfigPath = System.getenv("HOME").concat("/.config/helm");
+        } else if (SystemUtils.IS_OS_WINDOWS) {
+            helmCachePath = System.getenv("TEMP").concat("/helm");
+            helmConfigPath = System.getenv("APPDATA").concat("/helm");
         }
     }
 
@@ -622,36 +602,6 @@ public class ChartMap {
         } catch (SecurityException | NullPointerException e) {
             throw new ChartMapException(String.format("Exception trying to get HELM_BIN: %s ", e.getMessage()));
         }
-    }
-
-    /**
-     * Parses a line of output of the Helm version command and answers back the
-     * version it found
-     * 
-     * @param l A line of output of the Helm version command
-     * @return helmMajorVersion found in that line
-     */
-    private helmMajorVersion parseHelmMajorVersionOutput(String l) throws ChartMapException {
-        if (l != null && l.length() > 1) {
-            // in helm V3 the templated output of the command should look like 'v3.5.2'
-            // so pick off the second character to get the major version
-            if (l.charAt(1) == '3') {
-                helmMajorVersionUsed = helmMajorVersion.V3;
-                logger.log(logLevelDebug, "Helm Version 3 detected");
-                return helmMajorVersion.V3;
-            } else {
-                // in helm V2 there is no .Version variable so expect to get a complaint about
-                // that
-                String nv = "<no value>";
-                if (l.length() >= nv.length() && l.substring(0, nv.length() - 1).equals(nv)) {
-                    helmMajorVersionUsed = helmMajorVersion.V2;
-                    logger.log(logLevelDebug, "Helm Version 2 detected");
-                    return helmMajorVersion.V2;
-                }
-            }
-        }
-        // if neither V2 nor V3 is found throw an exception
-        throw new ChartMapException(String.format("Helm Version could not be determined from the string \"%s\"", l));
     }
 
     /**
@@ -1934,10 +1884,6 @@ public class ChartMap {
 
     // Getters and Setters
 
-    private String getDefaultHelmHome() {
-        return System.getenv("HELM_HOME");
-    }
-
     private String getApprSpec() {
         return apprSpec;
     }
@@ -1992,10 +1938,6 @@ public class ChartMap {
 
     private void setGenerateImage(boolean b) {
         this.generateImage = b;
-    }
-
-    private void setHelmHome(String helmHome) {
-        this.helmHome = helmHome;
     }
 
     private String getTempDirName() {

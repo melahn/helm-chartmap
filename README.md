@@ -50,6 +50,9 @@ The helm client command is determined by first using the value of the environmen
 variable *HELM_BIN*. If not found, then the value *helm* is used and it is assumed that
 the executable *helm* will be found in the PATH.  It is arguably more secure to set *HELM_BIN* explictly since that way you prevent the security exposure of some other (unknown) executable named *helm* being found in the PATH.  
 
+The location of the helm cache and configuration directories is derived using the rules defined in
+[Helm Documentation](https://helm.sh/docs/helm/helm/).
+
 The junit test cases rely on the environment variable *HELM_HOME* being set.
 
 ## Using Chart Map
@@ -71,7 +74,6 @@ Flags:
   -c  <chartname>  A name and version of a chart
   -f  <filename>  A location in the file system for a Helm Chart package (a tgz file)
   -u  <url>    A url for a Helm Chart
-  -d  <directoryname>  The file system location of HELM_HOME
   -o  <filename>  A name and version of the chart as an appr specification
   -e  <filename>  The location of an Environment Specification
   -g      Generate image from PlantUML file
@@ -92,8 +94,6 @@ Flags:
           *  A location in the file system for a Helm Chart package (a tgz file)
     * **-u** \<url\>
           *  A url for the Helm Chart
-  * **-d** \<directoryname\>
-    * The file system location of HELM_HOME
   * **-o** \<filename\>
     * The name of the file to be generated.  
       If a file extension of 'puml' is specifed the format of the generated file will be PlantUML.
@@ -117,20 +117,20 @@ Flags:
 ##### Generating a Chartmap using a chart reference
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -d "/Users/melahn/.helm" -o wordpress-10.6.10.txt  -v
+java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -o wordpress-10.6.10.txt  -v
 ```
 
 ##### Generating a Chartmap using a file specification
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -d "/Users/melahn/.helm" -o  alfresco-content-services-3.0.8.puml -v 
+java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -v 
 
 ```
 
 ##### Generating a Chartmap using a url specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -d "/Users/melahn/.helm" -o  alfresco-content-services-3.0.8.puml -g -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -g -v
 
 ```
 
@@ -139,7 +139,7 @@ Note in this example, the *-g* flag is set to automatically generate the image f
 ##### Generating a Chartmap using an appr specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2" -d "/Users/melahn/.helm" -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o  alfresco-dbp.puml -v
 
 ```
 
@@ -155,7 +155,6 @@ In addition to the command line interface, a Java API is provided.
     public ChartMap(ChartOption option,
                     String chart,
                     String outputFilename,
-                    String helmHome,
                     String envFilename,
                     boolean[] switches)                  
 ```
@@ -172,8 +171,6 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The name of the Helm Chart in one of the formats specified by the option parameter
 * *outputFilename*
   * The name of the file to which to write the generated Chart Map.  Note the file is overwritten if it exists.
-* *helmHome*
-  * The location of Helm Home
 * *envSpecFilename*
   * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format.
 * *switches*
@@ -220,7 +217,6 @@ public class ChartMapExample {
                     ChartOption.FILENAME,
                     "src/test/resource/testChartFile.tgz",
                     "my-chartmap.puml",
-                    System.getenv("HELM_HOME"),
                     "resource/example/example-env-spec.yaml",
                     true,
                     false,

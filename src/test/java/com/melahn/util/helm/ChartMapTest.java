@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +89,6 @@ public class ChartMapTest {
             }
             deletePreviouslyCreatedFiles();
             Files.createDirectories(testOutputPumlFilePathRV.getParent());
-            assertNotNull(System.getenv("HELM_HOME"));
         } catch (Exception e) {
             fail("Test setup failed: " + e.getMessage());
         }
@@ -110,31 +108,30 @@ public class ChartMapTest {
         // jar would have this updated dependency. Perhaps there is a better way
         String a[] = new String[] { "java", "-cp",
                 ".:../../resource/jar/helm-chartmap".concat(VersionSuffix).concat(".jar"),
-                "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-d",
-                System.getenv("HELM_HOME"), "-e", "../../".concat(testEnvFilePath.toString()), "-o", OutputFile };
+                "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-e",
+                "../../".concat(testEnvFilePath.toString()), "-o", OutputFile };
         // normal case calling main as a new process
         Process p = Runtime.getRuntime().exec(a, null, new File(TargetTestDirectory.toString()));
         p.waitFor(30000, TimeUnit.MILLISECONDS);
         assertEquals(0, p.exitValue());
         assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
         Files.deleteIfExists(Paths.get(TargetTestDirectory, OutputFile));
-        String[] b = new String[] { "-f", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
+        String[] b = new String[] { "-f", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
+                Paths.get(TargetTestDirectory, OutputFile).toString() };
         // normal case calling main directly
         ChartMap.main(b);
         assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
         // bad env filename to force main exception handling
-        String[] c = new String[] { "-f", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                "nofilehere.yaml", "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
+        String[] c = new String[] { "-f", testInputFilePath.toString(), "-e", "nofilehere.yaml", "-o",
+                Paths.get(TargetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(c));
         // test bad option
-        String[] d = new String[] { "-B", testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
+        String[] d = new String[] { "-B", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
+                Paths.get(TargetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(d));
         // test two options
-        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-d",
-                System.getenv("HELM_HOME"), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(TargetTestDirectory, OutputFile).toString() };
+        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-e",
+                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             assertThrows(ChartMapException.class, () -> ChartMap.main(e));
@@ -142,8 +139,8 @@ public class ChartMapTest {
             System.setOut(new PrintStream(initialOut));
         }
         // test missing option
-        String[] f = new String[] { testInputFilePath.toString(), "-d", System.getenv("HELM_HOME"), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
+        String[] f = new String[] { testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
+                Paths.get(TargetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             ChartMap.main(f);
@@ -170,8 +167,8 @@ public class ChartMapTest {
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
-                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, false });
+                testOutputTextFilePathNRNV.toString(), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, false });
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
@@ -195,15 +192,15 @@ public class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
         // force IOException -> ChartMapException path
         ChartMap cm1 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
-                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+                testOutputTextFilePathNRNV.toString(), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, true });
         cm1.setChartName("foo");
         cm1.createTempDir();
         assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
         // force ChartMapException path when no temp dir
         ChartMap cm2 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
-                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+                testOutputTextFilePathNRNV.toString(), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, true });
         cm2.setChartName("foo");
         assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
         // force ChartMapException path when null chartmap passed
@@ -211,8 +208,8 @@ public class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
         // test when the tgz has no directory
         ChartMap cm3 = new ChartMap(ChartOption.FILENAME, testInputFilePath.toString(),
-                testOutputTextFilePathNRNV.toString(), System.getenv("HELM_HOME"),
-                testEnvFilePath.toAbsolutePath().toString(), new boolean[] { false, false, false, true });
+                testOutputTextFilePathNRNV.toString(), testEnvFilePath.toAbsolutePath().toString(),
+                new boolean[] { false, false, false, true });
         cm3.setChartName(null);
         cm3.setChartVersion(null);
         cm3.createTempDir();
@@ -386,7 +383,7 @@ public class ChartMapTest {
         // null env var file
         boolean[] switches = { true, false, false, false };
         ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, testChartName,
-                testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null, switches);
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), null, switches);
         cm1.print();
         assertTrue(Files.exists(testOutputChartNamePumlPath));
         assertTrue(Files.exists(testOutputChartNamePngPath));
@@ -404,17 +401,10 @@ public class ChartMapTest {
         boolean[] switches = { true, false, false, false };
         // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, testChartName,
-                testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null, switches));
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), null, switches));
         // test a bad switches array
-        assertThrows(ChartMapException.class,
-                () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
-                        testOutputChartNamePumlPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"), null,
-                        new boolean[3]));
-        // test a missing helm directory
-        assertThrows(ChartMapException.class,
-                () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
-                        testOutputChartNamePumlPath.toAbsolutePath().toString(), null,
-                        testEnvFilePath.toAbsolutePath().toString(), switches));
+        assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[3]));
     }
 
     @Test
@@ -424,7 +414,6 @@ public class ChartMapTest {
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
                 .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
                 .concat("\t-u\t<url>\t\tA url for a Helm Chart\n")
-                .concat("\t-d\t<directoryname>\tThe file system location of HELM_HOME\n")
                 .concat("\t-o\t<filename>\tA name and version of the chart as an appr specification\n")
                 .concat("\t-e\t<filename>\tThe location of an Environment Specification\n")
                 .concat("\t-g\t\t\tGenerate image from PlantUML file\n").concat("\t-r\t\t\tRefresh\n")
@@ -613,7 +602,7 @@ public class ChartMapTest {
         // debug off makes it less noisy but be careful of any tests that depend on
         // debug entries
         boolean[] switches = new boolean[] { generateImage, refresh, verbose, false };
-        return new ChartMap(option, input, outputPath.toAbsolutePath().toString(), System.getenv("HELM_HOME"),
+        return new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
                 testEnvFilePath.toAbsolutePath().toString(), switches);
     }
 
