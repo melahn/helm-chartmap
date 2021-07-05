@@ -14,11 +14,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,7 @@ import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -38,30 +41,30 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ChartMapTest {
-    private static String VersionSuffix = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this
+    private static String versionSuffix = "-1.0.3-SNAPSHOT"; // needed for main test; it would be nice not to get this
                                                              // from the pom instead
-    private static String TargetTestDirectory = Paths.get("target/test").toString();
+    private static String targetTestDirectory = Paths.get("target/test").toString();
     private static String APPRBaseName = "helm-chartmap-test-chart";
-    private static String UrlBaseName = "test-chart-file";
-    private static Path testOutputPumlFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.puml");
-    private static Path testOutputPumlFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.puml");
-    private static Path testOutputPumlFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.puml");
-    private static Path testOutputPumlFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.puml");
-    private static Path testOutputPngFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.png");
-    private static Path testOutputTextFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.txt");
-    private static Path testOutputTextFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.txt");
-    private static Path testOutputTextFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.txt");
-    private static Path testOutputTextFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.txt");
-    private static Path testOutputJSONFilePathRV = Paths.get(TargetTestDirectory, "testChartFileRV.json");
-    private static Path testOutputJSONFilePathNRV = Paths.get(TargetTestDirectory, "testChartFileNRV.json");
-    private static Path testOutputJSONFilePathRNV = Paths.get(TargetTestDirectory, "testChartFileRNV.json");
-    private static Path testOutputJSONFilePathNRNV = Paths.get(TargetTestDirectory, "testChartFileNRNV.json");
-    private static Path testOutputAPPRPumlPath = Paths.get(TargetTestDirectory, APPRBaseName.concat(".puml"));
-    private static Path testOutputAPPRPngPath = Paths.get(TargetTestDirectory, APPRBaseName.concat(".png"));
-    private static Path testOutputChartNamePumlPath = Paths.get(TargetTestDirectory, "nginx:9.3.0.puml");
-    private static Path testOutputChartNamePngPath = Paths.get(TargetTestDirectory, "nginx:9.3.0.png");
-    private static Path testOutputChartUrlPumlPath = Paths.get(TargetTestDirectory, UrlBaseName.concat(".puml"));
-    private static Path testOutputChartUrlPngPath = Paths.get(TargetTestDirectory, UrlBaseName.concat(".png"));
+    private static String urlBaseName = "test-chart-file";
+    private static Path testOutputPumlFilePathRV = Paths.get(targetTestDirectory, "testChartFileRV.puml");
+    private static Path testOutputPumlFilePathNRV = Paths.get(targetTestDirectory, "testChartFileNRV.puml");
+    private static Path testOutputPumlFilePathRNV = Paths.get(targetTestDirectory, "testChartFileRNV.puml");
+    private static Path testOutputPumlFilePathNRNV = Paths.get(targetTestDirectory, "testChartFileNRNV.puml");
+    private static Path testOutputPngFilePathNRNV = Paths.get(targetTestDirectory, "testChartFileNRNV.png");
+    private static Path testOutputTextFilePathRV = Paths.get(targetTestDirectory, "testChartFileRV.txt");
+    private static Path testOutputTextFilePathNRV = Paths.get(targetTestDirectory, "testChartFileNRV.txt");
+    private static Path testOutputTextFilePathRNV = Paths.get(targetTestDirectory, "testChartFileRNV.txt");
+    private static Path testOutputTextFilePathNRNV = Paths.get(targetTestDirectory, "testChartFileNRNV.txt");
+    private static Path testOutputJSONFilePathRV = Paths.get(targetTestDirectory, "testChartFileRV.json");
+    private static Path testOutputJSONFilePathNRV = Paths.get(targetTestDirectory, "testChartFileNRV.json");
+    private static Path testOutputJSONFilePathRNV = Paths.get(targetTestDirectory, "testChartFileRNV.json");
+    private static Path testOutputJSONFilePathNRNV = Paths.get(targetTestDirectory, "testChartFileNRNV.json");
+    private static Path testOutputAPPRPumlPath = Paths.get(targetTestDirectory, APPRBaseName.concat(".puml"));
+    private static Path testOutputAPPRPngPath = Paths.get(targetTestDirectory, APPRBaseName.concat(".png"));
+    private static Path testOutputChartNamePumlPath = Paths.get(targetTestDirectory, "nginx:9.3.0.puml");
+    private static Path testOutputChartNamePngPath = Paths.get(targetTestDirectory, "nginx:9.3.0.png");
+    private static Path testOutputChartUrlPumlPath = Paths.get(targetTestDirectory, urlBaseName.concat(".puml"));
+    private static Path testOutputChartUrlPngPath = Paths.get(targetTestDirectory, urlBaseName.concat(".png"));
     private static Path testOneFileZipPath = Paths.get("src/test/resource/test-onefile.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
     private static String testInputFilePath = "src/test/resource/test-chart-file.tgz";
@@ -78,7 +81,7 @@ public class ChartMapTest {
          * deleted anyway when the test is next run.
          */
         System.out.println("Test complete.  Any generated file can be found in "
-                .concat(Paths.get(TargetTestDirectory).toAbsolutePath().toString()));
+                .concat(Paths.get(targetTestDirectory).toAbsolutePath().toString()));
     }
 
     @BeforeAll
@@ -107,31 +110,31 @@ public class ChartMapTest {
         // the next test because the shaded
         // jar would have this updated dependency. Perhaps there is a better way
         String a[] = new String[] { "java", "-cp",
-                ".:../../resource/jar/helm-chartmap".concat(VersionSuffix).concat(".jar"),
+                ".:../../resource/jar/helm-chartmap".concat(versionSuffix).concat(".jar"),
                 "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-e",
                 "../../".concat(testEnvFilePath.toString()), "-o", OutputFile };
         // normal case calling main as a new process
-        Process p = Runtime.getRuntime().exec(a, null, new File(TargetTestDirectory.toString()));
+        Process p = Runtime.getRuntime().exec(a, null, new File(targetTestDirectory.toString()));
         p.waitFor(30000, TimeUnit.MILLISECONDS);
         assertEquals(0, p.exitValue());
-        assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
-        Files.deleteIfExists(Paths.get(TargetTestDirectory, OutputFile));
+        assertTrue(Files.exists(Paths.get(targetTestDirectory, OutputFile)));
+        Files.deleteIfExists(Paths.get(targetTestDirectory, OutputFile));
         String[] b = new String[] { "-f", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(TargetTestDirectory, OutputFile).toString() };
+                Paths.get(targetTestDirectory, OutputFile).toString() };
         // normal case calling main directly
         ChartMap.main(b);
-        assertTrue(Files.exists(Paths.get(TargetTestDirectory, OutputFile)));
+        assertTrue(Files.exists(Paths.get(targetTestDirectory, OutputFile)));
         // bad env filename to force main exception handling
         String[] c = new String[] { "-f", testInputFilePath.toString(), "-e", "nofilehere.yaml", "-o",
-                Paths.get(TargetTestDirectory, OutputFile).toString() };
+                Paths.get(targetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(c));
         // test bad option
         String[] d = new String[] { "-B", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(TargetTestDirectory, OutputFile).toString() };
+                Paths.get(targetTestDirectory, OutputFile).toString() };
         assertThrows(ChartMapException.class, () -> ChartMap.main(d));
         // test two options
         String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(TargetTestDirectory, OutputFile).toString() };
+                testEnvFilePath.toString(), "-o", Paths.get(targetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             assertThrows(ChartMapException.class, () -> ChartMap.main(e));
@@ -140,7 +143,7 @@ public class ChartMapTest {
         }
         // test missing option
         String[] f = new String[] { testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(TargetTestDirectory, OutputFile).toString() };
+                Paths.get(targetTestDirectory, OutputFile).toString() };
         try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(mainTestOut));
             ChartMap.main(f);
@@ -405,6 +408,88 @@ public class ChartMapTest {
         // test a bad switches array
         assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[3]));
+    }
+
+    @Test
+    void helmConfigTest() throws ChartMapException, IOException, InterruptedException {
+
+        // environment variable combinations
+        assertEquals(0,
+                createProcess(
+                        new String[] { "HELM_CACHE_HOME", System.getenv("HELM_CACHE_HOME"), "HELM_CONFIG_HOME",
+                                System.getenv("HELM_CONFIG_HOME") },
+                        new String[] { "XDG_CACHE_HOME", "XDG_CONFIG_HOME" }));
+        assertEquals(0,
+                createProcess(
+                        new String[] { "HELM_CACHE_HOME", System.getenv("HELM_CACHE_HOME"), "XDG_CONFIG_HOME",
+                                System.getenv("XDG_CONFIG_HOME") },
+                        new String[] { "XDG_CACHE_HOME", "HELM_CONFIG_HOME" }));
+        assertEquals(0,
+                createProcess(
+                        new String[] { "XDG_CACHE_HOME", System.getenv("XDG_CACHE_HOME"), "HELM_CONFIG_HOME",
+                                System.getenv("HELM_CONFIG_HOME") },
+                        new String[] { "HELM_CACHE_HOME", "XDG_CONFIG_HOME" }));
+        assertEquals(0,
+                createProcess(
+                        new String[] { "XDG_CACHE_HOME", System.getenv("XDG_CACHE_HOME"), "XDG_CONFIG_HOME",
+                                System.getenv("XDG_CONFIG_HOME") },
+                        new String[] { "HELM_CACHE_HOME", "HELM_CONFIG_HOME" }));
+        if (SystemUtils.IS_OS_MAC) {
+            assertEquals(0,
+                    createProcess(
+                            new String[] { "HELM_CACHE_HOME", System.getenv("HOME").concat("/Library/Caches/helm"),
+                                    "HELM_CONFIG_HOME", System.getenv("HOME").concat("/Library/Preferences/helm") },
+                            new String[] { "XDG_CACHE_HOME", "XDG_CONFIG_HOME" }));
+            assertEquals(0,
+                    createProcess(
+                            new String[] { "XDG_CACHE_HOME", System.getenv("HOME").concat("/Library/Caches/helm"),
+                                    "XDG_CONFIG_HOME", System.getenv("HOME").concat("/Library/Preferences/helm") },
+                            new String[] { "HELM_CACHE_HOME", "HELM_CONFIG_HOME" }));
+            assertEquals(0,
+                    createProcess(
+                            new String[] { "HELM_CACHE_HOME", System.getenv("HOME").concat("/Library/Caches/helm"),
+                                    "XDG_CONFIG_HOME", System.getenv("HOME").concat("/Library/Preferences/helm") },
+                            new String[] { "XDG_CACHE_HOME", "HELM_CONFIG_HOME" }));
+            assertEquals(0,
+                    createProcess(
+                            new String[] { "XDG_CACHE_HOME", System.getenv("HOME").concat("/Library/Caches/helm"),
+                                    "HELM_CONFIG_HOME", System.getenv("HOME").concat("/Library/Preferences/helm") },
+                            new String[] { "HELM_CACHE_HOME", "XDG_CONFIG_HOME" }));
+        }
+        ChartMap cm = new ChartMap(ChartOption.URL,
+                "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz",
+                "cp-test.txt", null, new boolean[] { false, false, false, false });
+        final String cache = "foocache";
+        cm.setHelmCachePath(cache);
+        assertEquals(cache, cm.getHelmCachePath());
+        final String config = "fooconfig";
+        cm.setHelmConfigPath(config);
+        assertEquals(config, cm.getHelmConfigPath());
+    }
+
+    int createProcess(String[] a, String[] r) throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp",
+                ".:../../resource/jar/helm-chartmap".concat(versionSuffix).concat(".jar"),
+                "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-e",
+                "../../".concat(testEnvFilePath.toString()), "-o", "cp-test.txt", "-v");
+        Map<String, String> v = pb.environment();
+        for (int i = 0; i < a.length / 2; i++) {
+            if (a[i] != null && a[i + 1] != null) {
+                v.put(a[i], a[i + 1]);
+            }
+        }
+        for (int i = 0; i < r.length; i++) {
+            if (r[i] == null) {
+                v.remove(r[i]);
+            }
+        }
+        pb.directory(new File(targetTestDirectory));
+        File log = new File("process.txt");
+        pb.redirectErrorStream(true);
+        pb.redirectOutput(Redirect.appendTo(log));
+        Process process = pb.start();
+        process.waitFor(5, TimeUnit.SECONDS);
+        return process.exitValue();
     }
 
     @Test

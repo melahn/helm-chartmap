@@ -53,7 +53,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.keyvalue.MultiKey;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -118,6 +117,7 @@ public class ChartMap {
     private static final String TEMP_DIR_ERROR = "Error creating temp directory: ";
     private static final String ERROR_WING = "Error <";
     private static final int PROCESS_TIMEOUT = 100000;
+    private static final String HELM_SUBDIR = "/helm";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -564,23 +564,46 @@ public class ChartMap {
      * 
      * The logic for finding the paths is derived from the rules explained in
      * https://helm.sh/docs/helm/helm/
+     * 
+     * @throws ChartMapException if either the cache or config directorie could
+     * not be found
      */
-    private void getHelmPaths() {
+    protected void getHelmPaths() throws ChartMapException{
+        constructHelmCachePath();
+        constructHelmConfigPath();
+    }
 
-        // If a HELM_*_HOME environment variable is set, it will be used
-        // Otherwise, the XDG variables will be used 
+    private void constructHelmCachePath() throws ChartMapException{
         helmCachePath = System.getenv("HELM_CACHE_HOME")!=null?System.getenv("HELM_CACHE_HOME"):System.getenv("XDG_CACHE_HOME");
-        helmConfigPath = System.getenv("HELM_CONFIG_HOME")!=null?System.getenv("HELM_CONFIG_HOME"):System.getenv("XDG_CONFIG_HOME");
-          // When no other location is set a default location will be used based on the operating system
-        if (SystemUtils.IS_OS_MAC_OSX) {
+        // When no other location is set, use a default location based on the operating system
+        if (helmCachePath == null && System.getenv("HOME") !=null) { // Mac OSX
             helmCachePath = System.getenv("HOME").concat("/Library/Caches/helm");
+        }
+        if (helmCachePath == null && System.getenv("HOME") !=null) { // Linux
+            helmCachePath = System.getenv("HOME").concat("/.cache/helm");
+        }
+        if (helmCachePath == null && System.getenv("TEMP") !=null) { // Windows
+            helmCachePath = System.getenv("TEMP").concat(HELM_SUBDIR);
+        }
+        if (helmCachePath == null) { // None of the above
+           logErrorAndThrow("Could not locate the helm Cache path. Check your installation of helm is complete.");
+        }
+    }
+
+    private void constructHelmConfigPath() throws ChartMapException{
+        helmConfigPath = System.getenv("HELM_CONFIG_HOME")!=null?System.getenv("HELM_CONFIG_HOME"):System.getenv("XDG_CONFIG_HOME");
+        // When no other location is set, use a default location based on the operating system
+        if (helmConfigPath == null && System.getenv("HOME") !=null) { // Mac OSX
             helmConfigPath = System.getenv("HOME").concat("/Library/Preferences/helm");
-         } else if (SystemUtils.IS_OS_LINUX) {
-            helmCachePath = System.getenv("HOME").concat(".cache/helm");
+        }
+        if (helmConfigPath == null && System.getenv("HOME") !=null) { // Linux
             helmConfigPath = System.getenv("HOME").concat("/.config/helm");
-        } else if (SystemUtils.IS_OS_WINDOWS) {
-            helmCachePath = System.getenv("TEMP").concat("/helm");
-            helmConfigPath = System.getenv("APPDATA").concat("/helm");
+        }
+        if (helmConfigPath == null && System.getenv("APPDATA") !=null) { // Windows
+            helmConfigPath = System.getenv("APPDATA").concat(HELM_SUBDIR);
+        }
+        if (helmConfigPath == null) { // None of the above
+           logErrorAndThrow("Could not locate the helm Config path. Check your installation of helm is complete.");
         }
     }
 
@@ -1884,96 +1907,112 @@ public class ChartMap {
 
     // Getters and Setters
 
-    private String getApprSpec() {
+    public String getApprSpec() {
         return apprSpec;
     }
 
-    private String getDefaultOutputFilename() {
-        return DEFAULT_OUTPUT_FILENAME;
+    public String getChartFilename() {
+        return chartFilename;
     }
 
-    protected void setChartName(String chartName) {
-        this.chartName = chartName;
+    protected void setChartFilename(String f) {
+        this.chartFilename = f;
     }
 
-    private String getChartName() {
+    protected void setChartName(String n) {
+        this.chartName = n;
+    }
+
+    public String getChartName() {
         return chartName;
     }
 
-    protected void setChartVersion(String chartVersion) {
-        this.chartVersion = chartVersion;
+    protected void setChartVersion(String v) {
+        this.chartVersion = v;
     }
 
-    private String getChartVersion() {
+    public String getChartVersion() {
         return chartVersion;
     }
 
-    private String getChartUrl() {
+    public String getChartUrl() {
         return chartUrl;
     }
 
-    private void setChartUrl(String chartUrl) {
-        this.chartUrl = chartUrl;
+    protected void setChartUrl(String u) {
+        this.chartUrl = u;
     }
 
-    protected boolean isVerbose() {
-        return verbose;
-    }
-
-    protected void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    protected boolean isDebug() {
+    public boolean isDebug() {
         return debug;
     }
 
-    protected void setDebug(boolean debug) {
-        this.debug = debug;
+    protected void setDebug(boolean d) {
+        this.debug = d;
     }
 
-    private void setOutputFilename(String outputFilename) {
-        this.outputFilename = outputFilename;
+    public String getDefaultOutputFilename() {
+        return DEFAULT_OUTPUT_FILENAME;
     }
 
-    private void setGenerateImage(boolean b) {
+    protected void setEnvFilename(String e) {
+        this.envFilename = e;
+    }
+
+    protected void setGenerateImage(boolean b) {
         this.generateImage = b;
     }
 
-    private String getTempDirName() {
-        return tempDirName;
+    public String getHelmCachePath() {
+        return helmCachePath;
     }
 
-    private void setTempDirName(String tempDirName) {
-        this.tempDirName = tempDirName;
-    } // keep private since this directory gets recursively removed and so its kinda
-      // dangerous
-
-    private boolean isRefreshLocalRepo() {
-        return refreshLocalRepo;
+    protected void setHelmCachePath(String s) {
+        helmCachePath = s;
     }
 
-    private void setRefreshLocalRepo(boolean refreshLocalRepo) {
-        this.refreshLocalRepo = refreshLocalRepo;
+    public String getHelmConfigPath() {
+        return helmConfigPath;
+    }
+
+    protected void setHelmConfigPath(String s) {
+        helmConfigPath = s;
+    }
+
+    protected void setOutputFilename(String o) {
+        this.outputFilename = o;
     }
 
     public PrintFormat getPrintFormat() {
         return printFormat;
     }
 
-    private void setPrintFormat(PrintFormat printFormat) {
-        this.printFormat = printFormat;
+    protected void setPrintFormat(PrintFormat p) {
+        this.printFormat = p;
     }
 
-    private String getChartFilename() {
-        return chartFilename;
+    public String getTempDirName() {
+        return tempDirName;
     }
 
-    private void setChartFilename(String chartFilename) {
-        this.chartFilename = chartFilename;
+    private void setTempDirName(String t) {
+        this.tempDirName = t;
+    } // keep private since this directory gets recursively removed and so its kinda
+      // dangerous
+
+    public boolean isRefreshLocalRepo() {
+        return refreshLocalRepo;
     }
 
-    private void setEnvFilename(String envFilename) {
-        this.envFilename = envFilename;
+    protected void setRefreshLocalRepo(boolean r) {
+        this.refreshLocalRepo = r;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    protected void setVerbose(boolean v) {
+        this.verbose = v;
     }
 }
