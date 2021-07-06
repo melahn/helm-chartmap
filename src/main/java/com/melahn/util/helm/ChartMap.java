@@ -62,9 +62,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
-
 public class ChartMap {
-
     private String apprSpec;
     private HelmChart chart;
     private String chartFilename;
