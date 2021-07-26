@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.melahn</groupId>
@@ -154,17 +152,17 @@
         <version>3.2.1</version>
         <configuration>
           <filters>
-              <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                      <exclude>module-info.class</exclude>
-                      <exclude>META-INF/*.SF</exclude>
-                      <exclude>META-INF/*.DSA</exclude>
-                      <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-              </filter>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>module-info.class</exclude>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
           </filters>
-      </configuration>  
+        </configuration>
         <executions>
           <execution>
             <phase>package</phase>
@@ -220,6 +218,7 @@
         </dependencies>
         <executions>
           <execution>
+            <?m2e execute onConfiguration?>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -294,32 +293,33 @@
             </configuration>
           </execution>
         </executions>
-       </plugin>
-       <!-- 
+      </plugin>
+      <!-- 
          TODO Remove after archive-extract is deployed to maven central 
        -->
-       <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
         <version>3.0.0-M1</version>
         <configuration>
-           <groupId>com.melahn</groupId>
-           <artifactId>archive-extract</artifactId>
-           <version>1.0.0-SNAPSHOT</version>
-           <packaging>jar</packaging>
-           <file>/Users/melahn/development/visualstudio/test-zip-slip/target/archive-extract-1.0.0-SNAPSHOT.jar</file>
-           <generatePom>true</generatePom>
+          <groupId>com.melahn</groupId>
+          <artifactId>archive-extract</artifactId>
+          <version>1.0.0-SNAPSHOT</version>
+          <packaging>jar</packaging>
+          <file>/Users/melahn/development/visualstudio/test-zip-slip/target/archive-extract-1.0.0-SNAPSHOT.jar</file>
+          <generatePom>true</generatePom>
         </configuration>
         <executions>
-           <execution>
-              <id>install-jar-lib</id>
-              <goals>
-                 <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-           </execution>
+          <execution>
+            <?m2e execute onConfiguration?>
+            <id>install-jar-lib</id>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
         </executions>
-     </plugin>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -363,7 +363,7 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.8.1</version>
-  </dependency>
+    </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
@@ -388,7 +388,7 @@
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>1.28</version>
-  </dependency>
+    </dependency>
     <dependency>
       <groupId>com.melahn</groupId>
       <artifactId>archive-extract</artifactId>
