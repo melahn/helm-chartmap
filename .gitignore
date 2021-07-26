@@ -6,6 +6,7 @@ hs_err_pid*
 .classpath
 .settings
 .project
+.factorypath
 
 # Intellij
 .idea/
