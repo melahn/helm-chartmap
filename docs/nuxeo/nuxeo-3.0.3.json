@@ -2,7 +2,7 @@
   "children": [{
     "repoHost": "docker.packages.nuxeo.com",
     "children": [],
-    "name": "nuxeo/nuxeo",
+    "name": "nuxeo/nuxeo:latest",
     "type": "image",
     "version": "latest"
   }],

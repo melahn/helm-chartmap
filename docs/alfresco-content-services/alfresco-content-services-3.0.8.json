@@ -16,16 +16,16 @@
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-transform-misc",
+      "name": "alfresco/alfresco-shared-file-store",
       "type": "image",
-      "version": "2.1.0"
+      "version": "0.5.3"
     },
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-shared-file-store",
+      "name": "alfresco/alfresco-transform-misc",
       "type": "image",
-      "version": "0.5.3"
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
@@ -37,16 +37,9 @@
     {
       "repoHost": "quay.io",
       "children": [],
-      "name": "alfresco/alfresco-transform-router",
+      "name": "alfresco/alfresco-transform-router:1.1.0",
       "type": "image",
       "version": "1.1.0"
-    },
-    {
-      "repoHost": "Docker Hub",
-      "children": [],
-      "name": "alfresco/alfresco-tika",
-      "type": "image",
-      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
@@ -54,6 +47,13 @@
       "name": "alfresco/alfresco-content-repository",
       "type": "image",
       "version": "6.2.0.2"
+    },
+    {
+      "repoHost": "Docker Hub",
+      "children": [],
+      "name": "alfresco/alfresco-tika",
+      "type": "image",
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
@@ -98,7 +98,7 @@
       "children": [{
         "repoHost": "quay.io",
         "children": [],
-        "name": "alfresco/alfresco-digital-workspace",
+        "name": "alfresco/alfresco-digital-workspace:1.4.0",
         "type": "image",
         "version": "1.4.0"
       }],
@@ -119,7 +119,7 @@
         {
           "repoHost": "quay.io",
           "children": [],
-          "name": "alfresco/service-sync",
+          "name": "alfresco/service-sync:3.3.1",
           "type": "image",
           "version": "3.3.1"
         },
@@ -152,48 +152,29 @@
       "version": "3.0.2"
     },
     {
+      "keywords": [
+        "search",
+        "search services",
+        "alfresco search services",
+        "insight",
+        "insight engine",
+        "alfresco insight engine"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "alfresco/alfresco-search-services",
+        "type": "image",
+        "version": "1.4.0"
+      }],
+      "name": "alfresco-search:1.0.3",
+      "description": "A Helm chart for deploying Alfresco Search",
+      "type": "chart",
+      "shortName": "alfresco-search",
+      "version": "1.0.3"
+    },
+    {
       "children": [
-        {
-          "maintainers": [
-            {
-              "name": "jackzampolin",
-              "email": "jack.zampolin@gmail.com"
-            },
-            {
-              "name": "mgoodness",
-              "email": "mgoodness@gmail.com"
-            },
-            {
-              "name": "chancez",
-              "email": "chance.zibolski@coreos.com"
-            }
-          ],
-          "keywords": [
-            "ingress",
-            "nginx"
-          ],
-          "children": [
-            {
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "k8s.gcr.io/defaultbackend",
-              "type": "image",
-              "version": "1.3"
-            },
-            {
-              "repoHost": "quay.io",
-              "children": [],
-              "name": "kubernetes-ingress-controller/nginx-ingress-controller",
-              "type": "image",
-              "version": "0.12.0"
-            }
-          ],
-          "name": "nginx-ingress:0.14.0",
-          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
-          "type": "chart",
-          "shortName": "nginx-ingress",
-          "version": "0.14.0"
-        },
         {
           "keywords": [
             "activemq",
@@ -256,6 +237,47 @@
           "type": "chart",
           "shortName": "alfresco-identity-service",
           "version": "1.1.0"
+        },
+        {
+          "maintainers": [
+            {
+              "name": "jackzampolin",
+              "email": "jack.zampolin@gmail.com"
+            },
+            {
+              "name": "mgoodness",
+              "email": "mgoodness@gmail.com"
+            },
+            {
+              "name": "chancez",
+              "email": "chance.zibolski@coreos.com"
+            }
+          ],
+          "keywords": [
+            "ingress",
+            "nginx"
+          ],
+          "children": [
+            {
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "k8s.gcr.io/defaultbackend",
+              "type": "image",
+              "version": "1.3"
+            },
+            {
+              "repoHost": "quay.io",
+              "children": [],
+              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
+              "type": "image",
+              "version": "0.12.0"
+            }
+          ],
+          "name": "nginx-ingress:0.14.0",
+          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
+          "type": "chart",
+          "shortName": "nginx-ingress",
+          "version": "0.14.0"
         }
       ],
       "name": "alfresco-infrastructure:4.1.1",
@@ -263,28 +285,6 @@
       "type": "chart",
       "shortName": "alfresco-infrastructure",
       "version": "4.1.1"
-    },
-    {
-      "keywords": [
-        "search",
-        "search services",
-        "alfresco search services",
-        "insight",
-        "insight engine",
-        "alfresco insight engine"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "alfresco/alfresco-search-services",
-        "type": "image",
-        "version": "1.4.0"
-      }],
-      "name": "alfresco-search:1.0.3",
-      "description": "A Helm chart for deploying Alfresco Search",
-      "type": "chart",
-      "shortName": "alfresco-search",
-      "version": "1.0.3"
     }
   ],
   "name": "alfresco-content-services:3.0.8",
