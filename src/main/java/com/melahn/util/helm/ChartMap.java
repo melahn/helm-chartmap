@@ -116,6 +116,10 @@ public class ChartMap {
     private static final String ERROR_WING = "Error <";
     private static final int PROCESS_TIMEOUT = 100000;
     private static final String HELM_SUBDIR = "/helm";
+    private static final String HOME = "HOME";
+    private static final String TEMP = "TEMP";
+    private static final String APPDATA = "APPDATA";
+    private static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -149,6 +153,7 @@ public class ChartMap {
      * Parses the command line and generates a Chart Map file
      *
      * @param arg The command line args
+     * @throws ChartMapException when an error occurs
      */
     public static void main(String[] arg) throws ChartMapException {
         ChartMap chartMap = new ChartMap();
@@ -567,38 +572,58 @@ public class ChartMap {
      * not be found
      */
     protected void getHelmPaths() throws ChartMapException{
-        constructHelmCachePath();
-        constructHelmConfigPath();
+        ChartUtil.OSType os = ChartUtil.getOSType(); 
+        logger.log(logLevelVerbose, "detected Operating system was {}", os);
+        constructHelmCachePath(os);
+        constructHelmConfigPath(os);
     }
 
-    private void constructHelmCachePath() throws ChartMapException{
+    private void constructHelmCachePath( ChartUtil.OSType os) throws ChartMapException {
         helmCachePath = System.getenv("HELM_CACHE_HOME")!=null?System.getenv("HELM_CACHE_HOME"):System.getenv("XDG_CACHE_HOME");
         // When no other location is set, use a default location based on the operating system
-        if (helmCachePath == null && System.getenv("HOME") !=null) { // Mac OSX
-            helmCachePath = System.getenv("HOME").concat("/Library/Caches/helm");
+        if (helmCachePath == null && os == ChartUtil.OSType.MACOS) { 
+            if (System.getenv(HOME) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            }
+            helmCachePath = System.getenv(HOME).concat("/Library/Caches/helm");
         }
-        if (helmCachePath == null && System.getenv("HOME") !=null) { // Linux
-            helmCachePath = System.getenv("HOME").concat("/.cache/helm");
+        if (helmCachePath == null && os == ChartUtil.OSType.LINUX) { 
+            if (System.getenv(HOME) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            }
+            helmCachePath = System.getenv(HOME).concat("/.cache/helm");
         }
-        if (helmCachePath == null && System.getenv("TEMP") !=null) { // Windows
-            helmCachePath = System.getenv("TEMP").concat(HELM_SUBDIR);
+        if (helmCachePath == null && os == ChartUtil.OSType.WINDOWS) { 
+            if (System.getenv(TEMP) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, TEMP));
+            }
+            helmCachePath = System.getenv(TEMP).concat(HELM_SUBDIR);
         }
         if (helmCachePath == null) { // None of the above
            logErrorAndThrow("Could not locate the helm Cache path. Check your installation of helm is complete.");
         }
     }
 
-    private void constructHelmConfigPath() throws ChartMapException{
+    private void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException{
         helmConfigPath = System.getenv("HELM_CONFIG_HOME")!=null?System.getenv("HELM_CONFIG_HOME"):System.getenv("XDG_CONFIG_HOME");
         // When no other location is set, use a default location based on the operating system
-        if (helmConfigPath == null && System.getenv("HOME") !=null) { // Mac OSX
-            helmConfigPath = System.getenv("HOME").concat("/Library/Preferences/helm");
+        if (helmConfigPath == null && os == ChartUtil.OSType.MACOS) { 
+            if (System.getenv(HOME) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            }
+            helmConfigPath = System.getenv(HOME).concat("/Library/Preferences/helm");
         }
-        if (helmConfigPath == null && System.getenv("HOME") !=null) { // Linux
+        if (helmConfigPath == null && os == ChartUtil.OSType.LINUX) { 
+            if (System.getenv(HOME) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            }
             helmConfigPath = System.getenv("HOME").concat("/.config/helm");
         }
-        if (helmConfigPath == null && System.getenv("APPDATA") !=null) { // Windows
-            helmConfigPath = System.getenv("APPDATA").concat(HELM_SUBDIR);
+        if (helmConfigPath == null && os == ChartUtil.OSType.WINDOWS) { 
+            if (System.getenv(APPDATA) == null) {
+                logErrorAndThrow(String.format(CHECK_OS_MSG, APPDATA));
+            }
+            helmConfigPath = System.getenv(APPDATA).concat(HELM_SUBDIR);
         }
         if (helmConfigPath == null) { // None of the above
            logErrorAndThrow("Could not locate the helm Config path. Check your installation of helm is complete.");

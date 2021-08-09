@@ -1,5 +1,6 @@
 package com.melahn.util.helm;
 
+import java.util.Locale;
 import java.util.Map;
 
 public final class ChartUtil {
@@ -67,6 +68,36 @@ public final class ChartUtil {
             return k.substring(k.indexOf('.') + 1, k.length()); // pop the last segment off the key string
         } else {
             return "";
+        }
+    }
+
+    public enum OSType {
+        WINDOWS, MACOS, LINUX, OTHER
+      }
+
+    /**
+     * Used to derive the current OS using the os.name
+     * system property.  I use this instead of SystemUtils
+     * because I want to be able to set the OS name dynamically
+     * using a system property to allow for or more complete 
+     * test coverage.
+     * 
+     * I don't cache the value in this class because I wamt to be able to 
+     * spoof other OS types than the real type, again for
+     * test purposes.
+     * 
+     * @return the operating system 
+     */
+    public static OSType getOSType() {
+        String s = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);  // no default
+        if (s.indexOf("mac") >= 0)  {
+            return OSType.MACOS;
+        } else if (s.indexOf("win") >= 0) { // ignore darwin
+            return OSType.WINDOWS;
+        } else if (s.indexOf("nux") >= 0) {
+            return OSType.LINUX;
+        } else {
+            return OSType.OTHER;
         }
     }
 }

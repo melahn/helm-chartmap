@@ -1,7 +1,6 @@
 package com.melahn.util.helm;
 
-import java.io.IOException;
-
+import static com.melahn.util.test.ChartMapTestUtil.logContains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -13,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
@@ -32,15 +32,12 @@ import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
-import com.melahn.util.test.ChartMapTestUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class ChartMapTest {
+public class ChartMapIntegrationTest {
         // needed for main test; it would be nice not to get from the pom instead
         private static String versionSuffix = "-1.0.3-SNAPSHOT"; 
         private static String targetTestDirectory = Paths.get("target/test").toString();
@@ -72,32 +69,6 @@ public class ChartMapTest {
         private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
         private static String testChartUrl = "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz";
         private final PrintStream initialOut = System.out;
-
-        @AfterAll
-        public static void cleanUp() {
-                /**
-                 * No cleanup to do after test. I don't delete the generated files because they
-                 * might be handy to have around to diagnose issues in test failures. They are
-                 * deleted anyway when the test is next run.
-                 */
-                System.out.println("Test complete.  Any generated file can be found in "
-                                .concat(Paths.get(targetTestDirectory).toAbsolutePath().toString()));
-        }
-
-        @BeforeAll
-        public static void setUp() {
-                try {
-                        if (!Files.exists(Paths.get(".", testInputFilePath))) {
-                                throw new Exception(
-                                                String.format("test Input File %s does not exist", testInputFilePath));
-                        }
-                        ChartMapTestUtil.cleanDirectory(testOutputPumlFilePathRV.getParent());
-                        Files.createDirectories(testOutputPumlFilePathRV.getParent());
-                } catch (Exception e) {
-                        fail("Test setup failed: " + e.getMessage());
-                }
-                System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
-        }
 
         @Test
         void chartMapMainTest() throws ChartMapException, IOException, InterruptedException {
@@ -674,16 +645,5 @@ public class ChartMapTest {
 
         private boolean getFound() {
                 return found;
-        }
-
-        /**
-         * Answers true if the log contains a particular entry
-         * 
-         * @param baos the log
-         * @param s    entry being looked for
-         * @return true if the log contains s, false otherwise
-         */
-        private boolean logContains(ByteArrayOutputStream baos, String s) {
-                return baos.toString().contains(s);
         }
 }
