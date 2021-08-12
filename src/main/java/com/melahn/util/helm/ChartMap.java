@@ -62,38 +62,39 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
+
 public class ChartMap {
     private String apprSpec;
     private HelmChart chart;
-    private String chartFilename;
-    private ChartKeyMap charts;
-    private String chartName;
+    private String chartFilename = null;
+    private ChartKeyMap charts = new ChartKeyMap();
+    private String chartName = null;
     private String chartVersion;
-    private String chartUrl;
-    HashSet<String> chartsDependenciesPrinted;
-    protected ChartKeyMap chartsReferenced;
-    private boolean debug;
-    private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced;
-    private String envFilename;
-    HashSet<String> env;
-    private boolean generateImage;
+    private String chartUrl = null;
+    HashSet<String> chartsDependenciesPrinted = new HashSet<>();
+    protected ChartKeyMap chartsReferenced = new ChartKeyMap();
+    private boolean debug = false;
+    private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced = new HashMap<>();
+    private String envFilename = null;
+    HashSet<String> env = new HashSet<>();
+    private boolean generateImage =false;
     private String helmCommand;
     private String helmCachePath;
     private String helmConfigPath;
-    protected HashSet<String> imagesReferenced;
+    protected HashSet<String> imagesReferenced = new HashSet<>();
     private HelmChartReposLocal localRepos;
-    private static final String CHARTMAP_DEBUG = "CHARTMAP_DEBUG";
-    private static final String CHARTMAP_VERBOSE = "CHARTMAP_VERBOSE";
-    protected final Logger logger = LogManager.getLogger("chartmap");
-    protected Level logLevelDebug;
-    protected Level logLevelVerbose;
-    private String outputFilename;
-    private PrintFormat printFormat;
+    private String chartMapDebug = "CHARTMAP_DEBUG";
+    private String chartMapVerbose = "CHARTMAP_VERBOSE";
+    protected Logger logger; 
+    private Level logLevelDebug;
+    private Level logLevelVerbose;
+    private String outputFilename = DEFAULT_OUTPUT_FILENAME;
+    private PrintFormat printFormat = PrintFormat.TEXT;
     private IChartMapPrinter printer;
-    private boolean refreshLocalRepo;
+    private boolean refreshLocalRepo = false;
     private static final String START_OF_TEMPLATE = "# Source: ";
-    private String tempDirName;
-    private boolean verbose;
+    private String tempDirName = null;
+    private boolean verbose = false;
     private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of
                                                                                     // the file we use to hold the
                                                                                     // rendered templates
@@ -162,7 +163,8 @@ public class ChartMap {
                 chartMap.print();
             }
         } catch (ChartMapException e) {
-            chartMap.logger.error("ChartMapException:".concat(e.getMessage()));
+            Logger logger = chartMap.logger == null?LogManager.getLogger():chartMap.logger;
+            logger.error("ChartMapException:".concat(e.getMessage()));
             throw e;
         }
     }
@@ -187,11 +189,10 @@ public class ChartMap {
      * @throws ChartMapException when an error occurs creating the chart map
      **/
 
-    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename,
-            boolean[] switches) throws ChartMapException {
-        initialize();
+    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, boolean[] switches)
+            throws ChartMapException {
         ArrayList<String> args = new ArrayList<>();
-        parseOption(args, option);
+        addOptionsToArgs(args, option);
         args.add(chart);
         if (envFilename != null) {
             args.add("-e");
@@ -204,18 +205,18 @@ public class ChartMap {
                 throw new ChartMapException("Null parameter");
             }
         }
-        parseSwitches(args, switches);
+        addSwitchesToArgs(args, switches);
         parseArgs(args.toArray(new String[args.size()]));
     }
 
     /**
-     * sets the value of the chart option in the array list
+     * Sets the value of the chart option in the commandline array.
      * 
      * @param a the array list
      * @param o the chart option (e.g. APPRSPEC)
      * @throws ChartMapException if a null is passed as the option
      */
-    private void parseOption(ArrayList<String> a, ChartOption o) throws ChartMapException {
+    private void addOptionsToArgs(ArrayList<String> a, ChartOption o) throws ChartMapException {
 
         if (o == null) {
             throw new ChartMapException("Invalid Option Specification");
@@ -231,12 +232,12 @@ public class ChartMap {
     }
 
     /**
-     * Parses the command line switches and sets args
+     * Parses the switches array and adds them to the command line args.
      * 
      * @param args
      * @param switches
      */
-    private void parseSwitches(ArrayList<String> a, boolean[] s) throws ChartMapException {
+    private void addSwitchesToArgs(ArrayList<String> a, boolean[] s) throws ChartMapException {
         if (s.length != 4) {
             throw new ChartMapException("Switches are invalid. There should be four of them.");
         }
@@ -262,6 +263,8 @@ public class ChartMap {
      * @throws ChartMapException if an error occurs during print
      */
     public void print() throws ChartMapException {
+        setLogLevel();
+        setHelmEnvironment();
         createTempDir();
         loadLocalRepos();
         resolveChartDependencies();
@@ -269,39 +272,18 @@ public class ChartMap {
         removeTempDir();
     }
 
-    private ChartMap() throws ChartMapException {
-        initialize();
-    }
-
     /**
-     * Initializes the instance variables
-     * 
-     * @throws ChartMapException if the helm version is not supported
+     * Default constructor.
      */
-    private void initialize() throws ChartMapException {
-        setChartName(null);
-        setOutputFilename(getDefaultOutputFilename());
-        setChartFilename(null);
-        setChartUrl(null);
-        setVerbose(false);
-        helmCommand = getHelmCommand();
-        checkHelmVersion();
-        getHelmPaths();
-        setEnvFilename(null);
-        setTempDirName(null);
-        setPrintFormat(PrintFormat.TEXT);
-        setGenerateImage(false);
-        setRefreshLocalRepo(false);
-        charts = new ChartKeyMap();
-        chartsDependenciesPrinted = new HashSet<>();
-        chartsReferenced = new ChartKeyMap();
-        env = new HashSet<>();
-        imagesReferenced = new HashSet<>();
-        deploymentTemplatesReferenced = new HashMap<>();
+    private ChartMap() {
     }
 
     /**
-     * Parse the command line args
+     * Parse the command line args.
+     * 
+     *  At this point we haven't creqted the logger yet because we haven't parsed the commmand
+     *  line to get the verbose and debug flags which later would have affected what gets logged
+     *  se we use a logger just for help and error handling when needed.
      *
      * @param args command line args
      * @return boolean true if processing should continue, false otherwise
@@ -315,13 +297,12 @@ public class ChartMap {
             int count = parseOptions(cmd);
             parseSwitches(cmd);
             if (args.length == 0 || cmd.hasOption("h") || count == 0) {
-                logger.info(ChartMap.getHelp());
+                LogManager.getLogger().info(ChartMap.getHelp());
                 return false;
             }
-            setLogLevel();
             return true;
         } catch (ParseException e) {
-            logger.error(e.getMessage());
+            LogManager.getLogger().error(e.getMessage()); 
             throw new ChartMapException(String.format("Parse Exception: %s", e.getMessage()));
         }
     }
@@ -414,19 +395,28 @@ public class ChartMap {
      * number so verbose log entries will be ignored.
      * 
      * Note that log4j will ignore the integer values if the level already exists so
-     * there is no point in calling this method twice or initiatializing the Levels
-     * when they are declared
+     * there is no point in calling this method twice or initializing the Levels
+     * when they are declared.
+     * 
+     * The reason for the timestamped value for the levels is that they are static
+     * in Log4j2 and this can cause issues across multiple usages of ChartMap if a common 
+     * name is used with some pretty hard to debug problems.  This can be seen for example 
+     * in Junit tests when different debug and verbose levels are used in different tests.
      */
     protected void setLogLevel() {
+        String t = String.valueOf(System.currentTimeMillis());
+        chartMapDebug = chartMapDebug.concat(t);
+        chartMapVerbose = chartMapVerbose.concat(t);
+        logger = LogManager.getLogger(t);
         if (isDebug()) {
-            logLevelDebug = Level.forName(CHARTMAP_DEBUG, 350); // higher priority than INFO
+            logLevelDebug = Level.forName(chartMapDebug, 350); // higher priority than INFO
         } else {
-            logLevelDebug = Level.forName(CHARTMAP_DEBUG, 450); // lower priority than INFO
+            logLevelDebug = Level.forName(chartMapDebug, 450); // lower priority than INFO
         }
         if (isVerbose()) {
-            logLevelVerbose = Level.forName(CHARTMAP_VERBOSE, 350); // higher priority than INFO
+            logLevelVerbose = Level.forName(chartMapVerbose, 350); // higher priority than INFO
         } else {
-            logLevelVerbose = Level.forName(CHARTMAP_VERBOSE, 450); // lower priority than INFO
+            logLevelVerbose = Level.forName(chartMapVerbose, 450); // lower priority than INFO
         }
     }
 
@@ -514,9 +504,9 @@ public class ChartMap {
             // in helm v2, the cache location was set but in v3, it must be synthesized from
             // an OS specific location
             HelmChartRepoLocal[] repos = localRepos.getRepositories();
-            String cacheDirname = helmCachePath.concat("/repository/");
+            String cacheDirname = getHelmCachePath().concat("/repository/");
             for (HelmChartRepoLocal r : repos) {
-               r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
+                r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
             }
             printLocalRepos();
             loadLocalCharts();
@@ -531,7 +521,7 @@ public class ChartMap {
      * The helm version command offers templated output using go template syntax but
      * the values were not designed to be forward or backward compatible (!) hence
      * the tortured logic here
-
+     * 
      * @throws ChartMapException if a version other than V3 is found
      */
     private void checkHelmVersion() throws ChartMapException {
@@ -547,7 +537,8 @@ public class ChartMap {
                     logger.log(logLevelDebug, "Helm Version 3 detected");
                     return;
                 }
-                throw new ChartMapException("Unsupported Helm Version. Please upgrade to helm V3 or use a previous version of ChartMap.");
+                throw new ChartMapException(
+                        "Unsupported Helm Version. Please upgrade to helm V3 or use a previous version of ChartMap.");
             } else { // we could not even execute the helm command
                 throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0]
                         + cmdArray[1] + cmdArray[2] + cmdArray[3]);
@@ -555,7 +546,7 @@ public class ChartMap {
         } catch (IOException e) {
             // we could not get the output of the helm command
             throw new ChartMapException(
-                    String.format("Exception trying to discover Helm Version: %s ", e.getMessage())); 
+                    String.format("Exception trying to discover Helm Version: %s ", e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
@@ -563,70 +554,85 @@ public class ChartMap {
     }
 
     /**
-     * Finds the helm cache and configuration paths. 
+     * Sets the helm information, include the helm command, version and paths.
+     * 
+     * @throws ChartMapException if any of the helm information cannot be set
+     */
+    void setHelmEnvironment() throws ChartMapException {
+        helmCommand = getHelmCommand();
+        checkHelmVersion();
+        getHelmPaths();
+    }
+
+    /**
+     * Finds the helm cache and configuration paths.
      * 
      * The logic for finding the paths is derived from the rules explained in
      * https://helm.sh/docs/helm/helm/
      * 
-     * @throws ChartMapException if either the cache or config directorie could
-     * not be found
+     * @throws ChartMapException if either the cache or config directorie could not
+     *                           be found
      */
-    protected void getHelmPaths() throws ChartMapException{
-        ChartUtil.OSType os = ChartUtil.getOSType(); 
+    protected void getHelmPaths() throws ChartMapException {
+        ChartUtil.OSType os = ChartUtil.getOSType();
         logger.log(logLevelVerbose, "detected Operating system was {}", os);
         constructHelmCachePath(os);
         constructHelmConfigPath(os);
     }
 
-    private void constructHelmCachePath( ChartUtil.OSType os) throws ChartMapException {
-        helmCachePath = System.getenv("HELM_CACHE_HOME")!=null?System.getenv("HELM_CACHE_HOME"):System.getenv("XDG_CACHE_HOME");
-        // When no other location is set, use a default location based on the operating system
-        if (helmCachePath == null && os == ChartUtil.OSType.MACOS) { 
+    private void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
+        setHelmCachePath(System.getenv("HELM_CACHE_HOME") != null ? System.getenv("HELM_CACHE_HOME")
+                : System.getenv("XDG_CACHE_HOME"));
+        // When no other location is set, use a default location based on the operating
+        // system
+        if (getHelmCachePath() == null && os == ChartUtil.OSType.MACOS) {
             if (System.getenv(HOME) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
             }
             helmCachePath = System.getenv(HOME).concat("/Library/Caches/helm");
         }
-        if (helmCachePath == null && os == ChartUtil.OSType.LINUX) { 
+        if (getHelmCachePath() == null && os == ChartUtil.OSType.LINUX) {
             if (System.getenv(HOME) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
             }
-            helmCachePath = System.getenv(HOME).concat("/.cache/helm");
+            setHelmCachePath(System.getenv(HOME).concat("/.cache/helm"));
         }
-        if (helmCachePath == null && os == ChartUtil.OSType.WINDOWS) { 
+        if (getHelmCachePath() == null && os == ChartUtil.OSType.WINDOWS) {
             if (System.getenv(TEMP) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, TEMP));
             }
-            helmCachePath = System.getenv(TEMP).concat(HELM_SUBDIR);
+            setHelmCachePath(System.getenv(TEMP).concat(HELM_SUBDIR));
         }
-        if (helmCachePath == null) { // None of the above
-           logErrorAndThrow("Could not locate the helm Cache path. Check your installation of helm is complete.");
+        if (getHelmCachePath() == null) { // None of the above
+            logErrorAndThrow("Could not locate the helm Cache path. Check your installation of helm is complete.");
         }
     }
 
-    private void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException{
-        helmConfigPath = System.getenv("HELM_CONFIG_HOME")!=null?System.getenv("HELM_CONFIG_HOME"):System.getenv("XDG_CONFIG_HOME");
-        // When no other location is set, use a default location based on the operating system
-        if (helmConfigPath == null && os == ChartUtil.OSType.MACOS) { 
+    private void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
+        setHelmConfigPath(System.getenv("HELM_CONFIG_HOME") != null ? System.getenv("HELM_CONFIG_HOME")
+                : System.getenv("XDG_CONFIG_HOME"));
+        // When no other location is set, use a default location based on the operating
+        // system
+        if (getHelmConfigPath() == null && os == ChartUtil.OSType.MACOS) {
             if (System.getenv(HOME) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
             }
-            helmConfigPath = System.getenv(HOME).concat("/Library/Preferences/helm");
+            setHelmConfigPath(System.getenv(HOME).concat("/Library/Preferences/helm"));
         }
-        if (helmConfigPath == null && os == ChartUtil.OSType.LINUX) { 
+        if (getHelmConfigPath() == null && os == ChartUtil.OSType.LINUX) {
             if (System.getenv(HOME) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
             }
-            helmConfigPath = System.getenv("HOME").concat("/.config/helm");
+            setHelmConfigPath(System.getenv("HOME").concat("/.config/helm"));
         }
-        if (helmConfigPath == null && os == ChartUtil.OSType.WINDOWS) { 
+        if (getHelmConfigPath() == null && os == ChartUtil.OSType.WINDOWS) {
             if (System.getenv(APPDATA) == null) {
                 logErrorAndThrow(String.format(CHECK_OS_MSG, APPDATA));
             }
-            helmConfigPath = System.getenv(APPDATA).concat(HELM_SUBDIR);
+            setHelmConfigPath(System.getenv(APPDATA).concat(HELM_SUBDIR));
         }
-        if (helmConfigPath == null) { // None of the above
-           logErrorAndThrow("Could not locate the helm Config path. Check your installation of helm is complete.");
+        if (getHelmConfigPath() == null) { // None of the above
+            logErrorAndThrow("Could not locate the helm Config path. Check your installation of helm is complete.");
         }
     }
 
@@ -1896,25 +1902,21 @@ public class ChartMap {
      * switch was set
      */
     private void removeTempDir() throws ChartMapException {
-        if (isDebug()) {
-            logger.log(logLevelDebug, "{} {} was not removed", TEMP_DIR, getTempDirName());
-        } else {
-            try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()))) {
-                s.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary item ",
-                                p.getFileName());
-                    }
-                });
-            } catch (IOException e) {
-                logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary directory ",
-                        getTempDirName());
-                throw new ChartMapException(e.getMessage());
-            }
-            logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
+        logger.log(logLevelDebug, "{} {} was not removed because this is debug mode", TEMP_DIR, getTempDirName());
+        try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()))) {
+            s.sorted(Comparator.reverseOrder()).forEach(p -> {
+                try {
+                    Files.delete(p);
+                } catch (IOException e) {
+                    logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary item ",
+                            p.getFileName());
+                }
+            });
+        } catch (IOException e) {
+            logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary directory ", getTempDirName());
+            throw new ChartMapException(e.getMessage());
         }
+        logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
     }
 
     /**

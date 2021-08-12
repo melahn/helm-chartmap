@@ -2,14 +2,16 @@ package com.melahn.util.helm;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.Set;
 
-import com.melahn.util.helm.model.HelmMaintainer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.melahn.util.helm.model.HelmChart;
+import com.melahn.util.helm.model.HelmMaintainer;
 
 public class ChartMapPrinter implements IChartMapPrinter {
 
@@ -30,7 +32,8 @@ public class ChartMapPrinter implements IChartMapPrinter {
         try {
             writer = new FileWriter(outputFilename);
         } catch (IOException e) {
-            chartMap.logger.error("{}{}{}{}", "Error creating FileWriter for file ", outputFilename, " : ",
+            Logger logger = chartMap.logger == null?LogManager.getLogger():chartMap.logger;
+            logger.error("{}{}{}{}", "Error creating FileWriter for file ", outputFilename, " : ",
                     e.getMessage());
             throw new ChartMapException(e.getMessage());
         }
@@ -41,7 +44,8 @@ public class ChartMapPrinter implements IChartMapPrinter {
             writer.write(l + "\n");
             writer.flush();
         } catch (IOException e) {
-            chartMap.logger.error("{}{}", "Error writing line to file ", outputFilename);
+            Logger logger = chartMap.logger == null?LogManager.getLogger():chartMap.logger;
+            logger.error("{}{}", "Error writing line to file ", outputFilename);
             throw new ChartMapException(e.getMessage());
         }
     }
