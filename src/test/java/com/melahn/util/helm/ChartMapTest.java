@@ -1,7 +1,5 @@
 package com.melahn.util.helm;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -13,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class ChartMapTest {
     // needed for main test; it would be nice not to get from the pom instead
@@ -552,6 +553,27 @@ public class ChartMapTest {
             System.out.println("Second ChartMapException expected and thrown");
             assertFalse(false);
         }
+        // test case where the ChartMap logger is null and the ChartMapPrinter needs to create its own
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
+        false, false);
+        cm.logger = null;
+        cmp = new ChartMapPrinter(cm, f.toString(), null, null);
+        String nl = "null logger";
+        cmp.writeLine(nl);
+        assertTrue(fileContains(f, nl));
+        // force IOException to ChartMapException with a ChartMap with a null logger
+        assertThrows(ChartMapException.class, () ->  new ChartMapPrinter(cm, "/", null, null));
+        System.out.println("Third ChartMapException expected and thrown");
+        // force IOException using mocking
+        FileWriter mockedFileWriter;
+        mockedFileWriter = Mockito.mock(FileWriter.class);
+        Mockito.doThrow(new IOException("IO Exception occured")).when(mockedFileWriter).write(Mockito.anyString());
+        ChartMapPrinter cmp2 = new ChartMapPrinter(cm, f.toString(), null, null);
+        cmp2.writer = mockedFileWriter;
+        assertThrows(ChartMapException.class, () -> {
+            cm.logger = null;
+            cmp2.writeLine("IO Exception");
+        });
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
