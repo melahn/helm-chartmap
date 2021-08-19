@@ -189,7 +189,6 @@ public class ChartMapTest {
      * Tests the protected method ChartMap.unpackTestChart
      * 
      * @throws ChartMapException
-     * 
      * @throws IOException
      */
     @Test
@@ -230,22 +229,23 @@ public class ChartMapTest {
     }
 
     /**
-     * Tests some utility methods in ChartMap
-     * 
-     * @throws IOException
+     * Tests some utility methods in ChartMap.
      * 
      * @throws ChartMapException
+     * @throws IOException
      */
 
     @Test
     void utilityMethodsTest() throws IOException, ChartMapException {
-        Path d = Paths.get("./target");
-        String b = ChartMap.getBaseName(d.toString());
+        String b = ChartMap.getBaseName(Paths.get("./target").toString());
         assertEquals(null, b);
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
-        cm.print();
+        cm.print(); 
         assertEquals(PrintFormat.PLANTUML, cm.getPrintFormat());
+        cm.setPrintFormat(PrintFormat.JSON);
+        assertEquals(PrintFormat.JSON, cm.getPrintFormat());
+        assertEquals("chartmap.text", cm.getDefaultOutputFilename());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
