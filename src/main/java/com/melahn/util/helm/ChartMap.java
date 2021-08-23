@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.melahn.util.extract.ArchiveExtract;
 import com.melahn.util.helm.model.EnvironmentSpecification;
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartLocalCache;
@@ -44,7 +46,6 @@ import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 import com.melahn.util.helm.model.HelmRequirement;
 import com.melahn.util.helm.model.HelmRequirements;
-import com.melahn.util.extract.ArchiveExtract;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -77,7 +78,7 @@ public class ChartMap {
     private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced = new HashMap<>();
     private String envFilename = null;
     HashSet<String> env = new HashSet<>();
-    private boolean generateImage =false;
+    private boolean generateImage = false;
     private String helmCommand;
     private String helmCachePath;
     private String helmConfigPath;
@@ -85,7 +86,7 @@ public class ChartMap {
     private HelmChartReposLocal localRepos;
     private String chartMapDebug = "CHARTMAP_DEBUG";
     private String chartMapVerbose = "CHARTMAP_VERBOSE";
-    protected Logger logger; 
+    protected Logger logger;
     private Level logLevelDebug;
     private Level logLevelVerbose;
     private String outputFilename = DEFAULT_OUTPUT_FILENAME;
@@ -103,7 +104,6 @@ public class ChartMap {
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
-    private static final String LOG_FORMAT_5 = "{}{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
     private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
     private static final int GENERATE_SWITCH = 0;
@@ -113,8 +113,7 @@ public class ChartMap {
     private static final String CHART_YAML = "Chart.yaml";
     private static final String CHARTS_DIR_NAME = "charts";
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    private static final String TEMP_DIR_ERROR = "Error creating temp directory: ";
-    private static final String ERROR_WING = "Error <";
+    private static final String TEMP_DIR_ERROR = "IOException creating temp directory";
     private static final int PROCESS_TIMEOUT = 100000;
     private static final String HELM_SUBDIR = "/helm";
     private static final String HOME = "HOME";
@@ -163,7 +162,7 @@ public class ChartMap {
                 chartMap.print();
             }
         } catch (ChartMapException e) {
-            Logger logger = chartMap.logger == null?LogManager.getLogger():chartMap.logger;
+            Logger logger = chartMap.logger == null ? LogManager.getLogger() : chartMap.logger;
             logger.error("ChartMapException:".concat(e.getMessage()));
             throw e;
         }
@@ -281,9 +280,10 @@ public class ChartMap {
     /**
      * Parse the command line args.
      * 
-     *  At this point we haven't creqted the logger yet because we haven't parsed the commmand
-     *  line to get the verbose and debug flags which later would have affected what gets logged
-     *  se we use a logger just for help and error handling when needed.
+     * At this point we haven't creqted the logger yet because we haven't parsed the
+     * commmand line to get the verbose and debug flags which later would have
+     * affected what gets logged se we use a logger just for help and error handling
+     * when needed.
      *
      * @param args command line args
      * @return boolean true if processing should continue, false otherwise
@@ -302,7 +302,7 @@ public class ChartMap {
             }
             return true;
         } catch (ParseException e) {
-            LogManager.getLogger().error(e.getMessage()); 
+            LogManager.getLogger().error(e.getMessage());
             throw new ChartMapException(String.format("Parse Exception: %s", e.getMessage()));
         }
     }
@@ -399,9 +399,10 @@ public class ChartMap {
      * when they are declared.
      * 
      * The reason for the timestamped value for the levels is that they are static
-     * in Log4j2 and this can cause issues across multiple usages of ChartMap if a common 
-     * name is used with some pretty hard to debug problems.  This can be seen for example 
-     * in Junit tests when different debug and verbose levels are used in different tests.
+     * in Log4j2 and this can cause issues across multiple usages of ChartMap if a
+     * common name is used with some pretty hard to debug problems. This can be seen
+     * for example in Junit tests when different debug and verbose levels are used
+     * in different tests.
      */
     protected void setLogLevel() {
         String t = String.valueOf(System.currentTimeMillis());
@@ -864,7 +865,7 @@ public class ChartMap {
             } catch (Exception e) {
                 throw new RuntimeException(e); // NOSONAR
                                                // using a generic exception is a code smell but there is no avoiding
-                                               // because of labda functions poor exception handling ... look at
+                                               // because of lambda functions poor exception handling ... look at
                                                // removing the lambda
             }
         };
@@ -1891,9 +1892,8 @@ public class ChartMap {
             setTempDirName(p.toAbsolutePath().toString() + File.separator);
             logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(),
                     " will be used as the temporary directory.");
-        } catch (Exception e) {
-            logger.error(LOG_FORMAT_2, TEMP_DIR_ERROR, e.getMessage());
-            throw new ChartMapException(String.format(TEMP_DIR_ERROR + "%s", e.getMessage()));
+        } catch (IOException e) {
+            throw new ChartMapException(String.format(TEMP_DIR_ERROR));
         }
     }
 
@@ -1901,24 +1901,20 @@ public class ChartMap {
      * Removes the temporary directory created by createTempDir() unless the debug
      * switch was set
      */
-    private void removeTempDir() throws ChartMapException {
-        logger.log(logLevelDebug, "{} {} was not removed because this is debug mode", TEMP_DIR, getTempDirName());
-        try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()))) {
-            s.sorted(Comparator.reverseOrder()).forEach(p -> {
-                try {
-                    Files.delete(p);
-                } catch (IOException e) {
-                    logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary item ",
-                            p.getFileName());
-                }
-            });
-        } catch (IOException e) {
-            logger.error(LOG_FORMAT_5, ERROR_WING, e.getMessage(), "> removing temporary directory ", getTempDirName());
-            throw new ChartMapException(e.getMessage());
+    protected void removeTempDir() throws ChartMapException {
+        if (isDebug()) {
+            logger.info("{} {} was not removed because this is debug mode", TEMP_DIR, getTempDirName());
+        } else {
+            try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()),FileVisitOption.FOLLOW_LINKS)) {
+                s.sorted(Comparator.reverseOrder()).forEach(lambdaExceptionWrapper(Files::delete));
+            }
+            catch (IOException e) {
+                logger.error(LOG_FORMAT_2, "IO Exception walking temporary directory ", getTempDirName());
+                throw new ChartMapException(e.getMessage());
+            }
+            logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
         }
-        logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
     }
-
     /**
      * Logs an error and throws a ChartMapException
      * 

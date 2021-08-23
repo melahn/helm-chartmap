@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,6 +43,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class ChartMapTest {
@@ -172,7 +177,7 @@ public class ChartMapTest {
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV,
-            false, false, false, false);
+                false, false, false, false);
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
@@ -236,17 +241,46 @@ public class ChartMapTest {
      */
 
     @Test
-    void utilityMethodsTest() throws IOException, ChartMapException {
+    void utilityMethodsTest() throws ChartMapException, IOException {
         String b = ChartMap.getBaseName(Paths.get("./target").toString());
         assertEquals(null, b);
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
-        cm.print(); 
+        cm.print();
         assertEquals(PrintFormat.PLANTUML, cm.getPrintFormat());
         cm.setPrintFormat(PrintFormat.JSON);
         assertEquals(PrintFormat.JSON, cm.getPrintFormat());
         assertEquals("chartmap.text", cm.getDefaultOutputFilename());
-        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    @Test
+    void tempDirTest() throws ChartMapException, IOException {
+        // force IOException to ChartMapExceptions using static mocking
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
+            mf.when(() -> Files.createTempDirectory(any(), any())).thenThrow(IOException.class);
+            assertThrows(ChartMapException.class, () -> cm1.createTempDir());
+        }
+        System.out.println("IOException -> ChartMapException thrown as expected attempting to create temp dir");
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        cm2.createTempDir();
+        try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
+            mf.when(() -> Files.walk(any(), any())).thenThrow(IOException.class);
+            assertThrows(ChartMapException.class, () -> cm2.removeTempDir());
+        }
+        // create the ChartMap in debug mode and be sure the temp dir is not deleted
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        cm3.print();
+        assertTrue(Files.exists(Paths.get(cm3.getTempDirName())));
+        // create the ChartMap in non-debug mode and be sure the temp dir is deleted
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm4.print();
+        assertFalse(Files.exists(Paths.get(cm4.getTempDirName())));
+        System.out.println("IOException -> ChartMapException thrown as expected attempting to remove temp dir");
     }
 
     @Test
@@ -553,23 +587,23 @@ public class ChartMapTest {
             System.out.println("Second ChartMapException expected and thrown");
             assertFalse(false);
         }
-        // test case where the ChartMap logger is null and the ChartMapPrinter needs to create its own
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true,
-        false, false);
+        // test case where the ChartMap logger is null and the ChartMapPrinter needs to
+        // create its own
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true, false,
+                false);
         cm.logger = null;
         cmp = new ChartMapPrinter(cm, f.toString(), null, null);
         String nl = "null logger";
         cmp.writeLine(nl);
         assertTrue(fileContains(f, nl));
         // force IOException to ChartMapException with a ChartMap with a null logger
-        assertThrows(ChartMapException.class, () ->  new ChartMapPrinter(cm, "/", null, null));
+        assertThrows(ChartMapException.class, () -> new ChartMapPrinter(cm, "/", null, null));
         System.out.println("Third ChartMapException expected and thrown");
         // force IOException using mocking
-        FileWriter mockedFileWriter;
-        mockedFileWriter = Mockito.mock(FileWriter.class);
-        Mockito.doThrow(new IOException("IO Exception occured")).when(mockedFileWriter).write(Mockito.anyString());
+        FileWriter mfr = mock(FileWriter.class);
+        doThrow(new IOException("IO Exception occured")).when(mfr).write(anyString());
         ChartMapPrinter cmp2 = new ChartMapPrinter(cm, f.toString(), null, null);
-        cmp2.writer = mockedFileWriter;
+        cmp2.writer = mfr;
         assertThrows(ChartMapException.class, () -> {
             cm.logger = null;
             cmp2.writeLine("IO Exception");
