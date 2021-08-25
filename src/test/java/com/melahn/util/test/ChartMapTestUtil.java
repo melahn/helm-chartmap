@@ -1,26 +1,38 @@
 package com.melahn.util.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ChartMapTestUtil {
 
     /**
      * Answers true if the log contains a particular entry.
      * 
-     * @param baos the log
+     * @param l    the log
      * @param s    entry being looked for
-     * @return true if the log contains s, false otherwise
+     * @return true if the log contains s, false otherwise.
+     * @throws IOException if an error occurs reading the file
      */
-    public static boolean logContains(ByteArrayOutputStream baos, String s) {
-        return baos.toString().contains(s);
+    public static boolean logContains(Path l, String s) throws IOException {
+        List<String> list = new ArrayList<>();
+        BufferedReader br = Files.newBufferedReader(l);
+        list = br.lines().collect(Collectors.toList());
+        boolean found = false;
+        ListIterator<String> listIterator = list.listIterator();
+        while(listIterator.hasNext() && !found) {
+            found = listIterator.next().contains(s)?true:false;
+        }
+        return found;
     }
 
     /**
@@ -33,8 +45,7 @@ public class ChartMapTestUtil {
         try {
             System.out.println("Deleting any previously created files");
             if (Files.exists(d)) {
-                Files.walk(d, depth).filter(Files::isRegularFile)
-                              .forEach(p -> p.toFile().delete());
+                Files.walk(d, depth).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
                 Files.deleteIfExists(d);
             }
         } catch (IOException e) {
@@ -47,9 +58,9 @@ public class ChartMapTestUtil {
      * Start a sub-process, setting and removing some environment variables and
      * system properties beforehand.
      *
+     * @param a arguments
      * @param e Environment variables to add and remove
      * @param o value of os.type to set
-     * @param t test phase (e.g. "integration-test")
      * @param j Jacoco agent string
      * @param c name of class to run
      * @param p directory in which to run the process
@@ -58,42 +69,40 @@ public class ChartMapTestUtil {
      * @throws IOException
      * @throws InterruptedException
      */
-    int createProcess(Object[] e, String o, String t, String j, String c, Path p, File l)
-                             throws IOException, InterruptedException {
+    public int createProcess(List<String> a, Object[] e, String o, String j, String c, Path p, Path l)
+            throws IOException, InterruptedException {
         ProcessBuilder pb = null;
         String shadedJarName = this.getShadedJarName();
-        if (o == null) {
-            pb = new ProcessBuilder("java",
-                        "-javaagent:".concat(j),
-                        "-cp",
-                        shadedJarName,
-                        c,
-                        t);
-        } else {
-            pb = new ProcessBuilder("java",
-                        "-javaagent:".concat(j),
-                        "-cp",
-                        shadedJarName,
-                        "-Dos.name=".concat(o),
-                        c,
-                        t);
+        pb = new ProcessBuilder();
+        pb.command().add("java");
+        pb.command().add("-javaagent:".concat(j));
+        pb.command().add("-cp");
+        pb.command().add("../".concat(shadedJarName)); // expect the jar one level up
+        if (o != null) {
+            pb.command().add("-Dos.name=".concat(o));
+        }
+        pb.command().add(c);
+        for (int i = 0; i < a.size(); i++) {
+            pb.command().add(a.get(i));
         }
         // modify the environment
-        String[] a = (String[]) e[0];
-        Map<String, String> v = pb.environment();
-        for (int i = 0; i < a.length; i = i + 2) {
-            if (a[i] != null && a[i + 1] != null) {
-                v.put(a[i], a[i + 1]);
+        if (e != null) {
+            Map<String, String> env = pb.environment();
+            String[] addEnv = (String[]) e[0];
+            for (int i = 0; i < addEnv.length; i = i + 2) {
+                if (addEnv[i] != null && addEnv[i + 1] != null) {
+                    env.put(addEnv[i], addEnv[i + 1]);
+                }
             }
-        }
-        String[] r = (String[]) e[1];
-        for (int i = 0; i < r.length; i++) {
-            v.remove(r[i]);
+            String[] removeEnv = (String[]) e[1];
+            for (int i = 0; i < removeEnv.length; i++) {
+                env.remove(removeEnv[i]);
+            }
         }
         // Capture fhe output in case its interesting for debugging
         pb.directory(p.toAbsolutePath().toFile());
         pb.redirectErrorStream(true);
-        pb.redirectOutput(Redirect.appendTo(l));
+        pb.redirectOutput(Redirect.appendTo(l.toFile()));
         Process process = pb.start();
         final int waitTime = 10;
         process.waitFor(waitTime, TimeUnit.SECONDS);
@@ -105,10 +114,9 @@ public class ChartMapTestUtil {
      *
      * @return the name of the shaded jar
      */
-    String getShadedJarName() throws IOException {
+    public String getShadedJarName() throws IOException {
         final Properties properties = new Properties();
         properties.load(this.getClass().getClassLoader().getResourceAsStream("resources.properties"));
-        return "test-environment-".concat(properties.getProperty("shaded.jar.version")).concat(".jar");
+        return "helm-chartmap-".concat(properties.getProperty("shaded.jar.version")).concat(".jar");
     }
 }
-

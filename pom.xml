@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.melahn</groupId>
   <artifactId>helm-chartmap</artifactId>
   <version>1.0.3-SNAPSHOT</version>
@@ -59,6 +58,17 @@
     </plugins>
   </reporting>
   <build>
+    <resources>
+      <resource>
+        <!-- used to extract the project version to derive the name of the shaded jar for integration-tests -->
+        <directory>src/main/resources/resources-filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -179,6 +189,7 @@
                   <manifestEntries>
                     <Main-Class>com.melahn.util.helm.ChartMap</Main-Class>
                     <Build-Number>${buildNumber}</Build-Number>
+                    <Multi-Release>true</Multi-Release>
                   </manifestEntries>
                 </transformer>
               </transformers>

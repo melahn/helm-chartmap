@@ -105,76 +105,6 @@ public class ChartMapTest {
     }
 
     @Test
-    void chartMapMainTest() throws ChartMapException, IOException, InterruptedException {
-        String OutputFile = "testChartFileRV.txt";
-        if (Files.notExists(Paths.get("./target/test"))) {
-            Files.createDirectories(Paths.get("./target/test"));
-        }
-        // I use the previolsy generated shaded jar just to resolve the third party
-        // dependencies.
-        // This could miss a bug introduced by a third party dependency upgrade though
-        // it
-        // would be caught on the next test because the shaded jar would have this
-        // updated dependency. Perhaps there is a better way
-        String a[] = new String[] { "java", "-cp",
-                ".:../../resource/jar/helm-chartmap".concat(versionSuffix).concat(".jar"),
-                "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-e",
-                "../../".concat(testEnvFilePath.toString()), "-o", OutputFile };
-        // normalcase calling main as a new process
-        Process p = Runtime.getRuntime().exec(a, null, new File(targetTestDirectory.toString()));
-        p.waitFor(30000, TimeUnit.MILLISECONDS);
-        assertEquals(0, p.exitValue());
-        assertTrue(Files.exists(Paths.get(targetTestDirectory, OutputFile)));
-        Files.deleteIfExists(Paths.get(targetTestDirectory, OutputFile));
-        String[] b = new String[] { "-f", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(targetTestDirectory, OutputFile).toString() };
-        // normal case calling main directly
-        ChartMap.main(b);
-        assertTrue(Files.exists(Paths.get(targetTestDirectory, OutputFile)));
-        // bad env filename to force main exception handling
-        String[] c = new String[] { "-f", testInputFilePath.toString(), "-e", "nofilehere.yaml", "-o",
-                Paths.get(targetTestDirectory, OutputFile).toString() };
-        assertThrows(ChartMapException.class, () -> ChartMap.main(c));
-        // test bad option
-        String[] d = new String[] { "-B", testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(targetTestDirectory, OutputFile).toString() };
-        assertThrows(ChartMapException.class, () -> ChartMap.main(d));
-        // test two options
-        String[] e = new String[] { "-f", "-a", "-u", "-c", testInputFilePath.toString(), "-e",
-                testEnvFilePath.toString(), "-o", Paths.get(targetTestDirectory, OutputFile).toString() };
-        try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(mainTestOut));
-            assertThrows(ChartMapException.class, () -> ChartMap.main(e));
-            assertTrue(logContains(mainTestOut, "Parse Exception"));
-            System.setOut(new PrintStream(initialOut));
-        }
-        // test missing option
-        String[] f = new String[] { testInputFilePath.toString(), "-e", testEnvFilePath.toString(), "-o",
-                Paths.get(targetTestDirectory, OutputFile).toString() };
-        try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(mainTestOut));
-            ChartMap.main(f);
-            assertTrue(logContains(mainTestOut, "Usage"));
-            System.setOut(new PrintStream(initialOut));
-        }
-        // no args
-        try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(mainTestOut));
-            ChartMap.main(new String[0]);
-            assertTrue(logContains(mainTestOut, "Usage"));
-            System.setOut(new PrintStream(initialOut));
-        }
-        // help
-        try (ByteArrayOutputStream mainTestOut = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(mainTestOut));
-            ChartMap.main(new String[] { "-h" });
-            assertTrue(logContains(mainTestOut, "Usage"));
-            System.setOut(new PrintStream(initialOut));
-        }
-        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
-    }
-
-    @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV,
                 false, false, false, false);
@@ -239,7 +169,6 @@ public class ChartMapTest {
      * @throws ChartMapException
      * @throws IOException
      */
-
     @Test
     void utilityMethodsTest() throws ChartMapException, IOException {
         String b = ChartMap.getBaseName(Paths.get("./target").toString());
@@ -253,6 +182,12 @@ public class ChartMapTest {
         assertEquals("chartmap.text", cm.getDefaultOutputFilename());
     }
 
+    /**
+     * Tests the creation and removal of the temp directory used by ChartMap.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
     @Test
     void tempDirTest() throws ChartMapException, IOException {
         // force IOException to ChartMapExceptions using static mocking
@@ -470,9 +405,12 @@ public class ChartMapTest {
         return process.exitValue();
     }
 
+    /**
+     * Proves the help text is what is expected.
+     */
     @Test
     void helpTest() {
-        String helpTextExpected = "\nUsage:\n\n".concat("java -jar helm-chartmap-1.0.2.jar\n").concat("\nFlags:\n")
+        String helpTextExpected = "\nUsage:\n\n".concat("java -jar helm-chartmap-1.0.3.jar\n").concat("\nFlags:\n")
                 .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
                 .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
