@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-public class ChartMapTest {
+class ChartMapTest {
     // needed for main test; it would be nice not to get from the pom instead
     private static String versionSuffix = "-1.0.3-SNAPSHOT";
     private static String targetTestDirectory = Paths.get("target/test").toString();
@@ -80,7 +80,7 @@ public class ChartMapTest {
     private final PrintStream initialOut = System.out;
 
     @AfterAll
-    public static void cleanUp() {
+    static void cleanUp() {
         /**
          * No cleanup to do after test. I don't delete the generated files because they
          * might be handy to have around to diagnose issues in test failures. They are
@@ -91,7 +91,7 @@ public class ChartMapTest {
     }
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         try {
             if (!Files.exists(Paths.get(".", testInputFilePath))) {
                 throw new Exception(String.format("test Input File %s does not exist", testInputFilePath));
