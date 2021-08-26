@@ -25,13 +25,13 @@ import com.melahn.util.helm.model.HelmRequirement;
 
 import org.junit.jupiter.api.Test;
 
-public class ChartMapModelTest {
+class ChartMapModelTest {
 
     static final String EXPECTED = generateRandomString(10);
     static final String NOTEXPECTED = EXPECTED.concat(EXPECTED);
     
     @Test
-    public void testHelmChart() {
+    void testHelmChart() {
         HelmChart hc = new HelmChart();
         hc.setApiVersion(EXPECTED);
         assertEquals(EXPECTED, hc.getApiVersion());
@@ -105,7 +105,7 @@ public class ChartMapModelTest {
 
 
     @Test
-    public void testHelmChartLocalCache() {
+    void testHelmChartLocalCache() {
         HelmChartLocalCache hclc = new HelmChartLocalCache();
         hclc.setApiVersion(EXPECTED);
         assertEquals(EXPECTED, hclc.getApiVersion());
@@ -116,7 +116,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmChartRepo() {
+    void testHelmChartRepo() {
         HelmChartRepo hcr = new HelmChartRepo();
         hcr.setApiVersion(EXPECTED);
         assertEquals(EXPECTED, hcr.getApiVersion());
@@ -129,7 +129,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmChartReposLocal() {
+    void testHelmChartReposLocal() {
         HelmChartReposLocal hcrl = new HelmChartReposLocal();
         hcrl.setApiVersion(EXPECTED);
         assertEquals(EXPECTED, hcrl.getApiVersion());
@@ -142,7 +142,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmDeploymentContainer() {
+    void testHelmDeploymentContainer() {
         HelmDeploymentContainer hdc = new HelmDeploymentContainer();
         hdc.setImage(EXPECTED);
         assertEquals(EXPECTED, hdc.getImage());
@@ -178,7 +178,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmDeploymentSpec() {
+    void testHelmDeploymentSpec() {
         HelmDeploymentSpec hds = new HelmDeploymentSpec();
         hds.setReplicas(EXPECTED);
         assertSame(EXPECTED, hds.getReplicas());
@@ -189,7 +189,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmDeploymentSpecTemplateSpec() {
+    void testHelmDeploymentSpecTemplateSpec() {
         HelmDeploymentSpecTemplateSpec hdsts = new HelmDeploymentSpecTemplateSpec();
         HelmDeploymentContainer[] c = new HelmDeploymentContainer[1];
         hdsts.setContainers(c);
@@ -200,7 +200,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmDeploymentTemplate() {
+    void testHelmDeploymentTemplate() {
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         hdt.setApiVersion(EXPECTED);
         assertEquals(EXPECTED, hdt.getApiVersion());
@@ -212,7 +212,7 @@ public class ChartMapModelTest {
     }
 
     @Test
-    public void testHelmRequirement() {
+    void testHelmRequirement() {
         HelmRequirement hr = new HelmRequirement();
         hr.setCondition(EXPECTED);
         assertEquals(EXPECTED, hr.getCondition());

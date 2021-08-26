@@ -17,7 +17,7 @@ import com.melahn.util.test.ChartMapTestUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class ChartMapIntegrationTest {
+class ChartMapIntegrationTest {
 
     private static final String TARGET_TEST_DIR_NAME = "target/integration-test";
     private static final Path TARGET_TEST_PATH = Paths.get(TARGET_TEST_DIR_NAME);
