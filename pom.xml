@@ -175,6 +175,17 @@
                 <exclude>META-INF/*.RSA</exclude>
               </excludes>
             </filter>
+            <!-- 
+            Remove this filter after archive-extract is deployed to maven central 
+            -->
+            <filter>
+                <artifact>com.melahn:archive-extract</artifact>
+                <excludes>
+                  <exclude>org/apache/logging/log4j/**</exclude>
+                  <exclude>org/apache/commons/compress/**</exclude>
+                  <exclude>META-INF/versions/9/**</exclude>
+                </excludes>
+              </filter>
           </filters>
         </configuration>
         <executions>
@@ -316,7 +327,7 @@
         </executions>
       </plugin>
       <!-- 
-         TODO Remove after archive-extract is deployed to maven central 
+         Remove after archive-extract is deployed to maven central 
        -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
