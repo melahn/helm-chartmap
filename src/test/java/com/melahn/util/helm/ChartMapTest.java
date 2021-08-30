@@ -184,7 +184,7 @@ class ChartMapTest {
      * @throws ChartMapException
      */
     @Test
-    void testLoadLocalRepos() throws ChartMapException, IOException {
+    void loadLocalReposTest() throws ChartMapException, IOException {
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm = spy(cm);
@@ -574,7 +574,7 @@ class ChartMapTest {
     }
 
     @Test
-    void testDebug() throws ChartMapException, IOException {
+    void debugTest() throws ChartMapException, IOException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputPumlFilePathNRNV, true, false,
                 false, true);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
