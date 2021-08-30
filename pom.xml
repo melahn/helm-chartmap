@@ -60,7 +60,7 @@
   <build>
     <resources>
       <resource>
-        <!-- used to extract the project version to derive the name of the shaded jar for integration-tests -->
+        <!--used to extract the project version to derive the name of the shaded jar for integration-tests-->
         <directory>src/main/resources/resources-filtered</directory>
         <filtering>true</filtering>
       </resource>
@@ -134,7 +134,42 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.0.0-M5</version>
+        <configuration>
+            <skip>true</skip>
+            <trimStackTrace>false</trimStackTrace>
+         </configuration>
+         <executions>
+            <execution>
+               <id>unit-tests</id>
+               <phase>test</phase>
+               <goals>
+                  <goal>test</goal>
+               </goals>
+               <configuration>
+                      <skip>false</skip>
+                  <includes>
+                     <include>**/*Test.java</include>
+                  </includes>
+                  <excludes>
+                     <exclude>**/*IntegrationTest.java</exclude>
+                 </excludes>
+               </configuration>
+            </execution>
+            <execution>
+               <id>integration-tests</id>
+               <phase>integration-test</phase>
+               <goals>
+                  <goal>test</goal>
+               </goals>
+               <configuration>
+                  <skip>false</skip>
+                  <includes>
+                    <include>**/*IntegrationTest.java</include>
+                  </includes>
+               </configuration>
+            </execution>
+         </executions>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -365,12 +400,6 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.12.2</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>5.7.1</version>
-      <scope>test</scope>
-  </dependency-->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -440,15 +469,15 @@
       <version>3.9.0</version>
       <scope>test</scope>
     </dependency>
-    <!--dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>3.11.2</version>
-    </dependency-->
     <dependency>
       <groupId>com.melahn</groupId>
       <artifactId>archive-extract</artifactId>
       <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.9.0.2155</version>
     </dependency>
   </dependencies>
 </project>

@@ -9,8 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,19 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melahn.util.helm.model.HelmChart;
+import com.melahn.util.helm.model.HelmChartReposLocal;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
@@ -47,8 +48,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class ChartMapTest {
-    // needed for main test; it would be nice not to get from the pom instead
-    private static String versionSuffix = "-1.0.3-SNAPSHOT";
     private static String targetTestDirectory = Paths.get("target/test").toString();
     private static String APPRBaseName = "helm-chartmap-test-chart";
     private static String urlBaseName = "test-chart-file";
@@ -129,12 +128,6 @@ class ChartMapTest {
     @Test
     void unpackChartTest() throws ChartMapException, IOException {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
-        // force IOException -> ChartMapException path
-        // ChartMap cm1 = new ChartMap(ChartOption.FILENAME,
-        // testInputFilePath.toString(),
-        // testOutputTextFilePathNRNV.toString(),
-        // testEnvFilePath.toAbsolutePath().toString(),
-        // new boolean[] { false, false, false, true });
         ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFilePath.toString(), testOutputTextFilePathNRNV,
                 false, false, false, true);
         cm1.setChartName("foo");
@@ -157,7 +150,8 @@ class ChartMapTest {
         try (ByteArrayOutputStream unpackCharttestOut = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(unpackCharttestOut));
             assertThrows(ChartMapException.class, () -> cm3.unpackChart(testOneFileZipPath.toString()));
-            assertTrue(logContains(unpackCharttestOut, "Archive content does not appear to be valid"));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -180,6 +174,25 @@ class ChartMapTest {
         cm.setPrintFormat(PrintFormat.JSON);
         assertEquals(PrintFormat.JSON, cm.getPrintFormat());
         assertEquals("chartmap.text", cm.getDefaultOutputFilename());
+    }
+
+    /**
+     * Tests the loadLocalRepos method, focusing on the corner where an IOException
+     * is caught and converted to a thrown ChartMapException.  Mockiko spying is
+     * used.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void testLoadLocalRepos() throws ChartMapException, IOException {
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm = spy(cm);
+        ObjectMapper som = spy(ObjectMapper.class);
+        doReturn(som).when(scm).getObjectMapper();
+        doThrow(IOException.class).when(som).readValue(any(File.class), eq(HelmChartReposLocal.class));
+        assertThrows(ChartMapException.class, () -> scm.loadLocalRepos());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**
@@ -212,7 +225,7 @@ class ChartMapTest {
         assertTrue(Files.exists(Paths.get(cm3.getTempDirName())));
         // create the ChartMap in non-debug mode and be sure the temp dir is deleted
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm4.print();
         assertFalse(Files.exists(Paths.get(cm4.getTempDirName())));
         System.out.println("IOException -> ChartMapException thrown as expected attempting to remove temp dir");
@@ -252,12 +265,12 @@ class ChartMapTest {
     }
 
     @Test
-    void textChartRefreshVerboseTest() throws ChartMapException {
+    void textChartRefreshVerboseTest() throws ChartMapException, IOException {
         ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFilePath, testOutputTextFilePathRV, true, true,
                 true);
         testMap.print();
         assertTrue(Files.exists(testOutputTextFilePathRV));
-        assertTrue(fileContains(testOutputTextFilePathRV,
+        assertTrue(ChartMapTestUtil.fileContains(testOutputTextFilePathRV,
                 "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
     }
 
@@ -380,31 +393,6 @@ class ChartMapTest {
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[3]));
     }
 
-    int createProcess(String[] a, String[] r, String o) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder("java", "-Dos.name=".concat(o),
-                "-javaagent:../../lib/org.jacoco.agent-0.8.7-runtime.jar=destfile=../jacoco.exec,append=true", "-cp",
-                ".:../../resource/jar/helm-chartmap".concat(versionSuffix).concat(".jar"),
-                "com.melahn.util.helm.ChartMap", "-f", "../../".concat(testInputFilePath.toString()), "-e",
-                "../../".concat(testEnvFilePath.toString()), "-o", "cp-test.txt", "-v");
-        Map<String, String> v = pb.environment();
-        for (int i = 0; i < a.length; i = i + 2) {
-            if (a[i] != null && a[i + 1] != null) {
-                v.put(a[i], a[i + 1]);
-            }
-        }
-        for (int i = 0; i < r.length; i++) {
-            v.remove(r[i]);
-        }
-        // Capture fhe output in case its interesting for debugging
-        pb.directory(new File(targetTestDirectory));
-        File log = Paths.get(targetTestDirectory, "sub-process-out.txt").toFile();
-        pb.redirectErrorStream(true);
-        pb.redirectOutput(Redirect.appendTo(log));
-        Process process = pb.start();
-        process.waitFor(10, TimeUnit.SECONDS);
-        return process.exitValue();
-    }
-
     /**
      * Proves the help text is what is expected.
      */
@@ -499,7 +487,7 @@ class ChartMapTest {
         HelmChart h = new HelmChart();
         h.setRepoUrl(null);
         cmp.printChart(h);
-        assertFalse(fileContains(f, "repo url"));
+        assertFalse(ChartMapTestUtil.fileContains(f, "repo url"));
         final String OUTPUTFILENAME = "fooout";
         cmp.setOutputFilename(OUTPUTFILENAME);
         assertEquals(OUTPUTFILENAME, cmp.getOutputFilename());
@@ -533,7 +521,7 @@ class ChartMapTest {
         cmp = new ChartMapPrinter(cm, f.toString(), null, null);
         String nl = "null logger";
         cmp.writeLine(nl);
-        assertTrue(fileContains(f, nl));
+        assertTrue(ChartMapTestUtil.fileContains(f, nl));
         // force IOException to ChartMapException with a ChartMap with a null logger
         assertThrows(ChartMapException.class, () -> new ChartMapPrinter(cm, "/", null, null));
         System.out.println("Third ChartMapException expected and thrown");
@@ -580,8 +568,8 @@ class ChartMapTest {
         }
         h.setDeploymentTemplates(templates);
         testMap.printMap();
-        assertTrue(fileContains(testOutputPumlFilePathNRNV, "Unknown Repo URL"));
-        assertTrue(fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX1_2"));
+        assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "Unknown Repo URL"));
+        assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX1_2"));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -592,7 +580,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             cm.print();
-            assertTrue(logContains(o, "was not removed because this is debug mode"));
+            assertTrue(ChartMapTestUtil.streamContains(o, "was not removed because this is debug mode"));
             System.setOut(new PrintStream(initialOut));
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -657,41 +645,5 @@ class ChartMapTest {
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
-    }
-
-    private boolean fileContains(Path p, String s) {
-        setFound(false);
-        try (Stream<String> lines = Files.lines(p.toAbsolutePath())) {
-            lines.forEach((String line) -> {
-                if (line.contains(s)) {
-                    System.out.println(String.format("Expected line with \"%s\" found", s));
-                    setFound(true);
-                }
-            });
-        } catch (IOException e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-        return getFound();
-    }
-
-    boolean found = false; // used by Lambda in fileContains
-
-    private void setFound(boolean f) {
-        found = f;
-    }
-
-    private boolean getFound() {
-        return found;
-    }
-
-    /**
-     * Answers true if the log contains a particular entry
-     * 
-     * @param baos the log
-     * @param s    entry being looked for
-     * @return true if the log contains s, false otherwise
-     */
-    private boolean logContains(ByteArrayOutputStream baos, String s) {
-        return baos.toString().contains(s);
     }
 }

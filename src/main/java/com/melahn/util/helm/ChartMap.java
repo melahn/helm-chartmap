@@ -496,11 +496,9 @@ public class ChartMap {
             // in v2 all the repos were nicely collected into a single yaml file in helm
             // home but in v3 the location of the repo list is now os dependent
             String helmRepoFilename = helmConfigPath.concat("/repositories.yaml");
-
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             File reposYamlFile = new File(helmRepoFilename);
-
             localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
             // in helm v2, the cache location was set but in v3, it must be synthesized from
             // an OS specific location
@@ -512,8 +510,19 @@ public class ChartMap {
             printLocalRepos();
             loadLocalCharts();
         } catch (IOException e) {
-            throw new ChartMapException(String.format("IOException found loading local repos: %s.", e.getMessage()));
+            throw new ChartMapException(String.format("Exception found loading local repos: %s.", e.getMessage()));
         }
+    }
+
+    /**
+     * 
+     * This method was introduced to allow providing a test version of an ObjectMapper to
+     * allow testing of exception conditions.
+     * 
+     * @return an ObjectMapper
+     */
+    public ObjectMapper getObjectMapper() {
+        return new ObjectMapper(new YAMLFactory());
     }
 
     /**

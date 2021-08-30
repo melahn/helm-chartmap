@@ -1,6 +1,7 @@
 package com.melahn.util.test;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
@@ -18,12 +19,12 @@ public class ChartMapTestUtil {
     /**
      * Answers true if the log contains a particular entry.
      * 
-     * @param l    the log
+     * @param l    the file
      * @param s    entry being looked for
      * @return true if the log contains s, false otherwise.
      * @throws IOException if an error occurs reading the file
      */
-    public static boolean logContains(Path l, String s) throws IOException {
+    public static boolean fileContains(Path l, String s) throws IOException {
         List<String> list = new ArrayList<>();
         BufferedReader br = Files.newBufferedReader(l);
         list = br.lines().collect(Collectors.toList());
@@ -33,6 +34,17 @@ public class ChartMapTestUtil {
             found = listIterator.next().contains(s)?true:false;
         }
         return found;
+    }
+
+    /**
+     * Answers true if the stream contains a particular entry.
+     * 
+     * @param baos the log stream
+     * @param s    entry being looked for
+     * @return true if the log contains s, false otherwise
+     */
+    public static boolean streamContains(ByteArrayOutputStream baos, String s) {
+        return baos.toString().contains(s);
     }
 
     /**

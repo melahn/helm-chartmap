@@ -81,25 +81,25 @@ class ChartMapIntegrationTest {
                 outputFileName);
         assertNotEquals(0, utility.createProcess(a4, new String[][] { new String[] {}, new String[] {} }, null,
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath));
-        assertTrue(ChartMapTestUtil.logContains(logFilePath,
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath,
                 "ChartMapException:Parse Exception: Missing argument for option: f"));
         assertFalse(Files.exists(outputFilePath));
         // test missing option
         List<String> a5 = Arrays.asList(testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
         utility.createProcess(a5, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, TARGET_TEST_PATH, logFilePath);
-        assertTrue(ChartMapTestUtil.logContains(logFilePath, "Usage:"));
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));
         assertFalse(Files.exists(outputFilePath));
         // test no args
         utility.createProcess(Arrays.asList(), new String[][] { new String[] {}, new String[] {} }, null,
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath);
-        assertTrue(ChartMapTestUtil.logContains(logFilePath, "Usage:"));
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));
         assertFalse(Files.exists(outputFilePath));
         // test help
         List<String> a6 = Arrays.asList("-h");
         utility.createProcess(a6, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, TARGET_TEST_PATH, logFilePath);
-        assertTrue(ChartMapTestUtil.logContains(logFilePath, "Usage:"));
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));
         assertFalse(Files.exists(outputFilePath));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
