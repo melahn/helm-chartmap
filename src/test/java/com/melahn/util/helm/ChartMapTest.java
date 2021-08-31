@@ -205,6 +205,7 @@ class ChartMapTest {
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
         false);
         ChartMap scm = spy(cm);
+        // use a command that is the same across all the OS's
         Process p = Runtime.getRuntime().exec(new String[]{"echo", "I am the foo process"});
         Process sp = spy(p);
         doReturn(sp).when(scm).getProcess(any());
