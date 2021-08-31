@@ -196,6 +196,24 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the checkHelmVersion method.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void checkHelmVersionTest() throws ChartMapException, IOException {
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm = spy(cm);
+        Process p = Runtime.getRuntime().exec(new String[]{"echo", "I am the foo process"});
+        Process sp = spy(p);
+        doReturn(sp).when(scm).getProcess(any());
+        doReturn("helm").when(scm).getHelmCommand();
+        doReturn(1).when(sp).exitValue();
+        assertThrows(ChartMapException.class, () -> scm.checkHelmVersion());
+    }
+
+    /**
      * Tests the creation and removal of the temp directory used by ChartMap.
      * 
      * @throws ChartMapException

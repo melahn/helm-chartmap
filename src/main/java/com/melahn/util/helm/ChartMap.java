@@ -534,10 +534,10 @@ public class ChartMap {
      * 
      * @throws ChartMapException if a version other than V3 is found
      */
-    private void checkHelmVersion() throws ChartMapException {
-        String[] cmdArray = { helmCommand, "version", "--template", "{{ .Version }}" };
+    protected void checkHelmVersion() throws ChartMapException {
+        String[] cmdArray = { getHelmCommand(), "version", "--template", "{{ .Version }}" };
         try {
-            Process p = Runtime.getRuntime().exec(cmdArray);
+            Process p = getProcess(cmdArray);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
@@ -562,6 +562,19 @@ public class ChartMap {
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
         }
     }
+
+    /**
+     * 
+     * This method was introduced to allow providing a test version of a Process so
+     * as to return non zero exit codes for testing.
+     * 
+     * @return a Process
+     * @throws IOException 
+     */
+    public Process getProcess(String[] cmdArray) throws IOException {
+        return Runtime.getRuntime().exec(cmdArray);
+    }
+
 
     /**
      * Sets the helm information, include the helm command, version and paths.
@@ -654,7 +667,7 @@ public class ChartMap {
      * 
      * @return the helm command
      */
-    private String getHelmCommand() throws ChartMapException {
+    protected String getHelmCommand() throws ChartMapException {
         try {
             String helmBin = System.getenv("HELM_BIN");
             logger.log(logLevelDebug, "HELM_BIN = {}", helmBin);
