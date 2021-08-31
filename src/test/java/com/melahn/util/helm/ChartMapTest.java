@@ -202,16 +202,43 @@ class ChartMapTest {
      */
     @Test
     void checkHelmVersionTest() throws ChartMapException, IOException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
         false);
-        ChartMap scm = spy(cm);
-        // use a command that is the same across all the OS's
-        Process p = Runtime.getRuntime().exec(new String[]{"echo", "I am the foo process"});
-        Process sp = spy(p);
-        doReturn(sp).when(scm).getProcess(any());
-        doReturn("helm").when(scm).getHelmCommand();
-        doReturn(1).when(sp).exitValue();
-        assertThrows(ChartMapException.class, () -> scm.checkHelmVersion());
+        ChartMap scm1 = spy(cm1);
+        // Use a command that is the same across all the OS's so it will run
+        Process p1 = Runtime.getRuntime().exec(new String[]{"echo", "I am the foo process"});
+        Process sp1 = spy(p1);
+        doReturn(sp1).when(scm1).getProcess(any());
+        doReturn("helm").when(scm1).getHelmCommand();
+        // Return 1 to mimic a bad helm command forcing a ChartMapException
+        doReturn(1).when(sp1).exitValue();
+        assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm2 = spy(cm2);
+        // Use a command that is the same across all the OS's to mimic a helm not v3
+        Process p2 = Runtime.getRuntime().exec(new String[]{"echo", "I am not helm version 3"});
+        doReturn(p2).when(scm2).getProcess(any());
+        assertThrows(ChartMapException.class, () -> scm2.checkHelmVersion());
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm3 = spy(cm3);
+        // Use a command that will cause the process' BufferedReader to return null and force the
+        // ChartMapException.  
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        String nullCommand = isWindows? "type": "cat";
+        String nullArgument = isWindows ? "NUL": "/dev/null";
+        Process p3 = Runtime.getRuntime().exec(new String[]{nullCommand, nullArgument});
+        doReturn(p3).when(scm3).getProcess(any());
+        assertThrows(ChartMapException.class, () -> scm3.checkHelmVersion());
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm4 = spy(cm4);
+        // Use a command that will cause the process' BufferedReader to just one character and force the
+        // ChartMapException
+        Process p4 = Runtime.getRuntime().exec(new String[]{"echo", "1"});
+        doReturn(p4).when(scm4).getProcess(any());
+        assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
     }
 
     /**
