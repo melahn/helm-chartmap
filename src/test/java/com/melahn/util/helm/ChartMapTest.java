@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melahn.util.helm.model.HelmChart;
@@ -201,7 +202,7 @@ class ChartMapTest {
      * @throws ChartMapException
      */
     @Test
-    void checkHelmVersionTest() throws ChartMapException, IOException {
+    void checkHelmVersionTest() throws ChartMapException, InterruptedException, IOException {
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
         false);
         ChartMap scm1 = spy(cm1);
@@ -239,6 +240,21 @@ class ChartMapTest {
         Process p4 = Runtime.getRuntime().exec(new String[]{"echo", "1"});
         doReturn(p4).when(scm4).getProcess(any());
         assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
+        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm5 = spy(cm5);
+        // Cause an IOException -> ChartMapException on getProcess()
+        doThrow(IOException.class).when(scm5).getProcess(any());
+        assertThrows(ChartMapException.class, () -> scm5.checkHelmVersion());
+        ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        false);
+        ChartMap scm6 = spy(cm6);
+        Process p6 = Runtime.getRuntime().exec(new String[]{"echo", "I am gaing to throw an InterruptedException!!"});
+        Process sp6 = spy(p6);
+        doReturn(sp6).when(scm6).getProcess(any());
+        // Cause an InterruptedException -> ChartMapException on waitFor()
+        doThrow(InterruptedException.class).when(sp6).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
     }
 
     /**

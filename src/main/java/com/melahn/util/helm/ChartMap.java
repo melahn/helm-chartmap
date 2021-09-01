@@ -114,7 +114,7 @@ public class ChartMap {
     private static final String CHARTS_DIR_NAME = "charts";
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     private static final String TEMP_DIR_ERROR = "IOException creating temp directory";
-    private static final int PROCESS_TIMEOUT = 100000;
+    protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
     private static final String HELM_SUBDIR = "/helm";
     private static final String HOME = "HOME";
     private static final String TEMP = "TEMP";
