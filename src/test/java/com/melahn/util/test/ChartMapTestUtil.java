@@ -131,4 +131,11 @@ public class ChartMapTestUtil {
         properties.load(this.getClass().getClassLoader().getResourceAsStream("resources.properties"));
         return "helm-chartmap-".concat(properties.getProperty("shaded.jar.version")).concat(".jar");
     }
+
+    /**
+     * Answer true if this a Windows OS
+     */
+    public static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
 }

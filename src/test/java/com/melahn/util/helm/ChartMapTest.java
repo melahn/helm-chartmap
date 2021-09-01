@@ -1,5 +1,6 @@
 package com.melahn.util.helm;
 
+import static com.melahn.util.test.ChartMapTestUtil.isWindows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -179,7 +180,7 @@ class ChartMapTest {
 
     /**
      * Tests the loadLocalRepos method, focusing on the corner where an IOException
-     * is caught and converted to a thrown ChartMapException.  Mockiko spying is
+     * is caught and converted to a thrown ChartMapException. Mockiko spying is
      * used.
      * 
      * @throws ChartMapException
@@ -204,10 +205,10 @@ class ChartMapTest {
     @Test
     void checkHelmVersionTest() throws ChartMapException, InterruptedException, IOException {
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm1 = spy(cm1);
         // Use a command that is the same across all the OS's so it will run
-        Process p1 = Runtime.getRuntime().exec(new String[]{"echo", "I am the foo process"});
+        Process p1 = Runtime.getRuntime().exec(new String[] { "echo", "I am the foo process" });
         Process sp1 = spy(p1);
         doReturn(sp1).when(scm1).getProcess(any());
         doReturn("helm").when(scm1).getHelmCommand();
@@ -215,46 +216,143 @@ class ChartMapTest {
         doReturn(1).when(sp1).exitValue();
         assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm2 = spy(cm2);
         // Use a command that is the same across all the OS's to mimic a helm not v3
-        Process p2 = Runtime.getRuntime().exec(new String[]{"echo", "I am not helm version 3"});
+        Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "I am not helm version 3" });
         doReturn(p2).when(scm2).getProcess(any());
         assertThrows(ChartMapException.class, () -> scm2.checkHelmVersion());
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm3 = spy(cm3);
-        // Use a command that will cause the process' BufferedReader to return null and force the
-        // ChartMapException.  
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-        String nullCommand = isWindows? "type": "cat";
-        String nullArgument = isWindows ? "NUL": "/dev/null";
-        Process p3 = Runtime.getRuntime().exec(new String[]{nullCommand, nullArgument});
+        // Use a command that will cause the process' BufferedReader to return null and
+        // force the
+        // ChartMapException.
+        String nullCommand = isWindows() ? "type" : "cat";
+        String nullArgument = isWindows() ? "NUL" : "/dev/null";
+        Process p3 = Runtime.getRuntime().exec(new String[] { nullCommand, nullArgument });
         doReturn(p3).when(scm3).getProcess(any());
         assertThrows(ChartMapException.class, () -> scm3.checkHelmVersion());
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm4 = spy(cm4);
-        // Use a command that will cause the process' BufferedReader to just one character and force the
+        // Use a command that will cause the process' BufferedReader to just one
+        // character and force the
         // ChartMapException
-        Process p4 = Runtime.getRuntime().exec(new String[]{"echo", "1"});
+        Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "1" });
         doReturn(p4).when(scm4).getProcess(any());
         assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm5 = spy(cm5);
         // Cause an IOException -> ChartMapException on getProcess()
         doThrow(IOException.class).when(scm5).getProcess(any());
         assertThrows(ChartMapException.class, () -> scm5.checkHelmVersion());
         ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
+                false);
         ChartMap scm6 = spy(cm6);
-        Process p6 = Runtime.getRuntime().exec(new String[]{"echo", "I am gaing to throw an InterruptedException!!"});
+        Process p6 = Runtime.getRuntime()
+                .exec(new String[] { "echo", "I am gaing to throw an InterruptedException!!" });
         Process sp6 = spy(p6);
         doReturn(sp6).when(scm6).getProcess(any());
         // Cause an InterruptedException -> ChartMapException on waitFor()
         doThrow(InterruptedException.class).when(sp6).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
+    }
+
+    /**
+     * Test the constructHelmCachePathTest method with all OS Type and env vars.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void constructHelmCachePathTest() throws ChartMapException, IOException {
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        ChartMap scm1 = spy(cm1);
+        doReturn("target/test").when(scm1).getEnv("HOME");
+        scm1.constructHelmCachePath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test".concat("/Library/Caches/helm"), scm1.getHelmCachePath());
+
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        ChartMap scm2 = spy(cm2);
+        doReturn("target/test").when(scm2).getEnv("HOME");
+        scm2.constructHelmCachePath(ChartUtil.OSType.LINUX);
+        assertEquals("target/test".concat("/.cache/helm"), scm2.getHelmCachePath());
+
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        ChartMap scm3 = spy(cm3);
+        doReturn("target/test").when(scm3).getEnv("TEMP");
+        scm3.constructHelmCachePath(ChartUtil.OSType.WINDOWS);
+        assertEquals("target/test".concat("/helm"), scm3.getHelmCachePath());
+
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        ChartMap scm4 = spy(cm4);
+        doReturn("target/test/XDG_CACHE_HOME").when(scm4).getEnv("XDG_CACHE_HOME");
+        scm4.constructHelmCachePath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test/XDG_CACHE_HOME", scm4.getHelmCachePath());
+
+        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        ChartMap scm5 = spy(cm5);
+        doReturn("target/test/HELM_CACHE_HOME").when(scm5).getEnv("HELM_CACHE_HOME");
+        scm5.constructHelmCachePath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test/HELM_CACHE_HOME", scm5.getHelmCachePath());
+
+        // No valid helm cache directory in MACOSX is found so look for the exception
+        // and logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true);
+            ChartMap scm6 = spy(cm6);
+            doReturn(null).when(scm6).getEnv("HOME");
+            assertThrows(ChartMapException.class, () -> scm6.constructHelmCachePath(ChartUtil.OSType.MACOS));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
+            System.setOut(initialOut);
+        }
+
+        // No valid helm cache directory in LINUX is found so look for the exception and
+        // logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true);
+            ChartMap scm7 = spy(cm7);
+            doReturn(null).when(scm7).getEnv("HOME");
+            assertThrows(ChartMapException.class, () -> scm7.constructHelmCachePath(ChartUtil.OSType.LINUX));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
+            System.setOut(initialOut);
+        }
+
+        // No valid helm cache directory in Windows is found so look for the exception
+        // and logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm8 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true);
+            ChartMap scm8 = spy(cm8);
+            doReturn(null).when(scm8).getEnv("TEMP");
+            assertThrows(ChartMapException.class, () -> scm8.constructHelmCachePath(ChartUtil.OSType.WINDOWS));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.TEMP)));
+            System.setOut(initialOut);
+        }
+
+        // All other cases
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm9 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true);
+            assertThrows(ChartMapException.class, () -> cm9.constructHelmCachePath(ChartUtil.OSType.OTHER));
+            assertTrue(ChartMapTestUtil.streamContains(o,
+                    "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS."));
+            System.setOut(initialOut);
+        }
+
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**

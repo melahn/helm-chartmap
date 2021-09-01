@@ -115,11 +115,11 @@ public class ChartMap {
     private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     private static final String TEMP_DIR_ERROR = "IOException creating temp directory";
     protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
-    private static final String HELM_SUBDIR = "/helm";
-    private static final String HOME = "HOME";
-    private static final String TEMP = "TEMP";
-    private static final String APPDATA = "APPDATA";
-    private static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
+    protected static final String HELM_SUBDIR = "/helm";
+    protected static final String HOME = "HOME";
+    protected static final String TEMP = "TEMP";
+    protected static final String APPDATA = "APPDATA";
+    protected static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -516,8 +516,8 @@ public class ChartMap {
 
     /**
      * 
-     * This method was introduced to allow providing a test version of an ObjectMapper to
-     * allow testing of exception conditions.
+     * This method was introduced to allow providing a test version of an
+     * ObjectMapper to allow testing of exception conditions.
      * 
      * @return an ObjectMapper
      */
@@ -569,12 +569,11 @@ public class ChartMap {
      * as to return non zero exit codes for testing.
      * 
      * @return a Process
-     * @throws IOException 
+     * @throws IOException
      */
     public Process getProcess(String[] cmdArray) throws IOException {
         return Runtime.getRuntime().exec(cmdArray);
     }
-
 
     /**
      * Sets the helm information, include the helm command, version and paths.
@@ -603,35 +602,50 @@ public class ChartMap {
         constructHelmConfigPath(os);
     }
 
-    private void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
-        setHelmCachePath(System.getenv("HELM_CACHE_HOME") != null ? System.getenv("HELM_CACHE_HOME")
-                : System.getenv("XDG_CACHE_HOME"));
+    protected void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
+        String m = null;
+        setHelmCachePath(getEnv("HELM_CACHE_HOME") != null ? getEnv("HELM_CACHE_HOME") : getEnv("XDG_CACHE_HOME"));
         // When no other location is set, use a default location based on the operating
         // system
         if (getHelmCachePath() == null && os == ChartUtil.OSType.MACOS) {
-            if (System.getenv(HOME) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            if (getEnv(HOME) == null) {
+                // The reason I am not using the common function logErrorAndThrow() is that
+                // the code coverage tools has trouble recognizing that logErrorAndThrow() is called
+                // so I decided to inline the instructions 
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            helmCachePath = System.getenv(HOME).concat("/Library/Caches/helm");
+            setHelmCachePath(getEnv(HOME).concat("/Library/Caches/helm"));
         }
         if (getHelmCachePath() == null && os == ChartUtil.OSType.LINUX) {
-            if (System.getenv(HOME) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            if (getEnv(HOME) == null) {
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            setHelmCachePath(System.getenv(HOME).concat("/.cache/helm"));
+            setHelmCachePath(getEnv(HOME).concat("/.cache/helm"));
         }
         if (getHelmCachePath() == null && os == ChartUtil.OSType.WINDOWS) {
-            if (System.getenv(TEMP) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, TEMP));
+            if (getEnv(TEMP) == null) {
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.TEMP);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            setHelmCachePath(System.getenv(TEMP).concat(HELM_SUBDIR));
+            setHelmCachePath(getEnv(TEMP).concat(HELM_SUBDIR));
         }
-        if (getHelmCachePath() == null) { // None of the above
-            logErrorAndThrow("Could not locate the helm Cache path. Check your installation of helm is complete.");
+        if (getHelmCachePath() == null) {
+            m = "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS.";
+            logger.error(m);
+            throw new ChartMapException(m);
         }
     }
 
-    private void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
+    protected String getEnv(String e) {
+        return System.getenv(e);
+    }
+
+    protected void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
         setHelmConfigPath(System.getenv("HELM_CONFIG_HOME") != null ? System.getenv("HELM_CONFIG_HOME")
                 : System.getenv("XDG_CONFIG_HOME"));
         // When no other location is set, use a default location based on the operating
@@ -655,7 +669,8 @@ public class ChartMap {
             setHelmConfigPath(System.getenv(APPDATA).concat(HELM_SUBDIR));
         }
         if (getHelmConfigPath() == null) { // None of the above
-            logErrorAndThrow("Could not locate the helm Config path. Check your installation of helm is complete.");
+            logErrorAndThrow(
+                    "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS.");
         }
     }
 
@@ -1927,16 +1942,16 @@ public class ChartMap {
         if (isDebug()) {
             logger.info("{} {} was not removed because this is debug mode", TEMP_DIR, getTempDirName());
         } else {
-            try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()),FileVisitOption.FOLLOW_LINKS)) {
+            try (Stream<Path> s = Files.walk(Paths.get(getTempDirName()), FileVisitOption.FOLLOW_LINKS)) {
                 s.sorted(Comparator.reverseOrder()).forEach(lambdaExceptionWrapper(Files::delete));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.error(LOG_FORMAT_2, "IO Exception walking temporary directory ", getTempDirName());
                 throw new ChartMapException(e.getMessage());
             }
             logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
         }
     }
+
     /**
      * Logs an error and throws a ChartMapException
      * 
