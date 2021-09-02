@@ -261,7 +261,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the constructHelmCachePathTest method with all OS Type and env vars.
+     * Test the constructHelmCachePathTest method with all OS type and env var combinations.
      * 
      * @throws ChartMapException
      */
@@ -348,10 +348,139 @@ class ChartMapTest {
                     true);
             assertThrows(ChartMapException.class, () -> cm9.constructHelmCachePath(ChartUtil.OSType.OTHER));
             assertTrue(ChartMapTestUtil.streamContains(o,
-                    "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS."));
+                    "Could not locate the helm cache path. Check that your installation of helm is complete and that you are using a supported OS."));
             System.setOut(initialOut);
         }
 
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the constructHelmConfigPathTest method with all OS type and env var combinations.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void constructHelmConfigPathTest() throws ChartMapException, IOException {
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        ChartMap scm1 = spy(cm1);
+        doReturn("target/test").when(scm1).getEnv("HOME");
+        scm1.constructHelmConfigPath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test".concat("/Library/Preferences/helm"), scm1.getHelmConfigPath());
+
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        ChartMap scm2 = spy(cm2);
+        doReturn("target/test").when(scm2).getEnv("HOME");
+        scm2.constructHelmConfigPath(ChartUtil.OSType.LINUX);
+        assertEquals("target/test".concat("/.config/helm"), scm2.getHelmConfigPath());
+
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        ChartMap scm3 = spy(cm3);
+        doReturn("target/test").when(scm3).getEnv("APPDATA");
+        scm3.constructHelmConfigPath(ChartUtil.OSType.WINDOWS);
+        assertEquals("target/test".concat("/helm"), scm3.getHelmConfigPath());
+
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        ChartMap scm4 = spy(cm4);
+        doReturn("target/test/XDG_CONFIG_HOME").when(scm4).getEnv("XDG_CONFIG_HOME");
+        scm4.constructHelmConfigPath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test/XDG_CONFIG_HOME", scm4.getHelmConfigPath());
+
+        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true, true);
+        ChartMap scm5 = spy(cm5);
+        doReturn("target/test/HELM_CONFIG_HOME").when(scm5).getEnv("HELM_CONFIG_HOME");
+        scm5.constructHelmConfigPath(ChartUtil.OSType.MACOS);
+        assertEquals("target/test/HELM_CONFIG_HOME", scm5.getHelmConfigPath());
+
+        // No valid helm config directory in MACOS is found so look for the exception
+        // and logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            ChartMap scm6 = spy(cm6);
+            doReturn(null).when(scm6).getEnv("HOME");
+            assertThrows(ChartMapException.class, () -> scm6.constructHelmConfigPath(ChartUtil.OSType.MACOS));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
+            System.setOut(initialOut);
+        }
+
+        // No valid helm config directory in LINUX is found so look for the exception and
+        // logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            ChartMap scm7 = spy(cm7);
+            doReturn(null).when(scm7).getEnv("HOME");
+            assertThrows(ChartMapException.class, () -> scm7.constructHelmConfigPath(ChartUtil.OSType.LINUX));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
+            System.setOut(initialOut);
+        }
+
+        // No valid helm config directory in Windows is found so look for the exception
+        // and logged error message
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm8 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            ChartMap scm8 = spy(cm8);
+            doReturn(null).when(scm8).getEnv("APPDATA");
+            assertThrows(ChartMapException.class, () -> scm8.constructHelmConfigPath(ChartUtil.OSType.WINDOWS));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.APPDATA)));
+            System.setOut(initialOut);
+        }
+
+        // All other cases
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm9 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            assertThrows(ChartMapException.class, () -> cm9.constructHelmConfigPath(ChartUtil.OSType.OTHER));
+            assertTrue(ChartMapTestUtil.streamContains(o,
+                    "Could not locate the helm config path. Check that your installation of helm is complete and that you are using a supported OS."));
+            System.setOut(initialOut);
+        }
+
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the getHelmCommand method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void constructGetHelmCommandTest() throws ChartMapException, IOException {
+        // The helm command is found in HELM_BIN
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            ChartMap scm1 = spy(cm1);
+            String h = "target/test/HELM_BIN";
+            doReturn(h).when(scm1).getEnv("HELM_BIN");
+            scm1.getHelmCommand();
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used",h)));
+            System.setOut(initialOut);
+        }
+        // The helm command is not found in HELM_BIN so the default "helm" is used
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true, true);
+            ChartMap scm1 = spy(cm1);
+            doReturn(null).when(scm1).getEnv("HELM_BIN");
+            scm1.getHelmCommand();
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used","helm")));
+            System.setOut(initialOut);
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

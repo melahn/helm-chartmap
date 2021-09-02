@@ -602,6 +602,12 @@ public class ChartMap {
         constructHelmConfigPath(os);
     }
 
+    
+    /** 
+     * Constructs the helm cache path following the rules defined by helm.
+     * 
+     * @throws ChartMapException if a valid path could not be constructed
+     */
     protected void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
         String m = null;
         setHelmCachePath(getEnv("HELM_CACHE_HOME") != null ? getEnv("HELM_CACHE_HOME") : getEnv("XDG_CACHE_HOME"));
@@ -634,44 +640,69 @@ public class ChartMap {
             }
             setHelmCachePath(getEnv(TEMP).concat(HELM_SUBDIR));
         }
-        if (getHelmCachePath() == null) {
-            m = "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS.";
+        if (getHelmCachePath() == null) { // None of the above
+            m = "Could not locate the helm cache path. Check that your installation of helm is complete and that you are using a supported OS.";
             logger.error(m);
             throw new ChartMapException(m);
         }
     }
 
-    protected String getEnv(String e) {
-        return System.getenv(e);
-    }
-
+     /** 
+     * Constructs the helm config path following the rules defined by helm.
+     * 
+     * @throws ChartMapException if a valid path could not be constructed
+     */
     protected void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
-        setHelmConfigPath(System.getenv("HELM_CONFIG_HOME") != null ? System.getenv("HELM_CONFIG_HOME")
-                : System.getenv("XDG_CONFIG_HOME"));
+        String m = null;
+        setHelmConfigPath(getEnv("HELM_CONFIG_HOME") != null ? getEnv("HELM_CONFIG_HOME")
+                : getEnv("XDG_CONFIG_HOME"));
         // When no other location is set, use a default location based on the operating
         // system
         if (getHelmConfigPath() == null && os == ChartUtil.OSType.MACOS) {
-            if (System.getenv(HOME) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            if (getEnv(HOME) == null) {
+                // The reason I am not using the common function logErrorAndThrow() is that
+                // the code coverage tools has trouble recognizing that logErrorAndThrow() is called
+                // so I decided to inline the instructions 
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            setHelmConfigPath(System.getenv(HOME).concat("/Library/Preferences/helm"));
+            setHelmConfigPath(getEnv(HOME).concat("/Library/Preferences/helm"));
         }
         if (getHelmConfigPath() == null && os == ChartUtil.OSType.LINUX) {
-            if (System.getenv(HOME) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, HOME));
+            if (getEnv(HOME) == null) {
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            setHelmConfigPath(System.getenv("HOME").concat("/.config/helm"));
+            setHelmConfigPath(getEnv("HOME").concat("/.config/helm"));
         }
         if (getHelmConfigPath() == null && os == ChartUtil.OSType.WINDOWS) {
-            if (System.getenv(APPDATA) == null) {
-                logErrorAndThrow(String.format(CHECK_OS_MSG, APPDATA));
+            if (getEnv(APPDATA) == null) {
+                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.APPDATA);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-            setHelmConfigPath(System.getenv(APPDATA).concat(HELM_SUBDIR));
+            setHelmConfigPath(getEnv(APPDATA).concat(HELM_SUBDIR));
         }
         if (getHelmConfigPath() == null) { // None of the above
-            logErrorAndThrow(
-                    "Could not locate the helm Cache path. Check that your installation of helm is complete and that you are using a supported OS.");
+            m = "Could not locate the helm config path. Check that your installation of helm is complete and that you are using a supported OS.";
+            logger.error(m);
+            throw new ChartMapException(m);
         }
+    }
+
+    /**
+     * Gets the environment variable. Using my own function for this allows testing
+     * of different environment variable values using mocks and spies.  
+     * 
+     * @param e The name of the variable to fetch
+     * @return The value of the variable or null
+     */
+    protected String getEnv(String e) {
+        String v = System.getenv(e);
+        logger.log(logLevelDebug, "Environment Variable {} = {}", e, v);
+        return v;
     }
 
     /**
@@ -682,16 +713,12 @@ public class ChartMap {
      * 
      * @return the helm command
      */
-    protected String getHelmCommand() throws ChartMapException {
-        try {
-            String helmBin = System.getenv("HELM_BIN");
-            logger.log(logLevelDebug, "HELM_BIN = {}", helmBin);
-            String helmCommandResolved = helmBin == null ? "helm" : helmBin;
-            logger.log(logLevelDebug, "The helm command {} will be used.", helmCommandResolved);
-            return helmCommandResolved;
-        } catch (SecurityException | NullPointerException e) {
-            throw new ChartMapException(String.format("Exception trying to get HELM_BIN: %s ", e.getMessage()));
-        }
+    protected String getHelmCommand() {
+        String helmBin = getEnv("HELM_BIN");
+        logger.log(logLevelDebug, "HELM_BIN = {}", helmBin);
+        String helmCommandResolved = helmBin == null ? "helm" : helmBin;
+        logger.log(logLevelDebug, "The helm command {} will be used.", helmCommandResolved);
+        return helmCommandResolved;
     }
 
     /**
