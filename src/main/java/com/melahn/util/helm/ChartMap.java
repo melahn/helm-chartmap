@@ -749,15 +749,18 @@ public class ChartMap {
     }
 
     /**
-     * Takes a directory containing files in yaml form and constructs a HelmChart
-     * object from each and adds that Helm Chart object to the charts map
+     * Takes a yaml file containing elements representing cached helm charts
+     * and a helm chart object and adds that Helm Chart object to the charts map
+     * making8 sure ot set the url of each cached helm chart using the url
+     * 
      *
-     * @param c a Directory containing Helm Charts in yaml form
+     * @param r a HelmChartRepoLocal (needed for the url only)
+     * @param c a yaml file containing a set of helm charts 
      */
-    private void loadChartsFromCache(HelmChartRepoLocal r, File c) {
+    protected void loadChartsFromCache(HelmChartRepoLocal r, File c) {
         HelmChartLocalCache cache;
         try {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             cache = mapper.readValue(c, HelmChartLocalCache.class);
             Map<String, HelmChart[]> entries = cache.getEntries();
@@ -769,7 +772,7 @@ public class ChartMap {
                     // some chart entries don't contain the full url (ie one starting with 'http')
                     // but rather only contain a relative url and even that is not consistent. We do
                     // our best to construct a url from what we have
-                    if (h.getUrls()[0] != null && !h.getUrls()[0].substring(0, "http".length()).equals("http")) {
+                    if (h.getUrls() != null && h.getUrls().length > 0 && !h.getUrls()[0].isEmpty() && !h.getUrls()[0].substring(0, "http".length()).equals("http")) {
                         String[] url = new String[1];
                         url[0] = r.getUrl();
                         if (url[0].charAt(url[0].length() - 1) != '/') {
@@ -782,7 +785,7 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error loading charts from helm cache: {}", e.getMessage());
+            logger.info("Error loading charts from helm cache: {}", e.getMessage());
         }
     }
 
@@ -1996,6 +1999,10 @@ public class ChartMap {
         return apprSpec;
     }
 
+    public ChartKeyMap getCharts() {
+        return charts;
+        
+    }
     public String getChartFilename() {
         return chartFilename;
     }

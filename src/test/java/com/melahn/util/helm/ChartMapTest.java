@@ -3,6 +3,7 @@ package com.melahn.util.helm;
 import static com.melahn.util.test.ChartMapTestUtil.isWindows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melahn.util.helm.model.HelmChart;
+import com.melahn.util.helm.model.HelmChartLocalCache;
+import com.melahn.util.helm.model.HelmChartRepoLocal;
 import com.melahn.util.helm.model.HelmChartReposLocal;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
@@ -482,6 +485,95 @@ class ChartMapTest {
             System.setOut(initialOut);
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the loadChartsFromCache method.
+     * 
+     * @throws ChartMapException if an error occured loading the charts
+     * @throws IOException if an error occured fabricating my cache yaml file
+     */
+    @Test
+    void loadChartsFromCacheTest() throws ChartMapException, IOException {
+        HelmChartRepoLocal r = new HelmChartRepoLocal();
+        // Fabricate a HelmChartRepoLocal (I only need tbe url for this test)
+        r.setUrl("http://foo"); 
+        String n = "foo";
+        String v = "6.6.6";
+        // fabricate a cache yaml file with one entry
+        String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - https://foo\n")); 
+        String c = "loadChartsFromCacheTest.yaml"; 
+        Path p = Paths.get(targetTestDirectory, c);
+        File f = Files.createFile(p).toFile();
+        byte[] b = s.getBytes();
+        Files.write(p, b);
+        // create a test ChartMap and validate I can load the chart from my fabricated cache
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm1.loadChartsFromCache(r, f);
+        assertNotNull(cm1.getCharts().get("foo", "6.6.6"));
+
+        // Test for a missing urls element in the cache
+        Files.deleteIfExists(p);
+        f = Files.createFile(p).toFile();
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n")); 
+        b = s.getBytes();
+        Files.write(p, b);
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm2.loadChartsFromCache(r, f);
+        assertNotNull(cm2.getCharts().get("foo", "6.6.6"));
+
+        // Test for an empty urls array in the cache
+        Files.deleteIfExists(p);
+        f = Files.createFile(p).toFile();
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls: []\n")); 
+        b = s.getBytes();
+        Files.write(p, b);
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm3.loadChartsFromCache(r, f);
+        assertNotNull(cm3.getCharts().get("foo", "6.6.6"));
+                //test for an empty urls array in the cache
+        Files.deleteIfExists(p);
+        f = Files.createFile(p).toFile();
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls: []\n")); 
+        b = s.getBytes();
+        Files.write(p, b);
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm4.loadChartsFromCache(r, f);
+        assertNotNull(cm4.getCharts().get("foo", "6.6.6"));
+
+        // Test for an empty string element in the urls array
+        Files.deleteIfExists(p);
+        f = Files.createFile(p).toFile();
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - ''\n"));
+        b = s.getBytes();
+        Files.write(p, b);
+        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        true);
+        cm5.loadChartsFromCache(r, f);
+        assertNotNull(cm5.getCharts().get("foo", "6.6.6"));
+
+        // Finally, force an IOException and check the log to complete all the possible branches
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            Files.deleteIfExists(p);
+            f = Files.createFile(p).toFile(); 
+            s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - ''\n"));
+            b = s.getBytes();
+            Files.write(p, b);
+            ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+            false);
+            ChartMap scm6 = spy(cm6);
+            ObjectMapper som6 = spy(ObjectMapper.class);
+            doReturn(som6).when(scm6).getObjectMapper();
+            doThrow(IOException.class).when(som6).readValue(any(File.class), eq(HelmChartLocalCache.class));
+            System.setOut(new PrintStream(o));
+            scm6.loadChartsFromCache(r, f);
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("Error loading charts from helm cache: ")));
+            System.setOut(initialOut);
+        }
     }
 
     /**
