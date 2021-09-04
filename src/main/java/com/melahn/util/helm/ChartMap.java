@@ -793,17 +793,18 @@ public class ChartMap {
      * For each chart in the referenced charts map, print the chart. Precede that
      * with a summary of how many charts were referenced
      */
-    private void printCharts() {
+    protected void printCharts() {
         MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
+        IChartMapPrinter p = getPrinter();
         try {
             if (chartsReferenced.size() == 1) {
-                printer.printSectionHeader("There is one referenced Helm Chart");
+                p.printSectionHeader("There is one referenced Helm Chart");
             } else {
-                printer.printSectionHeader("There are " + chartsReferenced.size() + " referenced Helm Charts");
+                p.printSectionHeader("There are " + chartsReferenced.size() + " referenced Helm Charts");
             }
             while (it.hasNext()) {
                 it.next();
-                printer.printChart(it.getValue());
+                p.printChart(it.getValue());
             }
         } catch (ChartMapException e) {
             logger.error("IOException printing charts: {} ", e.getMessage());
@@ -1420,7 +1421,7 @@ public class ChartMap {
     private void renderTemplates(File d, HelmChart h, HelmChart p) throws ChartMapException {
         try {
             if (h.getType() != null && h.getType().equals("library")) {
-                // skip rendering library charts (these were intruduced in Helm V3)
+                // skip rendering library charts (these were introduced in Helm V3)
                 return;
             }
             File tf = runTemplateCommand(d, h);
@@ -2073,6 +2074,10 @@ public class ChartMap {
 
     protected void setOutputFilename(String o) {
         this.outputFilename = o;
+    }
+
+    public IChartMapPrinter getPrinter() {
+        return printer;
     }
 
     public PrintFormat getPrintFormat() {

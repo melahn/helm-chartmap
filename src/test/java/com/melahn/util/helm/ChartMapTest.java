@@ -577,6 +577,36 @@ class ChartMapTest {
     }
 
     /**
+     * Test the printCharts method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void printChartsTest() throws ChartMapException, IOException {
+        // Test for a single Chart 
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz", Paths.get("test-fakechart.txt"), true, false,
+        false);
+        cm1.print();
+        assertTrue(ChartMapTestUtil.fileContains(Paths.get("test-fakechart.txt"), "There is one referenced Helm Chart"));
+        // Force a ChartMapException using a spy
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm2 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz", Paths.get("test-fakechart.txt"), true, false,
+            false);
+            ChartMap scm2 = spy(cm2);
+            IChartMapPrinter sp2 = spy(IChartMapPrinter.class);
+            doReturn(sp2).when(scm2).getPrinter();
+            doThrow(ChartMapException.class).when(sp2).printSectionHeader(any(String.class));
+            scm2.print();
+            assertTrue(ChartMapTestUtil.streamContains(o,"IOException printing charts:"));
+            System.setOut(initialOut);
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+
+    }
+
+    /**
      * Tests the creation and removal of the temp directory used by ChartMap.
      * 
      * @throws ChartMapException
