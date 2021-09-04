@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -113,8 +114,8 @@ class ChartMapTest {
 
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV,
-                false, false, false, false);
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false, false);
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
@@ -136,22 +137,22 @@ class ChartMapTest {
     @Test
     void unpackChartTest() throws ChartMapException, IOException {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV,
-                false, false, false, true);
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false, true);
         cm1.setChartName("foo");
         cm1.createTempDir();
         assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
         // force ChartMapException path when no temp dir
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV,
-                false, false, false, true);
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false, true);
         cm2.setChartName("foo");
         assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
         // force ChartMapException path when null chartmap passed
         cm2.createTempDir();
         assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
         // test when the tgz has no directory
-        ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV,
-                false, false, false, true);
+        ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false, true);
         cm3.setChartName(null);
         cm3.setChartVersion(null);
         cm3.createTempDir();
@@ -686,18 +687,30 @@ class ChartMapTest {
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+
     /**
-     * Tests the getChart method.
+     * Tests the getChart methods.
      * 
      * @throws ChartMapException
      */
     @Test
     void getChartTest() throws ChartMapException {
+        // Test chart not found in getChart()
         ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         ChartMap scm1 = spy(cm1);
         doReturn(null).when(scm1).getChart(anyString());
         assertNull(scm1.getChart());
+
+        // Test getChart(String c) IOException to ChartMapException
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputTextFilePathNRNV, false, false,
+                true);
+        cm2.print();
+        try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
+            mf.when(() -> Files.copy(any(Path.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
+                    .thenThrow(IOException.class);
+            assertThrows(ChartMapException.class, () -> cm2.getChart(cm2.getChartName()));
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -735,6 +748,7 @@ class ChartMapTest {
         cm4.print();
         assertFalse(Files.exists(Paths.get(cm4.getTempDirName())));
         System.out.println("IOException -> ChartMapException thrown as expected attempting to remove temp dir");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
