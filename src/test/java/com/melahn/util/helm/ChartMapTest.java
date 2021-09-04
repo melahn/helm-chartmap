@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -31,6 +32,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melahn.util.helm.model.HelmChart;
@@ -264,7 +267,8 @@ class ChartMapTest {
     }
 
     /**
-     * Test the constructHelmCachePathTest method with all OS type and env var combinations.
+     * Test the constructHelmCachePathTest method with all OS type and env var
+     * combinations.
      * 
      * @throws ChartMapException
      */
@@ -359,7 +363,8 @@ class ChartMapTest {
     }
 
     /**
-     * Test the constructHelmConfigPathTest method with all OS type and env var combinations.
+     * Test the constructHelmConfigPathTest method with all OS type and env var
+     * combinations.
      * 
      * @throws ChartMapException
      */
@@ -413,7 +418,8 @@ class ChartMapTest {
             System.setOut(initialOut);
         }
 
-        // No valid helm config directory in LINUX is found so look for the exception and
+        // No valid helm config directory in LINUX is found so look for the exception
+        // and
         // logged error message
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
@@ -470,7 +476,7 @@ class ChartMapTest {
             String h = "target/test/HELM_BIN";
             doReturn(h).when(scm1).getEnv("HELM_BIN");
             scm1.getHelmCommand();
-            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used",h)));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used", h)));
             System.setOut(initialOut);
         }
         // The helm command is not found in HELM_BIN so the default "helm" is used
@@ -481,7 +487,7 @@ class ChartMapTest {
             ChartMap scm1 = spy(cm1);
             doReturn(null).when(scm1).getEnv("HELM_BIN");
             scm1.getHelmCommand();
-            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used","helm")));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used", "helm")));
             System.setOut(initialOut);
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -491,80 +497,88 @@ class ChartMapTest {
      * Test the loadChartsFromCache method.
      * 
      * @throws ChartMapException if an error occured loading the charts
-     * @throws IOException if an error occured fabricating my cache yaml file
+     * @throws IOException       if an error occured fabricating my cache yaml file
      */
     @Test
     void loadChartsFromCacheTest() throws ChartMapException, IOException {
         HelmChartRepoLocal r = new HelmChartRepoLocal();
         // Fabricate a HelmChartRepoLocal (I only need tbe url for this test)
-        r.setUrl("http://foo"); 
+        r.setUrl("http://foo");
         String n = "foo";
         String v = "6.6.6";
         // fabricate a cache yaml file with one entry
-        String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - https://foo\n")); 
-        String c = "loadChartsFromCacheTest.yaml"; 
+        String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                .concat("\n".concat("    urls:\n    - https://foo\n"));
+        String c = "loadChartsFromCacheTest.yaml";
         Path p = Paths.get(targetTestDirectory, c);
         File f = Files.createFile(p).toFile();
         byte[] b = s.getBytes();
         Files.write(p, b);
-        // create a test ChartMap and validate I can load the chart from my fabricated cache
+        // create a test ChartMap and validate I can load the chart from my fabricated
+        // cache
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm1.loadChartsFromCache(r, f);
         assertNotNull(cm1.getCharts().get("foo", "6.6.6"));
 
         // Test for a missing urls element in the cache
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
-        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n")); 
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                .concat("\n".concat("    urls:\n"));
         b = s.getBytes();
         Files.write(p, b);
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm2.loadChartsFromCache(r, f);
         assertNotNull(cm2.getCharts().get("foo", "6.6.6"));
 
         // Test for an empty urls array in the cache
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
-        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls: []\n")); 
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                .concat("\n".concat("    urls: []\n"));
         b = s.getBytes();
         Files.write(p, b);
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm3.loadChartsFromCache(r, f);
         assertNotNull(cm3.getCharts().get("foo", "6.6.6"));
-                //test for an empty urls array in the cache
+        // test for an empty urls array in the cache
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
-        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls: []\n")); 
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                .concat("\n".concat("    urls: []\n"));
         b = s.getBytes();
         Files.write(p, b);
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm4.loadChartsFromCache(r, f);
         assertNotNull(cm4.getCharts().get("foo", "6.6.6"));
 
         // Test for an empty string element in the urls array
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
-        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - ''\n"));
+        s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                .concat("\n".concat("    urls:\n    - ''\n"));
         b = s.getBytes();
         Files.write(p, b);
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        true);
+                true);
         cm5.loadChartsFromCache(r, f);
         assertNotNull(cm5.getCharts().get("foo", "6.6.6"));
 
-        // Finally, force an IOException and check the log to complete all the possible branches
+        // Finally, force an IOException and check the log to complete all the possible
+        // branches
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             Files.deleteIfExists(p);
-            f = Files.createFile(p).toFile(); 
-            s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v).concat("\n".concat("    urls:\n    - ''\n"));
+            f = Files.createFile(p).toFile();
+            s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
+                    .concat("\n".concat("    urls:\n    - ''\n"));
             b = s.getBytes();
             Files.write(p, b);
             ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-            false);
+                    false);
             ChartMap scm6 = spy(cm6);
             ObjectMapper som6 = spy(ObjectMapper.class);
             doReturn(som6).when(scm6).getObjectMapper();
@@ -584,26 +598,93 @@ class ChartMapTest {
      */
     @Test
     void printChartsTest() throws ChartMapException, IOException {
-        // Test for a single Chart 
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz", Paths.get("test-fakechart.txt"), true, false,
-        false);
+        // Test for a single Chart
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
+                Paths.get("test-fakechart.txt"), true, false, false);
         cm1.print();
-        assertTrue(ChartMapTestUtil.fileContains(Paths.get("test-fakechart.txt"), "There is one referenced Helm Chart"));
+        assertTrue(
+                ChartMapTestUtil.fileContains(Paths.get("test-fakechart.txt"), "There is one referenced Helm Chart"));
         // Force a ChartMapException using a spy
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm2 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz", Paths.get("test-fakechart.txt"), true, false,
-            false);
+            ChartMap cm2 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
+                    Paths.get("test-fakechart.txt"), true, false, false);
             ChartMap scm2 = spy(cm2);
             IChartMapPrinter sp2 = spy(IChartMapPrinter.class);
             doReturn(sp2).when(scm2).getPrinter();
             doThrow(ChartMapException.class).when(sp2).printSectionHeader(any(String.class));
             scm2.print();
-            assertTrue(ChartMapTestUtil.streamContains(o,"IOException printing charts:"));
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException printing charts:"));
             System.setOut(initialOut);
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
 
+    }
+
+    /**
+     * Tests the extractEmbeddedCharts method.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void testExtractEmbeddedCharts() throws ChartMapException, IOException, RuntimeException {
+        // Force a ChartMapException
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                true);
+        try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
+            mf.when(() -> Files.walk(any(Path.class), anyInt())).thenThrow(IOException.class);
+            System.out.print("An IOException is swallowed but expect this log message ... ");
+            assertThrows(ChartMapException.class, () -> cm1.extractEmbeddedCharts("foo"));
+        }
+        assertThrows(RuntimeException.class, () -> lambdaWrapper());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /*
+     * Raise an exception. Used as part of the test of the LambdaxcpetionWrapper.
+     * 
+     * @throws Exception
+     */
+    void raiseException(Exception e) throws Exception {
+        throw e;
+    }
+
+    /*
+     * a LambdaWrapper that just raises a RuntimeException to force that code path
+     * in the ChartMap.lambdaExceptionWrapper.
+     */
+    void lambdaWrapper() throws IOException, RuntimeException {
+        // Force the lambdaExceptionWrapper to throw a RuntimeException
+        Files.deleteIfExists(Paths.get("test-extract", "f"));
+        Files.deleteIfExists(Paths.get("test-extract"));
+        Path d = Files.createDirectories(Paths.get("test-extract"));
+        Files.createFile(Paths.get("test-extract", "f"));
+        try (Stream<Path> walk = Files.walk(d, 1)) {
+            walk.filter(Files::isRegularFile).collect(Collectors.toList())
+                    .forEach(ChartMap.lambdaExceptionWrapper(p -> raiseException(new RuntimeException())));
+        }
+    }
+
+    /**
+     *  Tests the resolveChartDependencies method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void resolveChartDependenciesTest() throws ChartMapException, IOException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    true);
+            ChartMap scm1 = spy(cm1);
+            doReturn(null).when(scm1).getChart();
+            doReturn("foobar").when(scm1).getChartName();
+            scm1.resolveChartDependencies();
+            assertTrue(ChartMapTestUtil.streamContains(o, "Chart foobar was not found"));
+            System.setOut(initialOut);
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**

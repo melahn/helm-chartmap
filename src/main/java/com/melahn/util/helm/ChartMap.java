@@ -825,7 +825,7 @@ public class ChartMap {
                 collectDependencies(chartDirName, null);
                 applyTemplates();
             } else {
-                logger.error("Chart {} was not found", chartName);
+                logger.error("Chart {} was not found", getChartName());
             }
         } catch (ChartMapException e) {
             logger.error("Error resolving chart dependencies: {}", e.getMessage());
@@ -842,7 +842,7 @@ public class ChartMap {
      * name, the chart is already in the charts map we create from the repo so find
      * the download url from that entry and download it
      */
-    private String getChart() throws ChartMapException {
+    protected String getChart() throws ChartMapException {
         String chartDirName = "";
         try {
             if (getApprSpec() != null) {
@@ -852,10 +852,10 @@ public class ChartMap {
             } else if (getChartFilename() != null) {
                 chartDirName = getChart(getChartFilename());
             } else {
-                HelmChart h = charts.get(chartName, chartVersion);
+                HelmChart h = charts.get(getChartName(), chartVersion);
                 if (h == null) {
                     throw (new ChartMapException(
-                            "chart ".concat(chartName.concat(":").concat(chartVersion).concat(" not found"))));
+                            "chart ".concat(getChartName().concat(":").concat(chartVersion).concat(" not found"))));
                 }
                 chartDirName = downloadChart(h.getUrls()[0]);
             }
@@ -864,7 +864,7 @@ public class ChartMap {
             logger.error("Error getting chart: {}", e.getMessage());
             throw (e);
         }
-        chart = charts.get(chartName, chartVersion);
+        chart = charts.get(getChartName(), chartVersion);
         if (chartDirName != null) {
             return chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)); // return the parent directory
         }
@@ -900,7 +900,7 @@ public class ChartMap {
             int exitCode = p.exitValue();
             if (exitCode == 0) {
                 chartDirName = getTempDirName() + apprSpec.substring(apprSpec.indexOf('/') + 1, apprSpec.length())
-                        .replace('@', '_').replace('/', '_') + File.separator + chartName;
+                        .replace('@', '_').replace('/', '_') + File.separator + getChartName();
                 createChart(chartDirName);
                 extractEmbeddedCharts(chartDirName);
             } else {
@@ -926,7 +926,7 @@ public class ChartMap {
         void accept(T t) throws E;
     }
 
-    static <T> Consumer<T> lambdaExceptionWrapper(LambdaConsumer<T, Exception> throwingConsumer) {
+    public static <T> Consumer<T> lambdaExceptionWrapper(LambdaConsumer<T, Exception> throwingConsumer) {
         return x -> {
             try {
                 throwingConsumer.accept(x);
@@ -947,14 +947,14 @@ public class ChartMap {
      * @throws ChartMapException if an exception occurs extracting the embedded
      *                           archives
      */
-    private void extractEmbeddedCharts(String d) throws ChartMapException {
+    public void extractEmbeddedCharts(String d) throws ChartMapException {
         final int MAXDEPTH = 5;
         try (Stream<Path> walk = Files.walk(Paths.get(d), MAXDEPTH)) {
             walk.filter(Files::isRegularFile).filter(p -> p.getFileName().toString().endsWith(".tgz"))
                     .collect(Collectors.toList()).forEach(lambdaExceptionWrapper(
-                            p -> new ArchiveExtract().extract(p.toString(), Paths.get(d, CHARTS_DIR_NAME))));
+                            p -> getExtracter().extract(p.toString(), Paths.get(d, CHARTS_DIR_NAME))));
         } catch (IOException e) {
-            String m = String.format("IO Exception extracting embedded charts from %s: %s", d, e.getMessage());
+            String m = String.format("IO Exception extracting embedded charts from %s", d);
             logger.error(m);
             throw new ChartMapException(m);
         }
@@ -1042,8 +1042,8 @@ public class ChartMap {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             HelmChart h = mapper.readValue(new File(yamlChartFilename), HelmChart.class);
-            chartName = h.getName();
-            chartVersion = h.getVersion();
+            setChartName(h.getName());
+            setChartVersion(h.getVersion());
             // If the chart is already in the charts map we want to transfer any extra
             // information
             // from that chart into the chart we create from the yaml file since otherwise
@@ -1076,7 +1076,7 @@ public class ChartMap {
             throw new ChartMapException(m);
         }
         try {
-            new ArchiveExtract().extract(chartFilename, Paths.get(tempDirName));
+            getExtracter().extract(chartFilename, Paths.get(tempDirName));
             // If the Chart Name or Version were not yet extracted, such as would happen if
             // the chart was provided as a local tgz file
             // then extract the chart name and version from the highest order Chart.yaml
@@ -1091,8 +1091,8 @@ public class ChartMap {
                     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                     HelmChart h = mapper.readValue(chartYamlFile, HelmChart.class);
-                    chartName = h.getName();
-                    chartVersion = h.getVersion();
+                    setChartName(h.getName());
+                    setChartVersion(h.getVersion());
                     if (charts.get(chartName, chartVersion) == null) {
                         charts.put(chartName, chartVersion, h);
                     }
@@ -1108,6 +1108,16 @@ public class ChartMap {
             logger.error(m);
             throw new ChartMapException(m);
         }
+    }
+
+    /**
+     * 
+     * Returns a new extracter instance.
+     * @return a new ArchiveExtract
+     * 
+    */
+    ArchiveExtract getExtracter() {
+        return new ArchiveExtract();
     }
 
     /**
