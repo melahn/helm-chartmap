@@ -864,14 +864,14 @@ public class ChartMap {
             logger.error("Error getting chart: {}", e.getMessage());
             throw (e);
         }
-        chart = charts.get(getChartName(), chartVersion);
+        chart = charts.get(getChartName(), getChartVersion());
         if (chartDirName != null) {
             return chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)); // return the parent directory
         }
         return chartDirName;
     }
 
-    private String getChart(String chartFilename) throws ChartMapException {
+    protected String getChart(String chartFilename) throws ChartMapException {
         try {
             Path src = new File(chartFilename).toPath();
             Path tgt = new File(getTempDirName()).toPath().resolve(new File(chartFilename).getName());
@@ -891,7 +891,7 @@ public class ChartMap {
      * @return the name of the directory into which the chart was downloaded e.g.
      *         /temp/melahn_helm-chartmap-test-chart_1.0.0/helm-chartmap-test-chart
      */
-    private String pullChart(String apprSpec) throws ChartMapException {
+    protected String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
         try {
             String command = "helm quay pull ".concat(apprSpec);
