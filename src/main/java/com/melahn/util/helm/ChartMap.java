@@ -879,8 +879,6 @@ public class ChartMap {
             String s = tgt.toAbsolutePath().toString();
             return (unpackChart(s));
         } catch (IOException e) {
-            //            throw (new ChartMapException("Exception copying ".concat(getChartFilename()).concat(" to ")
-            //.concat(getTempDirName()).concat(" : ").concat(e.getMessage())));
             throw new ChartMapException("IOException in getChart(".concat(chartFilename).concat(")"));
         }
     }
