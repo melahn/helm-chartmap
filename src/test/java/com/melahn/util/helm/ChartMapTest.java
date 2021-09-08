@@ -217,7 +217,7 @@ class ChartMapTest {
         // Use a command that is the same across all the OS's so it will run
         Process p1 = Runtime.getRuntime().exec(new String[] { "echo", "I am the foo process" });
         Process sp1 = spy(p1);
-        doReturn(sp1).when(scm1).getProcess(any());
+        doReturn(sp1).when(scm1).getProcess(any(), eq(null));
         doReturn("helm").when(scm1).getHelmCommand();
         // Return 1 to mimic a bad helm command forcing a ChartMapException
         doReturn(1).when(sp1).exitValue();
@@ -227,7 +227,7 @@ class ChartMapTest {
         ChartMap scm2 = spy(cm2);
         // Use a command that is the same across all the OS's to mimic a helm not v3
         Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "I am not helm version 3" });
-        doReturn(p2).when(scm2).getProcess(any());
+        doReturn(p2).when(scm2).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm2.checkHelmVersion());
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
@@ -238,7 +238,7 @@ class ChartMapTest {
         String nullCommand = isWindows() ? "type" : "cat";
         String nullArgument = isWindows() ? "NUL" : "/dev/null";
         Process p3 = Runtime.getRuntime().exec(new String[] { nullCommand, nullArgument });
-        doReturn(p3).when(scm3).getProcess(any());
+        doReturn(p3).when(scm3).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm3.checkHelmVersion());
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
@@ -247,24 +247,25 @@ class ChartMapTest {
         // character and force the
         // ChartMapException
         Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "1" });
-        doReturn(p4).when(scm4).getProcess(any());
+        doReturn(p4).when(scm4).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm5 = spy(cm5);
         // Cause an IOException -> ChartMapException on getProcess()
-        doThrow(IOException.class).when(scm5).getProcess(any());
+        doThrow(IOException.class).when(scm5).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm5.checkHelmVersion());
         ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm6 = spy(cm6);
         Process p6 = Runtime.getRuntime()
-                .exec(new String[] { "echo", "I am gaing to throw an InterruptedException!!" });
+                .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp6 = spy(p6);
-        doReturn(sp6).when(scm6).getProcess(any());
+        doReturn(sp6).when(scm6).getProcess(any(), eq(null));
         // Cause an InterruptedException -> ChartMapException on waitFor()
         doThrow(InterruptedException.class).when(sp6).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**
@@ -711,6 +712,32 @@ class ChartMapTest {
                     .thenThrow(IOException.class);
             assertThrows(ChartMapException.class, () -> cm2.getChart(cm2.getChartName()));
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the pullChart method using an APPR spec.
+     * 
+     * @throws ChartMapException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    @Test
+    void pullChartTest() throws ChartMapException, InterruptedException, IOException {
+        // Use a spy to throw an IOException -> ChartMapException
+        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        ChartMap scm1 = spy(cm1);
+        doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
+        assertThrows(ChartMapException.class, () -> scm1.print());
+        // Use a spy to throw an InterruptedException -> ChartMapException
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        ChartMap scm2 = spy(cm2);
+        Process p2 = Runtime.getRuntime()
+                .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
+        Process sp2 = spy(p2);
+        doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
+        doThrow(InterruptedException.class).when(sp2).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertThrows(ChartMapException.class, () -> scm2.print());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

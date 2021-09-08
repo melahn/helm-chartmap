@@ -535,9 +535,9 @@ public class ChartMap {
      * @throws ChartMapException if a version other than V3 is found
      */
     protected void checkHelmVersion() throws ChartMapException {
-        String[] cmdArray = { getHelmCommand(), "version", "--template", "{{ .Version }}" };
+        String[] c = { getHelmCommand(), "version", "--template", "{{ .Version }}" };
         try {
-            Process p = getProcess(cmdArray);
+            Process p = getProcess(c, null);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
@@ -550,8 +550,8 @@ public class ChartMap {
                 throw new ChartMapException(
                         "Unsupported Helm Version. Please upgrade to helm V3 or use a previous version of ChartMap.");
             } else { // we could not even execute the helm command
-                throw new ChartMapException("Error Code: " + exitCode + " executing command " + cmdArray[0]
-                        + cmdArray[1] + cmdArray[2] + cmdArray[3]);
+                throw new ChartMapException("Error Code: " + exitCode + " executing command " + c[0]
+                        + c[1] + c[2] + c[3]);
             }
         } catch (IOException e) {
             // we could not get the output of the helm command
@@ -568,11 +568,13 @@ public class ChartMap {
      * This method was introduced to allow providing a test version of a Process so
      * as to return non zero exit codes for testing.
      * 
+     * @param c the command and its parameters
+     * @param d the working directory
      * @return a Process
      * @throws IOException
      */
-    public Process getProcess(String[] cmdArray) throws IOException {
-        return Runtime.getRuntime().exec(cmdArray);
+    public Process getProcess(String[] c, File d) throws IOException {
+        return d!=null?Runtime.getRuntime().exec(c, null, d):Runtime.getRuntime().exec(c, null);
     }
 
     /**
@@ -893,8 +895,8 @@ public class ChartMap {
     protected String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
         try {
-            String command = "helm quay pull ".concat(apprSpec);
-            Process p = Runtime.getRuntime().exec(command, null, new File(getTempDirName()));
+            String[] c = {"helm", "quay", "pull", apprSpec};
+            Process p = getProcess(c, new File(getTempDirName()));
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitCode = p.exitValue();
             if (exitCode == 0) {
@@ -904,7 +906,7 @@ public class ChartMap {
                 extractEmbeddedCharts(chartDirName);
             } else {
                 throw new ChartMapException(
-                        String.format("Error Code: %c executing command \"%s\"", exitCode, command));
+                        String.format("Error Code: %c executing helm quay pull command ", exitCode));
             }
         } catch (IOException e) {
             throw (new ChartMapException(String.format(
