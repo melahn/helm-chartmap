@@ -968,14 +968,14 @@ public class ChartMap {
      * @param u A string holding the url of the Helm Chart to be downloaded
      * @return the name of the directory where the chart was pulled into e.g.
      *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
+     * @throws ChartMapException
      */
-    private String downloadChart(String u) {
+    protected String downloadChart(String u) throws ChartMapException {
         String chartDirName = null;
         String tgzFileName = tempDirName + this.getClass().getCanonicalName() + "_chart.tgz";
         try (FileOutputStream fos = new FileOutputStream(new File(tgzFileName));) {
             CloseableHttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(u);
-            HttpResponse response = client.execute(request);
+            HttpResponse response = getHttpResponse(client, u);
             HttpEntity entity = response.getEntity();
             int rc = response.getStatusLine().getStatusCode();
             if (rc == 200) {
@@ -989,12 +989,30 @@ public class ChartMap {
                 chartDirName = unpackChart(tgzFileName);
                 createChart(chartDirName);
             } else {
-                logger.error("Error downloading chart from URL: {} : {}", request.getURI(), rc);
+                String m = String.format("Error downloading chart from URL: %s : %s", u, rc);
+                logger.error(m);
+                throw new ChartMapException(m);
             }
-        } catch (Exception e) {
-            logger.error("Error downloading chart {} : {}", chartDirName, e.getMessage());
-        }
+        } catch (IOException e) {
+            String m = String.format("Exception %s downloading chart %s", e.getClass(), chartName);
+            logger.error(m);
+            throw new ChartMapException(m);
+        } 
         return chartDirName;
+    }
+
+    /**
+     * Gets an HTTP response.  The main purpose of extracting this to a method is to allow
+     * test cases for different kinds of responses and exceptions.
+     * 
+     * @param c Http client.  It is the caller's responsibility to close it.
+     * @param u the URL to get
+     * @return
+     * @throws IOException
+     */
+    protected static HttpResponse getHttpResponse(CloseableHttpClient c, String u) throws IOException {
+        HttpGet request = new HttpGet(u);
+        return c.execute(request);
     }
 
     /**

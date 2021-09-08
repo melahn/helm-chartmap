@@ -48,6 +48,7 @@ import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 import com.melahn.util.test.ChartMapTestUtil;
 
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -738,6 +739,29 @@ class ChartMapTest {
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
         doThrow(InterruptedException.class).when(sp2).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm2.print());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test downloadChart.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void downloadChartTest() throws ChartMapException, IOException {
+        // Test IOException -> ChartMapException using a static Mock
+        try (MockedStatic<ChartMap> mcm = Mockito.mockStatic(ChartMap.class)) {
+            mcm.when(() -> ChartMap.getHttpResponse(any(CloseableHttpClient.class), anyString()))
+                    .thenThrow(IOException.class);
+            ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false,
+                    false);
+            assertThrows(ChartMapException.class, () -> cm1.downloadChart("http://example.com"));
+            
+        }
+        // Test a bad http rc using a url that's guraranteed not to exist. See https://github.com/Readify/httpstatus.
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false,
+        false);
+        assertThrows(ChartMapException.class, () -> cm2.downloadChart("https://httpstat.us/404"));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
