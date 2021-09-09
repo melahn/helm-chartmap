@@ -58,7 +58,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class ChartMapTest {
-    private static String targetTestDirectory = Paths.get("target/test").toString();
+    private static String targetTest = "target/test";
+    private static String targetTestDirectory = Paths.get(targetTest).toString();
     private static String APPRBaseName = "helm-chartmap-test-chart";
     private static String urlBaseName = "test-chart-file";
     private static Path testOutputPumlFilePathRV = Paths.get(targetTestDirectory, "testChartFileRV.puml");
@@ -164,7 +165,8 @@ class ChartMapTest {
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
         }
-        // test when the tgz has no directory, this time with a non-null chartname and a null version
+        // test when the tgz has no directory, this time with a non-null chartname and a
+        // null version
         ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false, true);
         cm4.setChartName("foo");
@@ -177,9 +179,10 @@ class ChartMapTest {
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
         }
-        // test when the tgz has no directory, this time with a non-null version and a null chartname to complete all the variations
+        // test when the tgz has no directory, this time with a non-null version and a
+        // null chartname to complete all the variations
         ChartMap cm5 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-        false, true);
+                false, true);
         cm5.setChartName(null);
         cm5.setChartVersion("1.1.1");
         cm5.createTempDir();
@@ -213,9 +216,9 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the ChartMap.loadLocalRepos method, focusing on the corner where an IOException
-     * is caught and converted to a thrown ChartMapException. Mockiko spying is
-     * used.
+     * Tests the ChartMap.loadLocalRepos method, focusing on the corner where an
+     * IOException is caught and converted to a thrown ChartMapException. Mockiko
+     * spying is used.
      * 
      * @throws ChartMapException
      */
@@ -298,8 +301,8 @@ class ChartMapTest {
     }
 
     /**
-     * Test the ChartMap.constructHelmCachePathTest method with all OS type and env var
-     * combinations.
+     * Test the ChartMap.constructHelmCachePathTest method with all OS type and env
+     * var combinations.
      * 
      * @throws ChartMapException
      */
@@ -308,37 +311,37 @@ class ChartMapTest {
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         ChartMap scm1 = spy(cm1);
-        doReturn("target/test").when(scm1).getEnv("HOME");
+        doReturn(targetTest).when(scm1).getEnv("HOME");
         scm1.constructHelmCachePath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test".concat("/Library/Caches/helm"), scm1.getHelmCachePath());
+        assertEquals(targetTest.concat("/Library/Caches/helm"), scm1.getHelmCachePath());
 
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         ChartMap scm2 = spy(cm2);
-        doReturn("target/test").when(scm2).getEnv("HOME");
+        doReturn(targetTest).when(scm2).getEnv("HOME");
         scm2.constructHelmCachePath(ChartUtil.OSType.LINUX);
-        assertEquals("target/test".concat("/.cache/helm"), scm2.getHelmCachePath());
+        assertEquals(targetTest.concat("/.cache/helm"), scm2.getHelmCachePath());
 
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         ChartMap scm3 = spy(cm3);
-        doReturn("target/test").when(scm3).getEnv("TEMP");
+        doReturn(targetTest).when(scm3).getEnv("TEMP");
         scm3.constructHelmCachePath(ChartUtil.OSType.WINDOWS);
-        assertEquals("target/test".concat("/helm"), scm3.getHelmCachePath());
+        assertEquals(targetTest.concat("/helm"), scm3.getHelmCachePath());
 
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         ChartMap scm4 = spy(cm4);
-        doReturn("target/test/XDG_CACHE_HOME").when(scm4).getEnv("XDG_CACHE_HOME");
+        doReturn(targetTest.concat("/XDG_CACHE_HOME")).when(scm4).getEnv("XDG_CACHE_HOME");
         scm4.constructHelmCachePath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test/XDG_CACHE_HOME", scm4.getHelmCachePath());
+        assertEquals(targetTest.concat("/XDG_CACHE_HOME"), scm4.getHelmCachePath());
 
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         ChartMap scm5 = spy(cm5);
-        doReturn("target/test/HELM_CACHE_HOME").when(scm5).getEnv("HELM_CACHE_HOME");
+        doReturn(targetTest.concat("/HELM_CACHE_HOME")).when(scm5).getEnv("HELM_CACHE_HOME");
         scm5.constructHelmCachePath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test/HELM_CACHE_HOME", scm5.getHelmCachePath());
+        assertEquals(targetTest.concat("/HELM_CACHE_HOME"), scm5.getHelmCachePath());
 
         // No valid helm cache directory in MACOSX is found so look for the exception
         // and logged error message
@@ -394,8 +397,8 @@ class ChartMapTest {
     }
 
     /**
-     * Test the ChartMap.constructHelmConfigPathTest method with all OS type and env var
-     * combinations.
+     * Test the ChartMap.constructHelmConfigPathTest method with all OS type and env
+     * var combinations.
      * 
      * @throws ChartMapException
      */
@@ -404,37 +407,37 @@ class ChartMapTest {
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true, true);
         ChartMap scm1 = spy(cm1);
-        doReturn("target/test").when(scm1).getEnv("HOME");
+        doReturn(targetTest).when(scm1).getEnv("HOME");
         scm1.constructHelmConfigPath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test".concat("/Library/Preferences/helm"), scm1.getHelmConfigPath());
+        assertEquals(targetTest.concat("/Library/Preferences/helm"), scm1.getHelmConfigPath());
 
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true, true);
         ChartMap scm2 = spy(cm2);
-        doReturn("target/test").when(scm2).getEnv("HOME");
+        doReturn(targetTest).when(scm2).getEnv("HOME");
         scm2.constructHelmConfigPath(ChartUtil.OSType.LINUX);
-        assertEquals("target/test".concat("/.config/helm"), scm2.getHelmConfigPath());
+        assertEquals(targetTest.concat("/.config/helm"), scm2.getHelmConfigPath());
 
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true, true);
         ChartMap scm3 = spy(cm3);
-        doReturn("target/test").when(scm3).getEnv("APPDATA");
+        doReturn(targetTest).when(scm3).getEnv("APPDATA");
         scm3.constructHelmConfigPath(ChartUtil.OSType.WINDOWS);
-        assertEquals("target/test".concat("/helm"), scm3.getHelmConfigPath());
+        assertEquals(targetTest.concat("/helm"), scm3.getHelmConfigPath());
 
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true, true);
         ChartMap scm4 = spy(cm4);
-        doReturn("target/test/XDG_CONFIG_HOME").when(scm4).getEnv("XDG_CONFIG_HOME");
+        doReturn(targetTest.concat("/XDG_CONFIG_HOME")).when(scm4).getEnv("XDG_CONFIG_HOME");
         scm4.constructHelmConfigPath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test/XDG_CONFIG_HOME", scm4.getHelmConfigPath());
+        assertEquals(targetTest.concat("/XDG_CONFIG_HOME"), scm4.getHelmConfigPath());
 
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true, true);
         ChartMap scm5 = spy(cm5);
-        doReturn("target/test/HELM_CONFIG_HOME").when(scm5).getEnv("HELM_CONFIG_HOME");
+        doReturn(targetTest.concat("/HELM_CONFIG_HOME")).when(scm5).getEnv("HELM_CONFIG_HOME");
         scm5.constructHelmConfigPath(ChartUtil.OSType.MACOS);
-        assertEquals("target/test/HELM_CONFIG_HOME", scm5.getHelmConfigPath());
+        assertEquals(targetTest.concat("/HELM_CONFIG_HOME"), scm5.getHelmConfigPath());
 
         // No valid helm config directory in MACOS is found so look for the exception
         // and logged error message
@@ -852,6 +855,32 @@ class ChartMapTest {
             scm1.createChart(s);
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException extracting Chart information from ".concat(s)
                     .concat(File.separator).concat(ChartMap.CHART_YAML)));
+            System.setOut(new PrintStream(initialOut));
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the ChartMap.getConditionMap method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void getConditionMapTest() throws ChartMapException, IOException {
+        Path d = Paths.get(targetTest, "getConditionMapDirectory");
+        Path f = Paths.get(d.toString(), "requirements.yaml");
+        Files.deleteIfExists(f);
+        Files.deleteIfExists(d);
+        Files.createDirectory(d);
+        Files.createFile(f);
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    false);
+            System.setOut(new PrintStream(o));
+            cm1.getConditionMap(d.toString());
+            // no need for mockito here since the empty requirements file will induce an IOExceotion
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException parsing requirements file"));
             System.setOut(new PrintStream(initialOut));
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));

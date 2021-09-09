@@ -1225,11 +1225,11 @@ public class ChartMap {
     }
 
     /**
-     * Handles the case where a HelmChart wasn't excluded by a conditino property in
+     * Handles the case where a HelmChart wasn't excluded by a condition property in
      * a parent Helm Chart so it needs to be added to the referenced chart map and
      * attached as a dependent of the parent
      * 
-     * Note that charts with false conditinn properties are not printed at all
+     * Note that charts with false condition properties are not printed at all
      * 
      * @param condition        whether the chart was excluded
      * @param chartDirName     the name of the directory where the chart is found
@@ -1318,7 +1318,7 @@ public class ChartMap {
      * @param h            A Helm Chart
      * @return The name of a condition property if one exists, null otherwise
      */
-    String getConditionPropertyName(String chartDirName, HelmChart h) {
+    private String getConditionPropertyName(String chartDirName, HelmChart h) {
         Map<String, String> conditionMap = getConditionMap(
                 chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)));
         return conditionMap.get(h.getName());
@@ -1339,19 +1339,19 @@ public class ChartMap {
      *         file that contains the name of the condition property. The map may be
      *         empty.
      */
-    HashMap<String, String> getConditionMap(String directoryName) {
+    protected HashMap<String, String> getConditionMap(String directoryName) {
         File requirementsFile = new File(directoryName + File.separator + "requirements.yaml");
         HashMap<String, String> conditionMap = new HashMap<>();
         if (requirementsFile.exists()) {
             try {
-                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                ObjectMapper mapper = getObjectMapper();
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 HelmRequirements requirements = mapper.readValue(requirementsFile, HelmRequirements.class);
                 List<HelmRequirement> dependents;
                 dependents = Arrays.asList(requirements.getDependencies());
                 dependents.forEach(r -> conditionMap.put(r.getName(), r.getCondition()));
-            } catch (Exception e) {
-                logger.error("Error parsing requirements file {}", requirementsFile.getAbsolutePath());
+            } catch (IOException e) {
+                logger.error("IOException parsing requirements file {}", requirementsFile.getAbsolutePath());
             }
         }
         return conditionMap;
