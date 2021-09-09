@@ -540,8 +540,8 @@ public class ChartMap {
             Process p = getProcess(c, null);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-            int exitCode = p.exitValue();
-            if (exitCode == 0) {
+            int exitValue = p.exitValue();
+            if (exitValue == 0) {
                 String o = br.readLine();
                 if (o != null && o.length() > 1 && o.charAt(1) == '3') {
                     logger.log(logLevelDebug, "Helm Version 3 detected");
@@ -550,7 +550,7 @@ public class ChartMap {
                 throw new ChartMapException(
                         "Unsupported Helm Version. Please upgrade to helm V3 or use a previous version of ChartMap.");
             } else { // we could not even execute the helm command
-                throw new ChartMapException("Error Code: " + exitCode + " executing command " + c[0]
+                throw new ChartMapException("Error Code: " + exitValue + " executing command " + c[0]
                         + c[1] + c[2] + c[3]);
             }
         } catch (IOException e) {
@@ -898,15 +898,15 @@ public class ChartMap {
             String[] c = {"helm", "quay", "pull", apprSpec};
             Process p = getProcess(c, new File(getTempDirName()));
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-            int exitCode = p.exitValue();
-            if (exitCode == 0) {
+            int exitValue = p.exitValue();
+            if (exitValue == 0) {
                 chartDirName = getTempDirName() + apprSpec.substring(apprSpec.indexOf('/') + 1, apprSpec.length())
                         .replace('@', '_').replace('/', '_') + File.separator + getChartName();
                 createChart(chartDirName);
                 extractEmbeddedCharts(chartDirName);
             } else {
                 throw new ChartMapException(
-                        String.format("Error Code: %c executing helm quay pull command ", exitCode));
+                        String.format("Error Code: %c executing helm quay pull command ", exitValue));
             }
         } catch (IOException e) {
             throw (new ChartMapException(String.format(
@@ -1017,29 +1017,29 @@ public class ChartMap {
 
     /**
      * Updates the local chart cache using the Helm client. This is only done if the
-     * user has specified the refresh parameter on the command line or method call
+     * user has specified the refresh parameter on the command line or method call.
      *
      * @param dirName The name of the directory containing the chart
      * @throws ChartMapException if an error occurs updating the local repo
      */
-    private void updateLocalRepo(String dirName) throws ChartMapException {
+    protected void updateLocalRepo(String dirName) throws ChartMapException {
         // if the user wants us to update the Helm dependencies, do so
         if (this.isRefreshLocalRepo()) {
-            String command = "helm dep update";
-            int exitCode = -1;
+            String[] c = {"helm", "dep", "update"};
+            int exitValue = -1;
             try {
-                Process p = Runtime.getRuntime().exec(command, null, new File(dirName));
+                Process p = getProcess(c, new File(dirName));
                 p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-                exitCode = p.exitValue();
+                exitValue = p.exitValue();
             } catch (IOException e) {
-                throw new ChartMapException("IOException executing helm dep update: ".concat(e.getMessage()));
+                throw new ChartMapException("IOException executing helm dep update");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new ChartMapException(
-                        "InterruptedException while executing helm dep update: ".concat(e.getMessage()));
+                        "InterruptedException while executing helm dep update");
             }
-            if (exitCode != 0) {
-                throw new ChartMapException("Exception updating chart repo in " + dirName + ".  Exit code: " + exitCode
+            if (exitValue != 0) {
+                throw new ChartMapException("Exception updating chart repo in " + dirName + ".  Exit code: " + exitValue
                         + ".  Possibly you cannot access one of your remote charts repos.");
             } else {
                 logger.log(logLevelVerbose, "Updated Helm dependencies");
@@ -1049,7 +1049,7 @@ public class ChartMap {
 
     /**
      * Creates a chart in the charts map from a Chart.yaml located in the provided
-     * directory
+     * directory.
      *
      * @param chartDirName the name of the directory in which the Chart.yaml file is
      *                     to be found
@@ -1064,10 +1064,8 @@ public class ChartMap {
             setChartName(h.getName());
             setChartVersion(h.getVersion());
             // If the chart is already in the charts map we want to transfer any extra
-            // information
-            // from that chart into the chart we create from the yaml file since otherwise
-            // we
-            // will lose it. Currently there is only such piece of information, the repo url
+            // information from that chart into the chart we create from the yaml file since 
+            // otherwise we will lose it. Currently there is only such piece of information, the repo url
             HelmChart foundChart = charts.get(h.getName(), h.getVersion());
             if (foundChart != null) {
                 h.setRepoUrl(foundChart.getRepoUrl());
@@ -1612,8 +1610,8 @@ public class ChartMap {
                 bos.write(bytes, 0, len);
             }
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-            int exitCode = p.exitValue();
-            if (exitCode != 0) {
+            int exitValue = p.exitValue();
+            if (exitValue != 0) {
                 String message;
                 InputStream err = p.getErrorStream();
                 BufferedReader br = new BufferedReader(new java.io.InputStreamReader(err));
