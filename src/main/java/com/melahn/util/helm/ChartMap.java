@@ -110,10 +110,10 @@ public class ChartMap {
     private static final int REFRESH_SWITCH = 1;
     private static final int VERBOSE_SWITCH = 2;
     private static final int DEBUG_SWITCH = 3;
-    private static final String CHART_YAML = "Chart.yaml";
-    private static final String CHARTS_DIR_NAME = "charts";
-    private static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    private static final String TEMP_DIR_ERROR = "IOException creating temp directory";
+    protected static final String CHART_YAML = "Chart.yaml";
+    protected static final String CHARTS_DIR_NAME = "charts";
+    protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
+    protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
     protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
@@ -1054,11 +1054,10 @@ public class ChartMap {
      * @param chartDirName the name of the directory in which the Chart.yaml file is
      *                     to be found
      */
-    private void createChart(String chartDirName) {
+    protected void createChart(String chartDirName) {
         String yamlChartFilename = chartDirName + File.separator + CHART_YAML;
         try {
-
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             HelmChart h = mapper.readValue(new File(yamlChartFilename), HelmChart.class);
             setChartName(h.getName());
@@ -1073,8 +1072,8 @@ public class ChartMap {
             // Don't forget the values
             collectValues(chartDirName, h);
             charts.put(h.getName(), h.getVersion(), h);
-        } catch (Exception e) {
-            logger.error("Error extracting Chart information from {}", yamlChartFilename);
+        } catch (IOException e) {
+            logger.error("IOException extracting Chart information from {}", yamlChartFilename);
         }
     }
 
@@ -1587,7 +1586,7 @@ public class ChartMap {
             runTemplateCommand(f, p, h);
         } catch (ChartMapException e) {
             logger.error("ChartMapException: {} running template command: {} ", e.getMessage(), command);
-            throw (e);
+            throw e;
         }
         return f;
     }
@@ -1621,7 +1620,7 @@ public class ChartMap {
                 err.close();
                 throw new ChartMapException(
                         "Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
-            }
+            } 
         } catch (IOException e) {
             throw new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec)
                     .concat(" : ").concat(e.getMessage()));

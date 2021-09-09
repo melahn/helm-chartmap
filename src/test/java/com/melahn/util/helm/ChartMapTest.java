@@ -257,7 +257,8 @@ class ChartMapTest {
         doThrow(IOException.class).when(scm5).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm5.checkHelmVersion());
         // Cause an InterruptedException -> ChartMapException on waitFor()
-        // Be careful to put InterruptedException case last in the test case since the thread is not usable after that
+        // Be careful to put InterruptedException case last in the test case since the
+        // thread is not usable after that
         ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm6 = spy(cm6);
@@ -732,7 +733,8 @@ class ChartMapTest {
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.print());
         // Use a spy to throw an InterruptedException -> ChartMapException
-        // Be careful to put InterruptedException case last in the test case since the thread is not usable after that
+        // Be careful to put InterruptedException case last in the test case since the
+        // thread is not usable after that
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
         ChartMap scm2 = spy(cm2);
         Process p2 = Runtime.getRuntime()
@@ -783,17 +785,16 @@ class ChartMapTest {
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.updateLocalRepo("foo"));
         // Cause a bad exit value from the process
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, false, true,
-                false);
+        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, false, true, false);
         ChartMap scm2 = spy(cm2);
-        Process p2 = Runtime.getRuntime()
-                .exec(new String[] { "echo", "I am going to return a bad exitvalue!!!" });
+        Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to return a bad exitvalue!!!" });
         Process sp2 = spy(p2);
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
         doReturn(1).when(sp2).exitValue();
         assertThrows(ChartMapException.class, () -> scm2.updateLocalRepo("foo"));
         // Simulate an InterruptedException -> ChartMapException on waitFor()
-        // Be careful to put InterruptedException case last in the test case since the thread is not usable after that
+        // Be careful to put InterruptedException case last in the test case since the
+        // thread is not usable after that
         ChartMap cm3 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, false, true, false);
         ChartMap scm3 = spy(cm3);
         Process p3 = Runtime.getRuntime()
@@ -802,6 +803,31 @@ class ChartMapTest {
         doReturn(sp3).when(scm3).getProcess(any(), any(File.class));
         doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo"));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the createChart method.
+     * 
+     * @throws IOException
+     * @throws ChartMapException
+     */
+    @Test
+    void createChartTest() throws IOException, ChartMapException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+                    false, false);
+            ChartMap scm1 = spy(cm1);
+            ObjectMapper som1 = spy(ObjectMapper.class);
+            doReturn(som1).when(scm1).getObjectMapper();
+            doThrow(IOException.class).when(som1).readValue(any(File.class), eq(HelmChart.class));
+            String s = "foo";
+            System.setOut(new PrintStream(o));
+            scm1.createChart(s);
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException extracting Chart information from ".concat(s)
+                    .concat(File.separator).concat(ChartMap.CHART_YAML)));
+            System.setOut(new PrintStream(initialOut));
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -950,12 +976,11 @@ class ChartMapTest {
         ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
         cm1.print();
         assertTrue(Files.exists(testOutputAPPRPumlPath));
-        assertTrue(Files.exists(testOutputAPPRPngPath)); // test null appr spec
+        // test null appr spec
+        assertTrue(Files.exists(testOutputAPPRPngPath));
         assertThrows(ChartMapException.class,
-                () -> createTestMap(ChartOption.APPRSPEC, null, testOutputAPPRPumlPath, true, false, false)); // test
-                                                                                                              // malformed
-                                                                                                              // appr
-                                                                                                              // specs
+                () -> createTestMap(ChartOption.APPRSPEC, null, testOutputAPPRPumlPath, true, false, false));
+        // test various malformed appr specs
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat",
                 testOutputAPPRPumlPath, true, false, false));
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
