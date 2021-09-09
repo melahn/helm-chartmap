@@ -130,7 +130,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the protected method ChartMap.unpackTestChart
+     * Tests the ChartMap.unpackTestChart method
      * 
      * @throws ChartMapException
      * @throws IOException
@@ -164,6 +164,32 @@ class ChartMapTest {
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
         }
+        // test when the tgz has no directory, this time with a non-null chartname and a null version
+        ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false, true);
+        cm4.setChartName("foo");
+        cm4.setChartVersion(null);
+        cm4.createTempDir();
+        try (ByteArrayOutputStream unpackCharttestOut = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(unpackCharttestOut));
+            assertThrows(ChartMapException.class, () -> cm4.unpackChart(testOneFileZipPath.toString()));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
+            System.setOut(initialOut);
+        }
+        // test when the tgz has no directory, this time with a non-null version and a null chartname to complete all the variations
+        ChartMap cm5 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        false, true);
+        cm5.setChartName(null);
+        cm5.setChartVersion("1.1.1");
+        cm5.createTempDir();
+        try (ByteArrayOutputStream unpackCharttestOut = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(unpackCharttestOut));
+            assertThrows(ChartMapException.class, () -> cm5.unpackChart(testOneFileZipPath.toString()));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
+            System.setOut(initialOut);
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -187,7 +213,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the loadLocalRepos method, focusing on the corner where an IOException
+     * Tests the ChartMap.loadLocalRepos method, focusing on the corner where an IOException
      * is caught and converted to a thrown ChartMapException. Mockiko spying is
      * used.
      * 
@@ -206,7 +232,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the checkHelmVersion method.
+     * Tests the ChartMap.checkHelmVersion method.
      * 
      * @throws ChartMapException
      */
@@ -272,7 +298,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the constructHelmCachePathTest method with all OS type and env var
+     * Test the ChartMap.constructHelmCachePathTest method with all OS type and env var
      * combinations.
      * 
      * @throws ChartMapException
@@ -368,7 +394,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the constructHelmConfigPathTest method with all OS type and env var
+     * Test the ChartMap.constructHelmConfigPathTest method with all OS type and env var
      * combinations.
      * 
      * @throws ChartMapException
@@ -465,7 +491,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the getHelmCommand method.
+     * Test the ChartMap.getHelmCommand method.
      * 
      * @throws ChartMapException
      * @throws IOException
@@ -499,7 +525,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the loadChartsFromCache method.
+     * Test the ChartMap.loadChartsFromCache method.
      * 
      * @throws ChartMapException if an error occured loading the charts
      * @throws IOException       if an error occured fabricating my cache yaml file
@@ -596,7 +622,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the printCharts method.
+     * Test the ChartMap.printCharts method.
      * 
      * @throws ChartMapException
      * @throws IOException
@@ -627,7 +653,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the extractEmbeddedCharts method.
+     * Tests the ChartMap.extractEmbeddedCharts method.
      * 
      * @throws ChartMapException
      */
@@ -671,7 +697,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the resolveChartDependencies method.
+     * Tests the ChartMap.resolveChartDependencies method.
      * 
      * @throws ChartMapException
      * @throws IOException
@@ -693,7 +719,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the getChart methods.
+     * Tests the ChartMap.getChart methods.
      * 
      * @throws ChartMapException
      */
@@ -719,7 +745,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the pullChart method using an APPR spec.
+     * Tests the ChartMap.pullChart method using an APPR spec.
      * 
      * @throws ChartMapException
      * @throws InterruptedException
@@ -747,7 +773,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the downloadChart method.
+     * Test the ChartMap.downloadChart method.
      * 
      * @throws ChartMapException
      */
@@ -770,7 +796,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the updateLocalRepp method.
+     * Test the ChartMap.updateLocalRepp method.
      * 
      * @throws ChartMapException
      * @throws InterruptedException
@@ -807,7 +833,7 @@ class ChartMapTest {
     }
 
     /**
-     * Test the createChart method.
+     * Test the ChartMap.createChart method.
      * 
      * @throws IOException
      * @throws ChartMapException
