@@ -944,6 +944,27 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+    /**
+     * Test the ChartMap.handleHelmChartCondition method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void handleHelmChartConditionTest() throws ChartMapException, IOException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+                    false, false);
+            ChartMap scm1 = spy(cm1);
+            doThrow(IOException.class).when(scm1).collectValues(anyString(), any(HelmChart.class));
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> scm1.handleHelmChartCondition(new Boolean(true), "foo", "foo",
+                    new HelmChart(), new HelmChart()));
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException collecting values in handleHelmChartCondition"));
+            System.setOut(new PrintStream(initialOut));
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
 
     /**
      * Tests the creation and removal of the temp directory used by ChartMap.

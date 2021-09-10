@@ -617,9 +617,6 @@ public class ChartMap {
         // system
         if (getHelmCachePath() == null && os == ChartUtil.OSType.MACOS) {
             if (getEnv(HOME) == null) {
-                // The reason I am not using the common function logErrorAndThrow() is that
-                // the code coverage tools has trouble recognizing that logErrorAndThrow() is called
-                // so I decided to inline the instructions 
                 m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
                 logger.error(m);
                 throw new ChartMapException(m);
@@ -662,9 +659,6 @@ public class ChartMap {
         // system
         if (getHelmConfigPath() == null && os == ChartUtil.OSType.MACOS) {
             if (getEnv(HOME) == null) {
-                // The reason I am not using the common function logErrorAndThrow() is that
-                // the code coverage tools has trouble recognizing that logErrorAndThrow() is called
-                // so I decided to inline the instructions 
                 m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
                 logger.error(m);
                 throw new ChartMapException(m);
@@ -1241,7 +1235,7 @@ public class ChartMap {
      * @throws ChartMapException when an error occurs rendering templates or
      *                           collecting values
      */
-    private void handleHelmChartCondition(Boolean condition, String chartDirName, String directory,
+    protected void handleHelmChartCondition(Boolean condition, String chartDirName, String directory,
             HelmChart currentHelmChart, HelmChart parentHelmChart) throws ChartMapException {
         try {
             if (Boolean.TRUE.equals(condition)) {
@@ -1260,7 +1254,9 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            logErrorAndThrow("IOException collecting values in handleHelmChartCondition");
+            String m = "IOException collecting values in handleHelmChartCondition";
+            logger.error(m);
+            throw new ChartMapException(m);
         }
 
     }
@@ -1401,7 +1397,7 @@ public class ChartMap {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    private void collectValues(String dirName, HelmChart h) throws IOException {
+    protected void collectValues(String dirName, HelmChart h) throws IOException {
         if (h == null || dirName == null) {
             return;
         }
@@ -2008,17 +2004,6 @@ public class ChartMap {
             }
             logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(), " removed");
         }
-    }
-
-    /**
-     * Logs an error and throws a ChartMapException
-     * 
-     * @param m The error to log
-     * @throws ChartMapException
-     */
-    private void logErrorAndThrow(String m) throws ChartMapException {
-        logger.error(m);
-        throw new ChartMapException(m);
     }
 
     // Getters and Setters
