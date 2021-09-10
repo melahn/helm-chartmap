@@ -879,10 +879,69 @@ class ChartMapTest {
                     false);
             System.setOut(new PrintStream(o));
             cm1.getConditionMap(d.toString());
-            // no need for mockito here since the empty requirements file will induce an IOExceotion
+            // no need for mockito here since the empty requirements file will induce an
+            // IOExceotion
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException parsing requirements file"));
             System.setOut(new PrintStream(initialOut));
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the ChartMap.collectDependencies method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void collectDependenciesTest() throws ChartMapException, IOException {
+        // Test the currentDirectory.list returns null case
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        HelmChart h = new HelmChart();
+        h.setName("foo");
+        h.setVersion("1.1.1");
+        cm1.print();
+        int i1 = cm1.getChartsReferenced().size();
+        Path f1 = Paths.get(targetTest, "collectDependenciesTest");
+        Files.deleteIfExists(f1);
+        Files.createFile(f1);
+        cm1.collectDependencies(f1.toString(), h);
+        assertEquals(i1, cm1.getChartsReferenced().size());
+        // Test the chart file does not exist case
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        cm2.print();
+        int i2 = cm2.getChartsReferenced().size();
+        Path d2p = Paths.get(targetTest, "collectDependenciesTestDir1");
+        Path d2c = Paths.get(d2p.toString(), "collectDependenciesTestDir2");
+        Files.deleteIfExists(d2c);
+        Files.deleteIfExists(d2p);
+        Files.createDirectory(d2p);
+        Files.createDirectory(d2c);
+        cm2.collectDependencies(d2p.toString(), null);
+        assertEquals(i2, cm2.getChartsReferenced().size());
+        // Test an empty Chart.yaml file tp cause an IO Exception -> ChartMapException
+        Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+                    false, false);
+            cm3.print();
+            Files.createFile(p3);
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> cm3.collectDependencies(d2p.toString(), null));
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException getting Dependencies"));
+            System.setOut(new PrintStream(initialOut));
+        }
+        // Test the Chart.yaml file references a chart that does not exist
+        ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        cm4.print();
+        String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat("foo").concat("\n    version: ")
+                .concat("1.1.1").concat("\n".concat("    urls:\n    - https://foo\n"));
+        byte[] b = s.getBytes();
+        Files.write(p3, b);
+        assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

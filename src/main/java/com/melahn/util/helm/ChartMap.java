@@ -1163,7 +1163,7 @@ public class ChartMap {
      * 
      * @throws ChartMapException when an error occurs collecting dependencies
      */
-    private void collectDependencies(String chartDirName, HelmChart h) throws ChartMapException { // See issue #8
+    protected void collectDependencies(String chartDirName, HelmChart h) throws ChartMapException { 
         HelmChart parentHelmChart = null;
         try {
             if (h != null) {
@@ -1171,7 +1171,6 @@ public class ChartMap {
             }
             File currentDirectory = new File(chartDirName);
             String[] directories = currentDirectory.list((c, n) -> new File(c, n).isDirectory());
-
             if (directories != null) {
                 for (String directory : directories) {
                     if (h != null) {
@@ -1197,11 +1196,13 @@ public class ChartMap {
                         }
                         handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart),
                                 chartDirName, directory, currentHelmChart, parentHelmChart);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logErrorAndThrow(String.format("Exception getting Dependencies: %s", e.getMessage()));
+                    } 
+                } 
+            } 
+        } catch (IOException e) {
+            String m = String.format("IOException getting Dependencies: %s", e.getMessage());
+            logger.error(m);
+            throw new ChartMapException(m);
         }
     }
 
@@ -2028,8 +2029,12 @@ public class ChartMap {
 
     public ChartKeyMap getCharts() {
         return charts;
-        
     }
+
+    public ChartKeyMap getChartsReferenced() {
+        return chartsReferenced;
+    }
+
     public String getChartFilename() {
         return chartFilename;
     }
