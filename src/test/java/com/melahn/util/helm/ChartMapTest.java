@@ -944,6 +944,23 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+
+    /**
+     * Test the ChartMap.checkForCondition method.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void checkForConditionTest()  throws ChartMapException {
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+        false, false);
+        ChartMap scm1 = spy(cm1);
+        doReturn(null).when(scm1).getCondition(anyString(), any(HelmChart.class));
+        doReturn("foo").when(scm1).getConditionPropertyName(anyString(), any(HelmChart.class));
+        assertEquals(new Boolean(true), scm1.checkForCondition("foo", new HelmChart(), new HelmChart()));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
     /**
      * Test the ChartMap.handleHelmChartCondition method.
      * 

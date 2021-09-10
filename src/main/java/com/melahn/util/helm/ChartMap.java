@@ -1207,7 +1207,7 @@ public class ChartMap {
      * @param chartDirName     the name of the directory where the chart is found
      * @param currentHelmChart the helm chart found in the local charts repo
      */
-    private Boolean checkForCondition(String chartDirName, HelmChart currentHelmChart, HelmChart parentHelmChart) {
+    protected Boolean checkForCondition(String chartDirName, HelmChart currentHelmChart, HelmChart parentHelmChart) {
         Boolean condition = Boolean.TRUE;
         String conditionPropertyName = getConditionPropertyName(chartDirName, currentHelmChart);
         if (conditionPropertyName != null) {
@@ -1272,7 +1272,7 @@ public class ChartMap {
      *         type. the return value will be the value of that entry. Otherwise
      *         returns TRUE.
      */
-    Boolean getCondition(String key, HelmChart h) {
+    protected Boolean getCondition(String key, HelmChart h) {
         Boolean condition = Boolean.TRUE;
         Boolean envCondition = Boolean.FALSE;
         /**
@@ -1315,7 +1315,7 @@ public class ChartMap {
      * @param h            A Helm Chart
      * @return The name of a condition property if one exists, null otherwise
      */
-    private String getConditionPropertyName(String chartDirName, HelmChart h) {
+    protected String getConditionPropertyName(String chartDirName, HelmChart h) {
         Map<String, String> conditionMap = getConditionMap(
                 chartDirName.substring(0, chartDirName.lastIndexOf(File.separator)));
         return conditionMap.get(h.getName());
