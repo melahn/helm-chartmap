@@ -1291,8 +1291,8 @@ public class ChartMap {
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.error(("Exception getting condition of {}" + key));
+        } catch (IOException e) {
+            logger.error("IO Exception getting condition of {}", key);
         }
         /**
          * If the condition was not found in the environment variable set, look in the
@@ -1635,7 +1635,7 @@ public class ChartMap {
      * @return a list with each environment variable specified. This may be empty
      *         since such environment variables are not mandatory
      */
-    private List<String> getEnvVars() throws IOException {
+    protected List<String> getEnvVars() throws IOException {
         ArrayList<String> envVars = new ArrayList<>();
         if (envFilename != null) {
             try {

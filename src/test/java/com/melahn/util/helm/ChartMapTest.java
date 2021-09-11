@@ -951,9 +951,9 @@ class ChartMapTest {
      * @throws ChartMapException
      */
     @Test
-    void checkForConditionTest()  throws ChartMapException {
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
-        false, false);
+    void checkForConditionTest() throws ChartMapException {
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
         ChartMap scm1 = spy(cm1);
         doReturn(null).when(scm1).getCondition(anyString(), any(HelmChart.class));
         doReturn("foo").when(scm1).getConditionPropertyName(anyString(), any(HelmChart.class));
@@ -980,6 +980,33 @@ class ChartMapTest {
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException collecting values in handleHelmChartCondition"));
             System.setOut(new PrintStream(initialOut));
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the ChartMap.getCondition method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void getConditionTest() throws ChartMapException, IOException {
+        // Test getEnvVars throwing an IOException, using a spy
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+                    false, false);
+            ChartMap scm1 = spy(cm1);
+            doThrow(IOException.class).when(scm1).getEnvVars();
+            String k = "foo-key";
+            System.setOut(new PrintStream(o));
+            scm1.getCondition(k, new HelmChart());
+            System.setOut(new PrintStream(initialOut));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("IO Exception getting condition of %s", k)));
+        }
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
+                    false, false);
+        // Test the condition where the variable is found with a false value in the env list
+        assertEquals(Boolean.FALSE, cm2.getCondition("alfresco\\-infrastructure.alfresco\\-api\\-gateway.enabled", new HelmChart()));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
