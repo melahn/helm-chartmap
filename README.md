@@ -55,8 +55,6 @@ The location of the helm cache and configuration directories is derived using th
 
 The junit test cases rely on the environment variable *HELM_HOME* being set.
 
-If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&lt;anyvalue&gt;.
-
 ## Using Chart Map
 
 ### Setup
@@ -65,6 +63,8 @@ If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&
 or from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.0.2/helm-chartmap-1.0.2.jar)
 or build it yourself from source (see below).
 2. Run the command line, or write a Java program using the API, to generate a chart. See Syntax and Examples below.
+
+If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&lt;anyvalue&gt;.
 
 ### Command Line Syntax
 
