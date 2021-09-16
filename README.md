@@ -55,6 +55,8 @@ The location of the helm cache and configuration directories is derived using th
 
 The junit test cases rely on the environment variable *HELM_HOME* being set.
 
+If debug information is desired, set the environment variable CHARTMAP_DEBUG=&lt;anyvalue&gt;.
+
 ## Using Chart Map
 
 ### Setup
@@ -181,8 +183,6 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
       * When *true*, refresh the local Helm repo (default *false*)
     * *switches[2]* *verbose*
       * When *true*, provides a little more information as the Chart Map is generated (default *false*)
-    * *switches[3]* *debug*
-      * When *true*, provides a little more information to help debug *ChartMap* itself (default *false*)
 
 ##### Throws
 
