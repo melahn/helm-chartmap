@@ -84,7 +84,7 @@ public class ChartMap {
     private String helmConfigPath;
     protected HashSet<String> imagesReferenced = new HashSet<>();
     private HelmChartReposLocal localRepos;
-    private String chartMapDebug = "CHARTMAP_DEBUG";
+    private String chartMapDebug = CHARTMAP_DEBUG_ENV_VAR;
     private String chartMapVerbose = "CHARTMAP_VERBOSE";
     protected Logger logger;
     private Level logLevelDebug;
@@ -96,30 +96,30 @@ public class ChartMap {
     private static final String START_OF_TEMPLATE = "# Source: ";
     private String tempDirName = null;
     private boolean verbose = false;
-    private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; // this is the suffix of the name of
-                                                                                    // the file we use to hold the
-                                                                                    // rendered templates
-    protected static final int MAX_WEIGHT = 100;
-    private static final String TEMP_DIR = "Temporary Directory ";
+
+    private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
+    private static final int GENERATE_SWITCH = 0;
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
-    private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
-    private static final int GENERATE_SWITCH = 0;
+    private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; 
     private static final int REFRESH_SWITCH = 1;
+    private static final String TEMP_DIR = "Temporary Directory ";
     private static final int VERBOSE_SWITCH = 2;
-    private static final int DEBUG_SWITCH = 3;
+
+    protected static final String APPDATA = "APPDATA";
+    protected static final String CHARTMAP_DEBUG_ENV_VAR = "CHARTMAP_DEBUG";
     protected static final String CHART_YAML = "Chart.yaml";
     protected static final String CHARTS_DIR_NAME = "charts";
-    protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
-    protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
+    protected static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
+    protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
+    protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
     protected static final String TEMP = "TEMP";
-    protected static final String APPDATA = "APPDATA";
-    protected static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
+    protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
+    protected static final int MAX_WEIGHT = 100;
 
     /**
      * This inner class is used to assign a 'weight' to a template based on its
@@ -162,8 +162,7 @@ public class ChartMap {
                 chartMap.print();
             }
         } catch (ChartMapException e) {
-            Logger logger = chartMap.logger == null ? LogManager.getLogger() : chartMap.logger;
-            logger.error("ChartMapException:".concat(e.getMessage()));
+            chartMap.logger.error("ChartMapException: ".concat(e.getMessage()));
             throw e;
         }
     }
@@ -183,13 +182,13 @@ public class ChartMap {
      *                       when true switches[0] generates an image from the
      *                       PlantUML file (if any) switches[1] refresh the local
      *                       Helm repo switches[2] provides a little more
-     *                       information as the Chart Map is generated switches[3]
-     *                       debug mode ... more info about internals printed
+     *                       information as the Chart Map is generated 
      * @throws ChartMapException when an error occurs creating the chart map
      **/
 
     public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, boolean[] switches)
             throws ChartMapException {
+        setDebugLogLevel();
         ArrayList<String> args = new ArrayList<>();
         addOptionsToArgs(args, option);
         args.add(chart);
@@ -206,6 +205,15 @@ public class ChartMap {
         }
         addSwitchesToArgs(args, switches);
         parseArgs(args.toArray(new String[args.size()]));
+    }
+
+     /**
+     * Default constructor.
+     * 
+     * Just sets the debug log level.
+     */
+    public ChartMap() {
+        setDebugLogLevel();
     }
 
     /**
@@ -237,8 +245,8 @@ public class ChartMap {
      * @param switches
      */
     private void addSwitchesToArgs(ArrayList<String> a, boolean[] s) throws ChartMapException {
-        if (s.length != 4) {
-            throw new ChartMapException("Switches are invalid. There should be four of them.");
+        if (s.length != 3) {
+            throw new ChartMapException("Switches are invalid. There should be three of them.");
         }
         if (s[GENERATE_SWITCH]) {
             a.add("-g");
@@ -248,9 +256,6 @@ public class ChartMap {
         }
         if (s[VERBOSE_SWITCH]) {
             a.add("-v");
-        }
-        if (s[DEBUG_SWITCH]) {
-            a.add("-z");
         }
     }
 
@@ -262,19 +267,13 @@ public class ChartMap {
      * @throws ChartMapException if an error occurs during print
      */
     public void print() throws ChartMapException {
-        setLogLevel();
+        setVerboseLogLevel();
         setHelmEnvironment();
         createTempDir();
         loadLocalRepos();
         resolveChartDependencies();
         printMap();
         removeTempDir();
-    }
-
-    /**
-     * Default constructor.
-     */
-    private ChartMap() {
     }
 
     /**
@@ -289,7 +288,7 @@ public class ChartMap {
      * @return boolean true if processing should continue, false otherwise
      * @throws ChartMapException should a parse error occur
      */
-    private boolean parseArgs(String[] args) throws ChartMapException {
+    protected boolean parseArgs(String[] args) throws ChartMapException {
         Options options = setOptions();
         CommandLineParser parser = new DefaultParser();
         try {
@@ -389,6 +388,30 @@ public class ChartMap {
      * log4j2.xml, which is INFO (level 400). Otherwise set it to a higher level
      * number so debug log entries will be ignored.
      * 
+     * Note that log4j will ignore the integer values if the level already exists so
+     * there is no point in calling this method twice or initializing the Levels
+     * when they are declared.
+     * 
+     * The reason for the timestamped value for the levels is that they are static
+     * in Log4j2 and this can cause issues across multiple usages of ChartMap if a
+     * common name is used with some pretty hard to debug problems. This can be seen
+     * for example in Junit tests when different debug and verbose levels are used
+     * in different tests.
+     */
+    protected void setDebugLogLevel() {
+        String t = String.valueOf(System.currentTimeMillis());
+        chartMapDebug = chartMapDebug.concat(t);
+        logger = LogManager.getLogger(t);
+        if (System.getenv(CHARTMAP_DEBUG_ENV_VAR) != null) {
+            setDebug(true);
+            logger.info("Debug Mode is ON");
+            logLevelDebug = Level.forName(chartMapDebug, 350); // higher priority than INFO
+        } else {
+            logLevelDebug = Level.forName(chartMapDebug, 450); // lower priority than INFO
+        }
+    }
+
+    /**
      * If the user has specified the verbose flag, set the log level so it has a
      * higher priority (ie. a lower level value) than the logger configured in
      * log4j2.xml, which is INFO (level 400). Otherwise set it to a higher level
@@ -404,16 +427,9 @@ public class ChartMap {
      * for example in Junit tests when different debug and verbose levels are used
      * in different tests.
      */
-    protected void setLogLevel() {
+    protected void setVerboseLogLevel() {
         String t = String.valueOf(System.currentTimeMillis());
-        chartMapDebug = chartMapDebug.concat(t);
         chartMapVerbose = chartMapVerbose.concat(t);
-        logger = LogManager.getLogger(t);
-        if (isDebug()) {
-            logLevelDebug = Level.forName(chartMapDebug, 350); // higher priority than INFO
-        } else {
-            logLevelDebug = Level.forName(chartMapDebug, 450); // lower priority than INFO
-        }
         if (isVerbose()) {
             logLevelVerbose = Level.forName(chartMapVerbose, 350); // higher priority than INFO
         } else {
@@ -535,6 +551,7 @@ public class ChartMap {
      * @throws ChartMapException if a version other than V3 is found
      */
     protected void checkHelmVersion() throws ChartMapException {
+        logger.log(logLevelDebug, "+ Entering checkHelmVersion");
         String[] c = { getHelmCommand(), "version", "--template", "{{ .Version }}" };
         try {
             Process p = getProcess(c, null);
@@ -545,6 +562,7 @@ public class ChartMap {
                 String o = br.readLine();
                 if (o != null && o.length() > 1 && o.charAt(1) == '3') {
                     logger.log(logLevelDebug, "Helm Version 3 detected");
+                    logger.log(logLevelDebug, "+ Exiting checkHelmVersion");
                     return;
                 }
                 throw new ChartMapException(
@@ -713,7 +731,7 @@ public class ChartMap {
         String helmBin = getEnv("HELM_BIN");
         logger.log(logLevelDebug, "HELM_BIN = {}", helmBin);
         String helmCommandResolved = helmBin == null ? "helm" : helmBin;
-        logger.log(logLevelDebug, "The helm command {} will be used.", helmCommandResolved);
+        logger.log(logLevelDebug, "The helm command \'{}\' will be used.", helmCommandResolved);
         return helmCommandResolved;
     }
 
@@ -1517,7 +1535,7 @@ public class ChartMap {
      * this template has already been found
      * 
      * 3. The Chart has a dependency on this template and a superceding version of
-     * this template will be found laterbe found later
+     * this template will be found later
      * 
      * @param t the template currently being processed
      * @param p the parent of the template
@@ -1582,7 +1600,7 @@ public class ChartMap {
             }
             runTemplateCommand(f, p, h);
         } catch (ChartMapException e) {
-            logger.error("ChartMapException: {} running template command: {} ", e.getMessage(), command);
+            logger.error("ChartMapException {} running template command: {} ", e.getMessage(), command);
             throw e;
         }
         return f;

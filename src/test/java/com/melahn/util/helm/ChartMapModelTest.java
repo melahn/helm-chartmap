@@ -23,13 +23,26 @@ import com.melahn.util.helm.model.HelmDeploymentTemplate;
 import com.melahn.util.helm.model.HelmMaintainer;
 import com.melahn.util.helm.model.HelmRequirement;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class ChartMapModelTest {
 
     static final String EXPECTED = generateRandomString(10);
     static final String NOTEXPECTED = EXPECTED.concat(EXPECTED);
+    private final static String DIVIDER = "-------------------------------------";
     
+    @BeforeAll
+    static void setUp() {
+        System.out.println(DIVIDER.concat(" MODEL TESTS START ").concat(DIVIDER));
+    }
+    
+    @AfterAll
+    static void cleanUp() {
+        System.out.println(DIVIDER.concat(" MODEL TESTS END ").concat(DIVIDER));
+    }
+
     @Test
     void testHelmChart() {
         HelmChart hc = new HelmChart();

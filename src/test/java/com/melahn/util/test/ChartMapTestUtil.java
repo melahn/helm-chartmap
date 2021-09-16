@@ -7,20 +7,22 @@ import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ChartMapTestUtil {
 
     /**
      * Answers true if the log contains a particular entry.
      * 
-     * @param l    the file
-     * @param s    entry being looked for
+     * @param l the file
+     * @param s entry being looked for
      * @return true if the log contains s, false otherwise.
      * @throws IOException if an error occurs reading the file
      */
@@ -30,8 +32,8 @@ public class ChartMapTestUtil {
         list = br.lines().collect(Collectors.toList());
         boolean found = false;
         ListIterator<String> listIterator = list.listIterator();
-        while(listIterator.hasNext() && !found) {
-            found = listIterator.next().contains(s)?true:false;
+        while (listIterator.hasNext() && !found) {
+            found = listIterator.next().contains(s) ? true : false;
         }
         return found;
     }
@@ -52,16 +54,22 @@ public class ChartMapTestUtil {
      * 
      * @param d Path of the directory
      */
-    public static void cleanDirectory(Path d) {
-        final int depth = 3; // go three deep
-        try {
-            System.out.println("Deleting any previously created files");
-            if (Files.exists(d)) {
-                Files.walk(d, depth).filter(Files::isRegularFile).forEach(p -> p.toFile().delete());
-                Files.deleteIfExists(d);
+    public static void cleanDirectory(Path d) throws IOException {
+        final int depth = 5; // go five deep
+
+        System.out.println("Deleting any previously created files");
+        if (Files.exists(d)) {
+            try (Stream<Path> s = Files.walk(d, depth)) {
+                s.sorted(Comparator.reverseOrder()).forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (IOException e) {
+                System.out.println("Error walking directory: " + d);
             }
-        } catch (IOException e) {
-            System.out.println("Error deleting previously created files: " + e.getMessage());
         }
     }
 
@@ -116,7 +124,7 @@ public class ChartMapTestUtil {
         pb.redirectErrorStream(true);
         pb.redirectOutput(Redirect.appendTo(l.toFile()));
         Process process = pb.start();
-        final int waitTime = 10;
+        final int waitTime = 20;
         process.waitFor(waitTime, TimeUnit.SECONDS);
         return process.exitValue();
     }

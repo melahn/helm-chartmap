@@ -87,21 +87,12 @@ class ChartMapTest {
     private static String testChartName = "nginx:9.3.0";
     private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
     private static String testChartUrl = "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz";
+    private final static String DIVIDER = "-------------------------------------";
     private final PrintStream initialOut = System.out;
-
-    @AfterAll
-    static void cleanUp() {
-        /**
-         * No cleanup to do after test. I don't delete the generated files because they
-         * might be handy to have around to diagnose issues in test failures. They are
-         * deleted anyway when the test is next run.
-         */
-        System.out.println("Test complete.  Any generated file can be found in "
-                .concat(Paths.get(targetTestDirectory).toAbsolutePath().toString()));
-    }
 
     @BeforeAll
     static void setUp() {
+        System.out.println(DIVIDER.concat(" UNIT TESTS START ").concat(DIVIDER));
         try {
             if (!Files.exists(Paths.get(".", testInputFileName))) {
                 throw new Exception(String.format("test Input File %s does not exist", testInputFileName));
@@ -114,10 +105,22 @@ class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    @AfterAll
+    static void cleanUp() {
+        /**
+         * No cleanup to do after test. I don't delete the generated files because they
+         * might be handy to have around to diagnose issues in test failures. They are
+         * deleted anyway when the test is next run.
+         */
+        System.out.println("Test complete.  Any generated file can be found in "
+                .concat(Paths.get(targetTestDirectory).toAbsolutePath().toString()));
+        System.out.println(DIVIDER.concat(" UNIT TESTS END ").concat(DIVIDER));
+    }
+
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, false);
+                false);
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
         wdt.setTemplate(hdt);
@@ -140,13 +143,13 @@ class ChartMapTest {
     void unpackChartTest() throws ChartMapException, IOException {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
         ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, true);
+                false);
         cm1.setChartName("foo");
         cm1.createTempDir();
         assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
         // force ChartMapException path when no temp dir
         ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, true);
+                false);
         cm2.setChartName("foo");
         assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
         // force ChartMapException path when null chartmap passed
@@ -154,7 +157,7 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
         // test when the tgz has no directory
         ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, true);
+                false);
         cm3.setChartName(null);
         cm3.setChartVersion(null);
         cm3.createTempDir();
@@ -168,7 +171,7 @@ class ChartMapTest {
         // test when the tgz has no directory, this time with a non-null chartname and a
         // null version
         ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, true);
+                false);
         cm4.setChartName("foo");
         cm4.setChartVersion(null);
         cm4.createTempDir();
@@ -182,7 +185,7 @@ class ChartMapTest {
         // test when the tgz has no directory, this time with a non-null version and a
         // null chartname to complete all the variations
         ChartMap cm5 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
-                false, true);
+                false);
         cm5.setChartName(null);
         cm5.setChartVersion("1.1.1");
         cm5.createTempDir();
@@ -204,19 +207,29 @@ class ChartMapTest {
      */
     @Test
     void utilityMethodsTest() throws ChartMapException, IOException {
+        // Test some getters related to the print format and file name
         String b = ChartMap.getBaseName(Paths.get("./target").toString());
         assertEquals(null, b);
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
-        cm.print();
-        assertEquals(PrintFormat.PLANTUML, cm.getPrintFormat());
-        cm.setPrintFormat(PrintFormat.JSON);
-        assertEquals(PrintFormat.JSON, cm.getPrintFormat());
-        assertEquals("chartmap.text", cm.getDefaultOutputFilename());
+        cm1.print();
+        assertEquals(PrintFormat.PLANTUML, cm1.getPrintFormat());
+        cm1.setPrintFormat(PrintFormat.JSON);
+        assertEquals(PrintFormat.JSON, cm1.getPrintFormat());
+        assertEquals("chartmap.text", cm1.getDefaultOutputFilename());
+
+        // Test main exception path
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> ChartMap.main(new String[] {"-f foo"}));;
+            assertTrue(ChartMapTestUtil.streamContains(o, "ChartMapException:"));
+            System.setOut(initialOut);
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**
-     * Tests the ChartMap.loadLocalRepos method, focusing on the corner where an
+     * Tests the ChartMap.loadLocalRepos method, focusing on the corner case where an
      * IOException is caught and converted to a thrown ChartMapException. Mockiko
      * spying is used.
      * 
@@ -405,35 +418,35 @@ class ChartMapTest {
     @Test
     void constructHelmConfigPathTest() throws ChartMapException, IOException {
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
+                true);
         ChartMap scm1 = spy(cm1);
         doReturn(targetTest).when(scm1).getEnv("HOME");
         scm1.constructHelmConfigPath(ChartUtil.OSType.MACOS);
         assertEquals(targetTest.concat("/Library/Preferences/helm"), scm1.getHelmConfigPath());
 
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
+                true);
         ChartMap scm2 = spy(cm2);
         doReturn(targetTest).when(scm2).getEnv("HOME");
         scm2.constructHelmConfigPath(ChartUtil.OSType.LINUX);
         assertEquals(targetTest.concat("/.config/helm"), scm2.getHelmConfigPath());
 
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
+                true);
         ChartMap scm3 = spy(cm3);
         doReturn(targetTest).when(scm3).getEnv("APPDATA");
         scm3.constructHelmConfigPath(ChartUtil.OSType.WINDOWS);
         assertEquals(targetTest.concat("/helm"), scm3.getHelmConfigPath());
 
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
+                true);
         ChartMap scm4 = spy(cm4);
         doReturn(targetTest.concat("/XDG_CONFIG_HOME")).when(scm4).getEnv("XDG_CONFIG_HOME");
         scm4.constructHelmConfigPath(ChartUtil.OSType.MACOS);
         assertEquals(targetTest.concat("/XDG_CONFIG_HOME"), scm4.getHelmConfigPath());
 
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
+                true);
         ChartMap scm5 = spy(cm5);
         doReturn(targetTest.concat("/HELM_CONFIG_HOME")).when(scm5).getEnv("HELM_CONFIG_HOME");
         scm5.constructHelmConfigPath(ChartUtil.OSType.MACOS);
@@ -444,7 +457,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
+                    true);
             ChartMap scm6 = spy(cm6);
             doReturn(null).when(scm6).getEnv("HOME");
             assertThrows(ChartMapException.class, () -> scm6.constructHelmConfigPath(ChartUtil.OSType.MACOS));
@@ -453,12 +466,11 @@ class ChartMapTest {
         }
 
         // No valid helm config directory in LINUX is found so look for the exception
-        // and
-        // logged error message
+        // and logged error message
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
+                    true);
             ChartMap scm7 = spy(cm7);
             doReturn(null).when(scm7).getEnv("HOME");
             assertThrows(ChartMapException.class, () -> scm7.constructHelmConfigPath(ChartUtil.OSType.LINUX));
@@ -471,7 +483,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm8 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
+                    true);
             ChartMap scm8 = spy(cm8);
             doReturn(null).when(scm8).getEnv("APPDATA");
             assertThrows(ChartMapException.class, () -> scm8.constructHelmConfigPath(ChartUtil.OSType.WINDOWS));
@@ -483,47 +495,13 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm9 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
+                    true);
             assertThrows(ChartMapException.class, () -> cm9.constructHelmConfigPath(ChartUtil.OSType.OTHER));
             assertTrue(ChartMapTestUtil.streamContains(o,
                     "Could not locate the helm config path. Check that your installation of helm is complete and that you are using a supported OS."));
             System.setOut(initialOut);
         }
 
-        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
-    }
-
-    /**
-     * Test the ChartMap.getHelmCommand method.
-     * 
-     * @throws ChartMapException
-     * @throws IOException
-     */
-    @Test
-    void constructGetHelmCommandTest() throws ChartMapException, IOException {
-        // The helm command is found in HELM_BIN
-        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(o));
-            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
-            ChartMap scm1 = spy(cm1);
-            String h = "target/test/HELM_BIN";
-            doReturn(h).when(scm1).getEnv("HELM_BIN");
-            scm1.getHelmCommand();
-            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used", h)));
-            System.setOut(initialOut);
-        }
-        // The helm command is not found in HELM_BIN so the default "helm" is used
-        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(o));
-            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                    true, true);
-            ChartMap scm1 = spy(cm1);
-            doReturn(null).when(scm1).getEnv("HELM_BIN");
-            scm1.getHelmCommand();
-            assertTrue(ChartMapTestUtil.streamContains(o, String.format("The helm command %s will be used", "helm")));
-            System.setOut(initialOut);
-        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -1003,10 +981,12 @@ class ChartMapTest {
             System.setOut(new PrintStream(initialOut));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format("IO Exception getting condition of %s", k)));
         }
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
-                    false, false);
-        // Test the condition where the variable is found with a false value in the env list
-        assertEquals(Boolean.FALSE, cm2.getCondition("alfresco\\-infrastructure.alfresco\\-api\\-gateway.enabled", new HelmChart()));
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        // Test the condition where the variable is found with a false value in the env
+        // list
+        assertEquals(Boolean.FALSE,
+                cm2.getCondition("alfresco\\-infrastructure.alfresco\\-api\\-gateway.enabled", new HelmChart()));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -1033,11 +1013,6 @@ class ChartMapTest {
             mf.when(() -> Files.walk(any(), any())).thenThrow(IOException.class);
             assertThrows(ChartMapException.class, () -> cm2.removeTempDir());
         }
-        // create the ChartMap in debug mode and be sure the temp dir is not deleted
-        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                true, true);
-        cm3.print();
-        assertTrue(Files.exists(Paths.get(cm3.getTempDirName())));
         // create the ChartMap in non-debug mode and be sure the temp dir is deleted
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
@@ -1183,7 +1158,7 @@ class ChartMapTest {
     void chartNameTest() throws ChartMapException {
         // test normal path without using createTestMap utility function because I want
         // null env var file
-        boolean[] switches = { true, false, false, false };
+        boolean[] switches = { true, false, false };
         ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, switches);
         cm1.print();
@@ -1196,16 +1171,19 @@ class ChartMapTest {
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testOutputChartNamePumlPath, true,
                 false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void optionsTest() throws ChartMapException {
-        boolean[] switches = { true, false, false, false }; // test that a correct option is used
+        final int BAD_NUMBER_OF_SWITCHES = 8;
+        boolean[] switches = { true, false, false }; // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, switches)); //
         // test a bad switches array
         assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
-                testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[3]));
+                testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[BAD_NUMBER_OF_SWITCHES]));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**
@@ -1389,19 +1367,6 @@ class ChartMapTest {
     }
 
     @Test
-    void debugTest() throws ChartMapException, IOException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputPumlFilePathNRNV, true, false,
-                false, true);
-        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            System.setOut(new PrintStream(o));
-            cm.print();
-            assertTrue(ChartMapTestUtil.streamContains(o, "was not removed because this is debug mode"));
-            System.setOut(new PrintStream(initialOut));
-        }
-        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
-    }
-
-    @Test
     void JSONChartMapPrinterTest() throws ChartMapException, FileNotFoundException, IOException {
         final Path jsonDir = Paths.get("target/test/json/");
         final Path jsonFile = Paths.get(jsonDir.toString(), "test.json");
@@ -1448,15 +1413,12 @@ class ChartMapTest {
     }
 
     private ChartMap createTestMap(ChartOption option, String input, Path outputPath, boolean generateImage,
-            boolean refresh, boolean verbose, boolean... options) throws ChartMapException {
-        // debug off makes it less noisy but be careful of any tests that depend on
-        // debug entries
-        boolean debug = (options.length > 0) ? options[0] : false;
-        boolean[] switches = new boolean[] { generateImage, refresh, verbose, debug };
+            boolean refresh, boolean verbose) throws ChartMapException {
+        boolean[] switches = new boolean[] { generateImage, refresh, verbose };
         ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
                 testEnvFilePath.toAbsolutePath().toString(), switches);
-        cm.setLogLevel(); // set this explictly because some of the test cases may depend on a logger and
-                          // don't call print
+        //cm.setDebugLogLevel(); // set this explictly because some of the test cases may depend on a logger and
+         //                      // don't call print
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
