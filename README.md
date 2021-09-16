@@ -55,7 +55,7 @@ The location of the helm cache and configuration directories is derived using th
 
 The junit test cases rely on the environment variable *HELM_HOME* being set.
 
-If debug information is desired, set the environment variable CHARTMAP_DEBUG=&lt;anyvalue&gt;.
+If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&lt;anyvalue&gt;.
 
 ## Using Chart Map
 
