@@ -24,8 +24,7 @@ import org.junit.jupiter.api.Test;
  */
 class ChartMapIntegrationTest {
 
-    private static final String TARGET_TEST_DIR_NAME = "target/integration-test";
-    private static final Path TARGET_TEST_PATH = Paths.get(TARGET_TEST_DIR_NAME);
+    private List<String> args = null;
     private final String className = "com.melahn.util.helm.ChartMap";
     private final Path JaCocoAgentPath = Paths.get("", "lib/org.jacoco.agent-0.8.7-runtime").toAbsolutePath();
     private final String JaCocoAgentString = JaCocoAgentPath.toString()
@@ -38,8 +37,9 @@ class ChartMapIntegrationTest {
     private final String targetTestDirName = "target/integration-test";
     private final Path targetTestPath = Paths.get(targetTestDirName);
     private final ChartMapTestUtil utility = new ChartMapTestUtil();
-    private List<String> args = null;
-    private final static String DIVIDER = "-------------------------------------";
+    private static final String TARGET_TEST_DIR_NAME = "target/integration-test";
+    private static final Path TARGET_TEST_PATH = Paths.get(TARGET_TEST_DIR_NAME);
+    private static final String DIVIDER = "-------------------------------------";
 
     /**
      * Cleans the target test directory and creates one anew.

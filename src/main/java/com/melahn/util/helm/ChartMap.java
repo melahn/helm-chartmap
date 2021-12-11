@@ -157,7 +157,7 @@ public class ChartMap {
      */
     public static void main(String[] arg) throws ChartMapException {
         ChartMap chartMap = new ChartMap();
-        try {
+         try {
             if (chartMap.parseArgs(arg)) {
                 chartMap.print();
             }
@@ -589,7 +589,7 @@ public class ChartMap {
      * @param c the command and its parameters
      * @param d the working directory
      * @return a Process
-     * @throws IOException
+     * @throws IOException if an error occurs getting the process
      */
     public Process getProcess(String[] c, File d) throws IOException {
         return d!=null?Runtime.getRuntime().exec(c, null, d):Runtime.getRuntime().exec(c, null);
@@ -626,6 +626,7 @@ public class ChartMap {
     /** 
      * Constructs the helm cache path following the rules defined by helm.
      * 
+     * @param os the type of operating system
      * @throws ChartMapException if a valid path could not be constructed
      */
     protected void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
@@ -667,6 +668,7 @@ public class ChartMap {
      /** 
      * Constructs the helm config path following the rules defined by helm.
      * 
+     * @param os the type of operating system
      * @throws ChartMapException if a valid path could not be constructed
      */
     protected void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
@@ -855,6 +857,9 @@ public class ChartMap {
      * file, there is no need to fetch a chart 4. If the user specified the chart by
      * name, the chart is already in the charts map we create from the repo so find
      * the download url from that entry and download it
+     * 
+     * @return the name of the directory in which the chart can be found
+     * @throws ChartMapException if the chart could not be gotten
      */
     protected String getChart() throws ChartMapException {
         String chartDirName = "";
@@ -885,6 +890,14 @@ public class ChartMap {
         return chartDirName;
     }
 
+    /**
+     * Given a chart location in the file system, unpacks the chart
+     * 
+     * @param chartFilename the location of the chart in the file system
+     * @return the name of the directory in which the chart was unpacked e.g.
+     *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
+     * @throws ChartMapException
+     */
     protected String getChart(String chartFilename) throws ChartMapException {
         try {
             Path src = new File(chartFilename).toPath();
@@ -903,6 +916,7 @@ public class ChartMap {
      * @param apprSpec a string specifying the location of the chart
      * @return the name of the directory into which the chart was downloaded e.g.
      *         /temp/melahn_helm-chartmap-test-chart_1.0.0/helm-chartmap-test-chart
+     * @throws ChartMapException if the chart could not be pulled 
      */
     protected String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
@@ -956,7 +970,6 @@ public class ChartMap {
      * Extracts embedded charts found in a chart directory
      * 
      * @param d A directory containing a chart
-     * @return
      * @throws ChartMapException if an exception occurs extracting the embedded
      *                           archives
      */
@@ -980,7 +993,7 @@ public class ChartMap {
      * @param u A string holding the url of the Helm Chart to be downloaded
      * @return the name of the directory where the chart was pulled into e.g.
      *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
-     * @throws ChartMapException
+     * @throws ChartMapException if an error occured downloading the chart
      */
     protected String downloadChart(String u) throws ChartMapException {
         String chartDirName = null;
@@ -1019,8 +1032,8 @@ public class ChartMap {
      * 
      * @param c Http client.  It is the caller's responsibility to close it.
      * @param u the URL to get
-     * @return
-     * @throws IOException
+     * @return the HttpResponse
+     * @throws IOException if an error occured executing the HTTP request
      */
     protected static HttpResponse getHttpResponse(CloseableHttpClient c, String u) throws IOException {
         HttpGet request = new HttpGet(u);
@@ -1224,6 +1237,8 @@ public class ChartMap {
      * 
      * @param chartDirName     the name of the directory where the chart is found
      * @param currentHelmChart the helm chart found in the local charts repo
+     * @param parentHelmChart  the parent of the current helm chart
+     * @return True if a condition for including the chart was found
      */
     protected Boolean checkForCondition(String chartDirName, HelmChart currentHelmChart, HelmChart parentHelmChart) {
         Boolean condition = Boolean.TRUE;
@@ -1412,7 +1427,7 @@ public class ChartMap {
      *
      * @param dirName the name of the directory in which the values file exists
      * @param h       the Helm Chart object to which these values apply
-     * @throws IOException
+     * @throws IOException if an error occured collecting the values
      */
     @SuppressWarnings("unchecked")
     protected void collectValues(String dirName, HelmChart h) throws IOException {
@@ -1652,6 +1667,7 @@ public class ChartMap {
      *
      * @return a list with each environment variable specified. This may be empty
      *         since such environment variables are not mandatory
+     * @throws IOException if the env vars could be get gotten
      */
     protected List<String> getEnvVars() throws IOException {
         ArrayList<String> envVars = new ArrayList<>();
@@ -2009,6 +2025,7 @@ public class ChartMap {
     /**
      * Removes the temporary directory created by createTempDir() unless the debug
      * switch was set
+     * @throws ChartMapException if an error occured removing the directory
      */
     protected void removeTempDir() throws ChartMapException {
         if (isDebug()) {

@@ -147,15 +147,18 @@ class ChartMapTest {
         cm1.setChartName("foo");
         cm1.createTempDir();
         assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
+        System.out.println("ChartMapException thrown as expected");
         // force ChartMapException path when no temp dir
         ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         cm2.setChartName("foo");
         assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
+        System.out.println("ChartMapException thrown as expected");
         // force ChartMapException path when null chartmap passed
         cm2.createTempDir();
         assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
         // test when the tgz has no directory
+        System.out.println("ChartMapException thrown as expected");
         ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         cm3.setChartName(null);
@@ -167,6 +170,7 @@ class ChartMapTest {
             assertTrue(
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
         // test when the tgz has no directory, this time with a non-null chartname and a
         // null version
@@ -181,6 +185,7 @@ class ChartMapTest {
             assertTrue(
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
         // test when the tgz has no directory, this time with a non-null version and a
         // null chartname to complete all the variations
@@ -195,6 +200,7 @@ class ChartMapTest {
             assertTrue(
                     ChartMapTestUtil.streamContains(unpackCharttestOut, "Archive content does not appear to be valid"));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -224,6 +230,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> ChartMap.main(new String[] {"-f foo"}));;
             assertTrue(ChartMapTestUtil.streamContains(o, "ChartMapException:"));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -244,6 +251,7 @@ class ChartMapTest {
         doReturn(som).when(scm).getObjectMapper();
         doThrow(IOException.class).when(som).readValue(any(File.class), eq(HelmChartReposLocal.class));
         assertThrows(ChartMapException.class, () -> scm.loadLocalRepos());
+        System.out.println("IOException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -266,6 +274,7 @@ class ChartMapTest {
         // Return 1 to mimic a bad helm command forcing a ChartMapException
         doReturn(1).when(sp1).exitValue();
         assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
+        System.out.println("ChartMapException thrown as expected");
         // Test not helm version 3
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
@@ -274,6 +283,7 @@ class ChartMapTest {
         Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "I am not helm version 3" });
         doReturn(p2).when(scm2).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm2.checkHelmVersion());
+        System.out.println("ChartMapException thrown as expected");
         // Use a command that will cause the process' BufferedReader to return null and
         // force the ChartMapException.
         ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
@@ -284,6 +294,7 @@ class ChartMapTest {
         Process p3 = Runtime.getRuntime().exec(new String[] { nullCommand, nullArgument });
         doReturn(p3).when(scm3).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm3.checkHelmVersion());
+        System.out.println("ChartMapException thrown as expected");
         // Use a command that will cause the process' BufferedReader to just one
         // character and force the ChartMapException
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
@@ -292,12 +303,14 @@ class ChartMapTest {
         Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "1" });
         doReturn(p4).when(scm4).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
+        System.out.println("ChartMapException thrown as expected");
         // Cause an IOException -> ChartMapException on getProcess()
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm5 = spy(cm5);
         doThrow(IOException.class).when(scm5).getProcess(any(), eq(null));
         assertThrows(ChartMapException.class, () -> scm5.checkHelmVersion());
+        System.out.println("IOException -> ChartMapException thrown as expected");
         // Cause an InterruptedException -> ChartMapException on waitFor()
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
@@ -310,6 +323,7 @@ class ChartMapTest {
         doReturn(sp6).when(scm6).getProcess(any(), eq(null));
         doThrow(InterruptedException.class).when(sp6).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
+        System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -367,6 +381,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm6.constructHelmCachePath(ChartUtil.OSType.MACOS));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // No valid helm cache directory in LINUX is found so look for the exception and
@@ -380,6 +395,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm7.constructHelmCachePath(ChartUtil.OSType.LINUX));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // No valid helm cache directory in Windows is found so look for the exception
@@ -393,6 +409,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm8.constructHelmCachePath(ChartUtil.OSType.WINDOWS));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.TEMP)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // All other cases
@@ -404,6 +421,7 @@ class ChartMapTest {
             assertTrue(ChartMapTestUtil.streamContains(o,
                     "Could not locate the helm cache path. Check that your installation of helm is complete and that you are using a supported OS."));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -463,6 +481,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm6.constructHelmConfigPath(ChartUtil.OSType.MACOS));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // No valid helm config directory in LINUX is found so look for the exception
@@ -476,6 +495,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm7.constructHelmConfigPath(ChartUtil.OSType.LINUX));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // No valid helm config directory in Windows is found so look for the exception
@@ -489,6 +509,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> scm8.constructHelmConfigPath(ChartUtil.OSType.WINDOWS));
             assertTrue(ChartMapTestUtil.streamContains(o, String.format(ChartMap.CHECK_OS_MSG, ChartMap.APPDATA)));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
 
         // All other cases
@@ -500,8 +521,8 @@ class ChartMapTest {
             assertTrue(ChartMapTestUtil.streamContains(o,
                     "Could not locate the helm config path. Check that your installation of helm is complete and that you are using a supported OS."));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
-
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -599,6 +620,7 @@ class ChartMapTest {
             scm6.loadChartsFromCache(r, f);
             assertTrue(ChartMapTestUtil.streamContains(o, String.format("Error loading charts from helm cache: ")));
             System.setOut(initialOut);
+            System.out.println("IOException -> ChartMapException thrown as expected");
         }
     }
 
@@ -628,6 +650,7 @@ class ChartMapTest {
             scm2.print();
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException printing charts:"));
             System.setOut(initialOut);
+            System.out.println("ChartMapException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
 
@@ -647,8 +670,10 @@ class ChartMapTest {
             mf.when(() -> Files.walk(any(Path.class), anyInt())).thenThrow(IOException.class);
             System.out.print("An IOException is swallowed but expect this log message ... ");
             assertThrows(ChartMapException.class, () -> cm1.extractEmbeddedCharts("foo"));
+            System.out.println("ChartMapException thrown as expected");
         }
         assertThrows(RuntimeException.class, () -> lambdaWrapper());
+        System.out.println("RuntimeException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -721,6 +746,7 @@ class ChartMapTest {
             mf.when(() -> Files.copy(any(Path.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
                     .thenThrow(IOException.class);
             assertThrows(ChartMapException.class, () -> cm2.getChart(cm2.getChartName()));
+            System.out.println("IOException -> ChartMapException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -739,6 +765,7 @@ class ChartMapTest {
         ChartMap scm1 = spy(cm1);
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.print());
+        System.out.println("IOException -> ChartMapException thrown as expected");
         // Use a spy to throw an InterruptedException -> ChartMapException
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
@@ -750,6 +777,7 @@ class ChartMapTest {
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
         doThrow(InterruptedException.class).when(sp2).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm2.print());
+        System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -767,12 +795,13 @@ class ChartMapTest {
             ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false,
                     false);
             assertThrows(ChartMapException.class, () -> cm1.downloadChart("http://example.com"));
-
+            System.out.println("IOException -> ChartMapException thrown as expected");
         }
         // Test a bad http rc using a url that's guraranteed not to exist. See
         // https://github.com/Readify/httpstatus.
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.downloadChart("https://httpstat.us/404"));
+        System.out.println("ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -791,6 +820,7 @@ class ChartMapTest {
         ChartMap scm1 = spy(cm1);
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.updateLocalRepo("foo"));
+        System.out.println("IOException -> ChartMapException thrown as expected");
         // Cause a bad exit value from the process
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, false, true, false);
         ChartMap scm2 = spy(cm2);
@@ -799,6 +829,7 @@ class ChartMapTest {
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
         doReturn(1).when(sp2).exitValue();
         assertThrows(ChartMapException.class, () -> scm2.updateLocalRepo("foo"));
+        System.out.println("ChartMapException thrown as expected");
         // Simulate an InterruptedException -> ChartMapException on waitFor()
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
@@ -810,6 +841,7 @@ class ChartMapTest {
         doReturn(sp3).when(scm3).getProcess(any(), any(File.class));
         doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo"));
+        System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -834,6 +866,7 @@ class ChartMapTest {
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException extracting Chart information from ".concat(s)
                     .concat(File.separator).concat(ChartMap.CHART_YAML)));
             System.setOut(new PrintStream(initialOut));
+            System.out.println("IOException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -910,6 +943,7 @@ class ChartMapTest {
             assertThrows(ChartMapException.class, () -> cm3.collectDependencies(d2p.toString(), null));
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException getting Dependencies"));
             System.setOut(new PrintStream(initialOut));
+            System.out.println("ChartMapException thrown as expected");
         }
         // Test the Chart.yaml file references a chart that does not exist
         ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
@@ -920,6 +954,7 @@ class ChartMapTest {
         byte[] b = s.getBytes();
         Files.write(p3, b);
         assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
+        System.out.println("ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -957,6 +992,7 @@ class ChartMapTest {
                     new HelmChart(), new HelmChart()));
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException collecting values in handleHelmChartCondition"));
             System.setOut(new PrintStream(initialOut));
+            System.out.println("IOException -> ChartMapException thrown as expected");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1013,6 +1049,7 @@ class ChartMapTest {
             mf.when(() -> Files.walk(any(), any())).thenThrow(IOException.class);
             assertThrows(ChartMapException.class, () -> cm2.removeTempDir());
         }
+        System.out.println("ChartMapException thrown as expected attempting to remove temp dir");
         // create the ChartMap in non-debug mode and be sure the temp dir is deleted
         ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
@@ -1134,14 +1171,18 @@ class ChartMapTest {
         assertTrue(Files.exists(testOutputAPPRPngPath));
         assertThrows(ChartMapException.class,
                 () -> createTestMap(ChartOption.APPRSPEC, null, testOutputAPPRPumlPath, true, false, false));
+        System.out.println("ChartMapException thrown as expected with a null appr spec");
         // test various malformed appr specs
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat",
                 testOutputAPPRPumlPath, true, false, false));
+        System.out.println("ChartMapException thrown as expected with a bad appr spec");
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
                 testOutputAPPRPumlPath, true, false, false)); // test chart not found in app repo
+        System.out.println("ChartMapException thrown as expected with a bad appr spec");
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0", testOutputAPPRPumlPath,
                 true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
+        System.out.println("ChartMapException thrown as expected");
     }
 
     @Test
@@ -1152,6 +1193,7 @@ class ChartMapTest {
         assertTrue(Files.exists(testOutputChartUrlPngPath)); // test null chart name
         assertThrows(ChartMapException.class,
                 () -> createTestMap(ChartOption.URL, null, testOutputChartUrlPumlPath, true, false, false));
+        System.out.println("ChartMapException thrown as expected with a null chart name");
     }
 
     @Test
@@ -1167,10 +1209,12 @@ class ChartMapTest {
         // test missing version in chartname
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.CHARTNAME, "badchartname-noversion",
                 testOutputChartNamePumlPath, true, false, false));
+        System.out.println("ChartMapException thrown as expected test missing version in chartname");
         // test chart not found
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", testOutputChartNamePumlPath, true,
                 false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
+        System.out.println("ChartMapException thrown as expected when test chart not found");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -1180,9 +1224,11 @@ class ChartMapTest {
         boolean[] switches = { true, false, false }; // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, switches)); //
+        System.out.println("ChartMapException thrown as expected with a bad switches array");
         // test a bad switches array
         assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, testChartName,
                 testOutputChartNamePumlPath.toAbsolutePath().toString(), null, new boolean[BAD_NUMBER_OF_SWITCHES]));
+        System.out.println("ChartMapException thrown as expected with a bad number of switches in the array");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -1317,7 +1363,7 @@ class ChartMapTest {
         assertTrue(ChartMapTestUtil.fileContains(f, nl));
         // force IOException to ChartMapException with a ChartMap with a null logger
         assertThrows(ChartMapException.class, () -> new ChartMapPrinter(cm, "/", null, null));
-        System.out.println("Third ChartMapException expected and thrown");
+        System.out.println("IO Exception -> ChartMapException thrown as expected because the logger is null");
         // force IOException using mocking
         FileWriter mfr = mock(FileWriter.class);
         doThrow(new IOException("IO Exception occured")).when(mfr).write(anyString());
@@ -1327,6 +1373,7 @@ class ChartMapTest {
             cm.logger = null;
             cmp2.writeLine("IO Exception");
         });
+        System.out.println("IO Exception -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
