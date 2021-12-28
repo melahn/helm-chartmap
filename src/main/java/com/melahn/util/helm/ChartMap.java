@@ -75,7 +75,7 @@ public class ChartMap {
     HashSet<String> chartsDependenciesPrinted = new HashSet<>();
     protected ChartKeyMap chartsReferenced = new ChartKeyMap();
     private boolean debug = false;
-    private HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced = new HashMap<>();
+    protected HashMap<String, WeightedDeploymentTemplate> deploymentTemplatesReferenced = new HashMap<>();
     private String envFilename = null;
     HashSet<String> env = new HashSet<>();
     private boolean generateImage = false;
@@ -1393,7 +1393,7 @@ public class ChartMap {
      * location of the hierarchy in the file system (parents having priority over
      * children) and set that one in the chart
      */
-    private void applyTemplates() {
+    protected void applyTemplates() {
         MapIterator<MultiKey<? extends String>, HelmChart> i = chartsReferenced.mapIterator();
         while (i.hasNext()) {
             i.next();

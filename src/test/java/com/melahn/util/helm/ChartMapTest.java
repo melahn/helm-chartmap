@@ -236,6 +236,27 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the unusual case where the weighted template is not found when applying the templates.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void applyTemplatesTest() throws ChartMapException {
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        cm.print();
+        HelmChart h = cm.chartsReferenced.get("nginx", "9.3.0");
+        HashMap<String, ChartMap.WeightedDeploymentTemplate> dtr = cm.deploymentTemplatesReferenced;
+        for (HelmDeploymentTemplate t : h.getDeploymentTemplates()) {
+                dtr.remove(t.getFileName()); // this will force the case where the weighted template was not found
+                cm.deploymentTemplatesReferenced = dtr;
+        }
+        cm.applyTemplates();
+        assertTrue(h.getDeploymentTemplates().isEmpty());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests the ChartMap.loadLocalRepos method, focusing on the corner case where an
      * IOException is caught and converted to a thrown ChartMapException. Mockiko
      * spying is used.
