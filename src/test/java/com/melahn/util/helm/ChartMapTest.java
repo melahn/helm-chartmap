@@ -258,6 +258,48 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the unusual case where a helm template file has empty content and where
+     * it
+     * contains an bbject whose kind is not a string.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     * 
+     */
+    @Test
+    void renderTemplatesTest() throws ChartMapException, IOException {
+        Path notMapPath = Paths.get(targetTest, "notMap.yaml"); 
+        Files.deleteIfExists(notMapPath);
+        notMapPath = Files.createFile(notMapPath);
+        Files.write(notMapPath, " foo ".getBytes()); // not a Map
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm1 = spy(cm1);
+        doReturn(notMapPath.toFile()).when(scm1).runTemplateCommand(any(File.class), any(HelmChart.class));
+        try {
+            // case where Yaml.loadAll does not yield a Map
+            scm1.renderTemplates(new File(targetTest), new HelmChart(), new HelmChart());
+        } catch (Exception e) {
+            assertFalse(true); // No exception should be thrown
+        }
+        Path notKindPath = Paths.get(targetTest, "notKind.yaml"); 
+        Files.deleteIfExists(notKindPath);
+        notKindPath = Files.createFile(notKindPath);
+        Files.write(notKindPath, "notKind: foo\n".getBytes()); // something not a 'kind' object
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm2 = spy(cm2);
+        doReturn(notKindPath.toFile()).when(scm2).runTemplateCommand(any(File.class), any(HelmChart.class));
+        try {
+            // case where Yaml.loadAll does not yield a Map
+            scm2.renderTemplates(new File(targetTest), new HelmChart(), new HelmChart());
+        } catch (Exception e) {
+            assertFalse(true); // No exception should be thrown here either
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests some error conditions in collectValues
      * 
      * @throws ChartMapException
@@ -265,12 +307,11 @@ class ChartMapTest {
      */
     @Test
     void collectValuesTest() throws ChartMapException, IOException {
-        String d = "fooCollectValuesFile";
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         // test the cases where one or both of the parameters are null
         try {
-            cm1.collectValues(d, null);
+            cm1.collectValues("fooCollectValuesFile", null);
             cm1.collectValues(null, new HelmChart());
             cm1.collectValues(null, null);
         } catch (Exception e) {
@@ -281,7 +322,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-                            true);
+                    true);
             cm2.setVerboseLogLevel(); // this is called explicitly because print is not called
             cm2.collectValues(targetTest, new HelmChart());
             assertTrue(

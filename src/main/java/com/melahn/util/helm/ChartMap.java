@@ -896,7 +896,7 @@ public class ChartMap {
      * @param chartFilename the location of the chart in the file system
      * @return the name of the directory in which the chart was unpacked e.g.
      *         /temp/helm-chartmap-test-chart_1.0.2/helm-chartmap-test-chart
-     * @throws ChartMapException
+     * @throws ChartMapException when an IO Exception occurs
      */
     protected String getChart(String chartFilename) throws ChartMapException {
         try {
@@ -1473,7 +1473,7 @@ public class ChartMap {
      * 
      * @throws ChartMapException when an error occurs rendering template
      */
-    private void renderTemplates(File d, HelmChart h, HelmChart p) throws ChartMapException {
+    protected void renderTemplates(File d, HelmChart h, HelmChart p) throws ChartMapException {
         try {
             if (h.getType() != null && h.getType().equals("library")) {
                 // skip rendering library charts (these were introduced in Helm V3)
@@ -1580,12 +1580,14 @@ public class ChartMap {
     /**
      * Runs the helm template command
      *
-     * @param dir       the directory in which to run the command
-     * @param helmChart the helm chart on which the template command should be run
-     * @return the template file that was generated
+     * @param dir   the directory in which to run the command
+     * @param h     the helm chart on which the template command should be run
+     * @return      the template file that was generated
+     * @throws ChartMapException when an error occurs running the helm template command
+     * @throws IOException when an IO error occurs creating files
      * 
      */
-    private File runTemplateCommand(File dir, HelmChart h) throws IOException, ChartMapException {
+    protected File runTemplateCommand(File dir, HelmChart h) throws IOException, ChartMapException {
         String command = helmCommand;
         // Get any variables the user may have specified and append to the command
         List<String> envVars = getEnvVars();
