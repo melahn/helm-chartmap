@@ -1437,8 +1437,7 @@ public class ChartMap {
         File valuesFile = new File(dirName + File.separator + "values.yaml");
         if (valuesFile.exists()) {
             FileInputStream fis = new FileInputStream(valuesFile);
-            Yaml yaml = new Yaml();
-            Object o = yaml.load(fis);
+            Object o = new Yaml().load(fis);
             if (o instanceof Map<?, ?>) {
                 Map<String, Object> chartValues = (Map<String, Object>) o;
                 h.setValues(chartValues);

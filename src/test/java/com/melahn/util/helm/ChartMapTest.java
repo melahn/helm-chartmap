@@ -227,7 +227,7 @@ class ChartMapTest {
         // Test main exception path
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            assertThrows(ChartMapException.class, () -> ChartMap.main(new String[] {"-f foo"}));;
+            assertThrows(ChartMapException.class, () -> ChartMap.main(new String[] { "-f foo" }));
             assertTrue(ChartMapTestUtil.streamContains(o, "ChartMapException:"));
             System.setOut(initialOut);
             System.out.println("ChartMapException thrown as expected");
@@ -236,7 +236,8 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the unusual case where the weighted template is not found when applying the templates.
+     * Tests the unusual case where the weighted template is not found when applying
+     * the templates.
      * 
      * @throws ChartMapException
      */
@@ -248,8 +249,8 @@ class ChartMapTest {
         HelmChart h = cm.chartsReferenced.get("nginx", "9.3.0");
         HashMap<String, ChartMap.WeightedDeploymentTemplate> dtr = cm.deploymentTemplatesReferenced;
         for (HelmDeploymentTemplate t : h.getDeploymentTemplates()) {
-                dtr.remove(t.getFileName()); // this will force the case where the weighted template was not found
-                cm.deploymentTemplatesReferenced = dtr;
+            dtr.remove(t.getFileName()); // this will force the case where the weighted template was not found
+            cm.deploymentTemplatesReferenced = dtr;
         }
         cm.applyTemplates();
         assertTrue(h.getDeploymentTemplates().isEmpty());
@@ -257,7 +258,46 @@ class ChartMapTest {
     }
 
     /**
-     * Tests the ChartMap.loadLocalRepos method, focusing on the corner case where an
+     * Tests some error conditions in collectValues
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void collectValuesTest() throws ChartMapException, IOException {
+        String d = "fooCollectValuesFile";
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        // test the cases where one or both of the parameters are null
+        try {
+            cm1.collectValues(d, null);
+            cm1.collectValues(null, new HelmChart());
+            cm1.collectValues(null, null);
+        } catch (Exception e) {
+            assertFalse(true); // No exception should be thrown
+        }
+        // test the return of something other than a Map from yaml.load
+        Path pathOfEmptyFile = Files.createFile(Paths.get(targetTest, "values.yaml"));
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                            true);
+            cm2.setVerboseLogLevel(); // this is called explicitly because print is not called
+            cm2.collectValues(targetTest, new HelmChart());
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o,
+                            String.format("The values.yaml file: %s could not be parsed. Possibly it is empty.",
+                                    pathOfEmptyFile.toAbsolutePath())));
+
+            System.setOut(initialOut);
+            System.out.println("Expected error message found");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the ChartMap.loadLocalRepos method, focusing on the corner case where
+     * an
      * IOException is caught and converted to a thrown ChartMapException. Mockiko
      * spying is used.
      * 
@@ -1485,8 +1525,6 @@ class ChartMapTest {
         boolean[] switches = new boolean[] { generateImage, refresh, verbose };
         ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
                 testEnvFilePath.toAbsolutePath().toString(), switches);
-        //cm.setDebugLogLevel(); // set this explictly because some of the test cases may depend on a logger and
-         //                      // don't call print
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
