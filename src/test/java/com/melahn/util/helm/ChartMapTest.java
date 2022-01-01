@@ -160,6 +160,32 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the runTemplateCommand methods.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void runTemplateCommandTest() throws ChartMapException, IOException { 
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        // test that a bogus directory will cause an IO exception
+        HelmChart h = new HelmChart();
+        h.setName("fooChart");
+        assertThrows(IOException.class, () -> cm.runTemplateCommand(new File("foo"), h));
+        System.out.println("IOException thrown as expected");
+        // create a templates file that will be in the way of the one to be created by the runtTemplateCommand method so 
+        // as to induce a ChartMapException
+        Path d = Paths.get(targetTest, "runTemplateCommandTestDir");
+        Path t = Paths.get(targetTest, "runTemplateCommandTestDir", h.getName(), "templates");
+        Path y = Paths.get(t.toString(),"com.melahn.util.helm.ChartMap_renderedtemplates.yaml");
+        Files.createDirectories(t);
+        Files.createFile(y);
+        assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(d.toFile(),h));
+        System.out.println("ChartMapException thrown as expected");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests the ChartMap.unpackTestChart method
      * 
      * @throws ChartMapException

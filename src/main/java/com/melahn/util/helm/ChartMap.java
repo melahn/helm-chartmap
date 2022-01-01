@@ -1626,12 +1626,12 @@ public class ChartMap {
      * Runs the helm template command give a template f to create and a process.
      * Handled in a separate to reduce code complexity of caller.
      *
-     * @oaram f the file to which to write the template
+     * @param f the file to which to write the template
      * @param p the process to use to run the command
      * @param h the helm chart
      * 
      */
-    private void runTemplateCommand(File f, Process p, HelmChart h) throws ChartMapException {
+    protected void runTemplateCommand(File f, Process p, HelmChart h) throws ChartMapException {
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
                 BufferedInputStream bis = new BufferedInputStream(p.getInputStream());) {
             byte[] bytes = new byte[16384];

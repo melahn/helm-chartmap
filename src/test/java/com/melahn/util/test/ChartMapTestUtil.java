@@ -55,7 +55,7 @@ public class ChartMapTestUtil {
      * @param d Path of the directory
      */
     public static void cleanDirectory(Path d) throws IOException {
-        final int depth = 5; // go five deep
+        final int depth = 7; // go five deep
 
         System.out.println("Deleting any previously created files");
         if (Files.exists(d)) {
