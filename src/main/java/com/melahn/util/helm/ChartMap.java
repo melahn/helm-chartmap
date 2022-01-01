@@ -1708,7 +1708,7 @@ public class ChartMap {
      * @param s a String whose weight is desired
      * @return the calculated weight
      */
-    private int getWeight(String s) {
+    protected int getWeight(String s) {
         return (s != null) ? s.split(File.separator).length : MAX_WEIGHT;
     }
 

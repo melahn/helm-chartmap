@@ -117,6 +117,11 @@ class ChartMapTest {
         System.out.println(DIVIDER.concat(" UNIT TESTS END ").concat(DIVIDER));
     }
 
+    /**
+     * Tests the WeightedDeploymentTemplate inner class.
+     * 
+     * @throws ChartMapException
+     */
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
@@ -130,6 +135,27 @@ class ChartMapTest {
         assertEquals(1, wdt2.getWeight());
         ChartMap.WeightedDeploymentTemplate wdt3 = cm.new WeightedDeploymentTemplate(null, hdt);
         assertEquals(ChartMap.MAX_WEIGHT, wdt3.getWeight());
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the processWeights and getWeight methods.
+     * 
+     * @throws ChartMapException
+     */
+    @Test 
+    void processWeightsTest() throws ChartMapException {
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        ChartMap scm = spy(cm);
+        doReturn(0).when(scm).getWeight(anyString());
+        try {
+            scm.print();
+        }
+        catch (Exception e) {
+            assertTrue(true); // no exception is expected
+        }
+        assertEquals(ChartMap.MAX_WEIGHT, cm.getWeight(null));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
