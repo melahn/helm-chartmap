@@ -1630,6 +1630,7 @@ public class ChartMap {
      * @param p the process to use to run the command
      * @param h the helm chart
      * 
+     * @throws ChartMapException if an IOException, InterruptedException or a template command error occurs
      */
     protected void runTemplateCommand(File f, Process p, HelmChart h) throws ChartMapException {
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
@@ -1649,16 +1650,16 @@ public class ChartMap {
                     logger.error(message);
                 }
                 err.close();
-                throw new ChartMapException(
-                        "Error rendering template for chart " + h.getNameFull() + ".  See stderr for more details.");
+                logger.error("Error running template command. Exit Value = {}.", exitValue);
+                throw new ChartMapException(String.format("Error running template command. Exit Value = %d.", exitValue));
             } 
         } catch (IOException e) {
-            throw new ChartMapException("IOException pulling chart from appr using specification ".concat(apprSpec)
-                    .concat(" : ").concat(e.getMessage()));
+            logger.error("IOException running template command");
+            throw new ChartMapException("IOException running template command");
         } catch (InterruptedException e) {
+            logger.error("InterruptedException running template command");
             Thread.currentThread().interrupt();
-            throw new ChartMapException("InterruptedException pulling chart from appr using specification "
-                    .concat(apprSpec).concat(" : ").concat(e.getMessage()));
+            throw new ChartMapException("InterruptedException running template command");
         }
     }
 

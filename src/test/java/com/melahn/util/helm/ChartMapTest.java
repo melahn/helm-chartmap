@@ -18,11 +18,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -163,9 +165,11 @@ class ChartMapTest {
      * Tests the runTemplateCommand methods.
      * 
      * @throws ChartMapException
+     * @throws InterruptedException
+     * @throws IOException
      */
     @Test
-    void runTemplateCommandTest() throws ChartMapException, IOException { 
+    void runTemplateCommandTest() throws ChartMapException, InterruptedException, IOException { 
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         // test that a bogus directory will cause an IO exception
@@ -182,6 +186,44 @@ class ChartMapTest {
         Files.createFile(y);
         assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(d.toFile(),h));
         System.out.println("ChartMapException thrown as expected");
+        // test the IOException case when reading the output of the template command
+        Process p1 = Runtime.getRuntime().exec("echo", null);
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("./"), p1, null));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "IOException running template command"));
+            System.setOut(initialOut);
+            System.out.println("IOException -> ChartMapException thrown as expected when a bogus file is used");
+        }
+        // test the bad exit value case when running template command using a spy
+        Process p2 = Runtime.getRuntime().exec("echo", null);
+        Process sp2 = spy(p2);
+        doReturn(666).when(sp2).exitValue();
+        InputStream es = new ByteArrayInputStream(new byte[] { 'f', 'o', 'o', 'b', 'a', 'r' }); // needed to test the logging of the error stream
+        doReturn(es).when(sp2).getErrorStream();
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream(); ByteArrayOutputStream e = new ByteArrayOutputStream() ) {
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("foo"), sp2, new HelmChart()));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "Error running template command. Exit Value = 666."));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "foobar")); // put there by the spy input stream
+            System.setOut(initialOut);
+            System.out.println("IOException -> ChartMapException thrown as expected when the template process returns 666");
+        }
+        // test for InterruptedException using a spy
+        Process p3 = Runtime.getRuntime().exec("echo", null);
+        Process sp3 = spy(p3);
+        doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("foo"), sp3, new HelmChart()));
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "InterruptedException running template command"));
+            System.setOut(initialOut);
+            System.out.println("InterruptedException -> ChartMapException thrown as expected");
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
