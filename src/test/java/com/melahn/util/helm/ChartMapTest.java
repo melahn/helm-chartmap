@@ -18,6 +18,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,10 +27,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -246,23 +250,67 @@ class ChartMapTest {
             String chartName = "foochart";
             Path p1 = Paths.get(targetTest, "getTemplateArrayTestFile1");
             Files.createFile(p1);
-            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); // file is a template
+            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); // file is a
+                                                                                                           // template
             cm.getTemplateArray(p1.toFile(), chartName); // tests that file is a template
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p2 = Paths.get(targetTest, "getTemplateArrayTestFile2");
             Files.createFile(p2);
-            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); // file is not a template (no '#')
-            cm.getTemplateArray(p2.toFile(), chartName); // tests that line from file is long enough but is not a template
+            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); // file
+                                                                                                                       // is
+                                                                                                                       // not
+                                                                                                                       // a
+                                                                                                                       // template
+                                                                                                                       // (no
+                                                                                                                       // '#')
+            cm.getTemplateArray(p2.toFile(), chartName); // tests that line from file is long enough but is not a
+                                                         // template
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p3 = Paths.get(targetTest, "getTemplateArrayTestFile3");
             Files.createFile(p3);
             Files.write(p3, " ".getBytes()); // file is not a template (too short)
-            cm.getTemplateArray(p3.toFile(), chartName); // tests that line from file is not long enough and so is not a template
+            cm.getTemplateArray(p3.toFile(), chartName); // tests that line from file is not long enough and so is not a
+                                                         // template
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
-            cm.getTemplateArray(new File("./"), chartName);  // induces an Exception but one that is not thrown
+            cm.getTemplateArray(new File("./"), chartName); // induces an Exception but one that is not thrown
             assertTrue(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             System.setOut(initialOut);
             System.out.println("Expected logged error found");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the processTemplateYaml method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void processTemplateYamlTest() throws ChartMapException, IOException {
+        String c = "fooChart";
+        String l0 = "foo"; // split line length not > 1
+        String l1 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/templates/").concat(ChartMap.RENDERED_TEMPLATE_FILE);
+        String l2 = "foo".concat(c).concat("/templates/").concat(ChartMap.RENDERED_TEMPLATE_FILE);
+        String l3 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/");
+        String l4 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/").concat("notrenderedtemplatesfile");;
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        // Exercise all the mathematical variations one can find in the yaml line that might signal
+        // a helm template element
+        try {
+            cm.processTemplateYaml(l0, new BufferedReader(new StringReader(c)),
+                    new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
+            cm.processTemplateYaml(l1, new BufferedReader(new StringReader(c)),
+                    new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
+            cm.processTemplateYaml(l2, new BufferedReader(new StringReader(c)),
+                    new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
+            cm.processTemplateYaml(l3, new BufferedReader(new StringReader(c)),
+                    new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
+            cm.processTemplateYaml(l4, new BufferedReader(new StringReader(c)),
+                    new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
+        } catch (Exception e) {
+            assertFalse(true); // no exception is expected
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }

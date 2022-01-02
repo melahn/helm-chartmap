@@ -102,7 +102,6 @@ public class ChartMap {
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
-    private static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; 
     private static final int REFRESH_SWITCH = 1;
     private static final String TEMP_DIR = "Temporary Directory ";
     private static final int VERBOSE_SWITCH = 2;
@@ -115,7 +114,8 @@ public class ChartMap {
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
     protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
+    protected static final int PROCESS_TIMEOUT = 100000; 
+    protected static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; 
     protected static final String START_OF_TEMPLATE = "# Source: ";
     protected static final String TEMP = "TEMP";
     protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
@@ -1757,10 +1757,10 @@ public class ChartMap {
      * @return the line last read
      * @throws IOException
      */
-    private String processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a, String c) throws IOException {
+    protected String processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a, String c) throws IOException {
         String[] s = l.split(File.separator, 3);
         Boolean b = Boolean.FALSE;
-        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE + c) && s[1].equals("templates")
+        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE.concat(c)) && s[1].equals("templates")
                 && !l.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
             b = Boolean.TRUE; // the yaml files in this section are ones we care about
         }
