@@ -93,7 +93,6 @@ public class ChartMap {
     private PrintFormat printFormat = PrintFormat.TEXT;
     private IChartMapPrinter printer;
     private boolean refreshLocalRepo = false;
-    private static final String START_OF_TEMPLATE = "# Source: ";
     private String tempDirName = null;
     private boolean verbose = false;
 
@@ -117,6 +116,7 @@ public class ChartMap {
     protected static final String HOME = "HOME";
     protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
     protected static final int PROCESS_TIMEOUT = 100000; // protected allows testcases to access
+    protected static final String START_OF_TEMPLATE = "# Source: ";
     protected static final String TEMP = "TEMP";
     protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
     protected static final int MAX_WEIGHT = 100;
@@ -1726,14 +1726,14 @@ public class ChartMap {
      * @return an array with True object if the corresponding template is one that
      *         pertains to the chart
      */
-    private ArrayList<Boolean> getTemplateArray(File f, String c) {
+    protected ArrayList<Boolean> getTemplateArray(File f, String c) {
         ArrayList<Boolean> a = new ArrayList<>();
         String line = null;
         try (BufferedReader br = new BufferedReader(new FileReader(f));) {
             line = br.readLine();
             while (line != null) {
                 if (line.length() > (START_OF_TEMPLATE + c).length() && line.charAt(0) == '#') {
-                    // a pattern like this <chartName>/templates/... means that this is
+                    // a pattern like # Source: <chartname>/templates ... means that this is
                     // a template of immediate interest to the chart e.g.
                     // helm-chartmap-test-chart/templates
                     line = processTemplateYaml(line, br, a, c);
@@ -1741,8 +1741,8 @@ public class ChartMap {
                     line = br.readLine();
                 }
             }
-        } catch (Exception e) {
-            logger.error(LOG_FORMAT_4, "Exception creating template array in ", f.getName(), " with line ", line);
+        } catch (IOException e) {
+            logger.error(LOG_FORMAT_4, "IOException creating template array in ", f.getName(), " with line ", line);
         }
         return a;
     }

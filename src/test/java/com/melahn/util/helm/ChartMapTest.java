@@ -145,7 +145,7 @@ class ChartMapTest {
      * 
      * @throws ChartMapException
      */
-    @Test 
+    @Test
     void processWeightsTest() throws ChartMapException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
@@ -153,8 +153,7 @@ class ChartMapTest {
         doReturn(0).when(scm).getWeight(anyString());
         try {
             scm.print();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             assertTrue(true); // no exception is expected
         }
         assertEquals(ChartMap.MAX_WEIGHT, cm.getWeight(null));
@@ -169,7 +168,7 @@ class ChartMapTest {
      * @throws IOException
      */
     @Test
-    void runTemplateCommandTest() throws ChartMapException, InterruptedException, IOException { 
+    void runTemplateCommandTest() throws ChartMapException, InterruptedException, IOException {
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         // test that a bogus directory will cause an IO exception
@@ -177,14 +176,15 @@ class ChartMapTest {
         h.setName("fooChart");
         assertThrows(IOException.class, () -> cm.runTemplateCommand(new File("foo"), h));
         System.out.println("IOException thrown as expected");
-        // create a templates file that will be in the way of the one to be created by the runtTemplateCommand method so 
+        // create a templates file that will be in the way of the one to be created by
+        // the runtTemplateCommand method so
         // as to induce a ChartMapException
         Path d = Paths.get(targetTest, "runTemplateCommandTestDir");
         Path t = Paths.get(targetTest, "runTemplateCommandTestDir", h.getName(), "templates");
-        Path y = Paths.get(t.toString(),"com.melahn.util.helm.ChartMap_renderedtemplates.yaml");
+        Path y = Paths.get(t.toString(), "com.melahn.util.helm.ChartMap_renderedtemplates.yaml");
         Files.createDirectories(t);
         Files.createFile(y);
-        assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(d.toFile(),h));
+        assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(d.toFile(), h));
         System.out.println("ChartMapException thrown as expected");
         // test the IOException case when reading the output of the template command
         Process p1 = Runtime.getRuntime().exec("echo", null);
@@ -200,9 +200,12 @@ class ChartMapTest {
         Process p2 = Runtime.getRuntime().exec("echo", null);
         Process sp2 = spy(p2);
         doReturn(666).when(sp2).exitValue();
-        InputStream es = new ByteArrayInputStream(new byte[] { 'f', 'o', 'o', 'b', 'a', 'r' }); // needed to test the logging of the error stream
+        InputStream es = new ByteArrayInputStream(new byte[] { 'f', 'o', 'o', 'b', 'a', 'r' }); // needed to test the
+                                                                                                // logging of the error
+                                                                                                // stream
         doReturn(es).when(sp2).getErrorStream();
-        try (ByteArrayOutputStream o = new ByteArrayOutputStream(); ByteArrayOutputStream e = new ByteArrayOutputStream() ) {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream();
+                ByteArrayOutputStream e = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("foo"), sp2, new HelmChart()));
             assertTrue(
@@ -210,7 +213,8 @@ class ChartMapTest {
             assertTrue(
                     ChartMapTestUtil.streamContains(o, "foobar")); // put there by the spy input stream
             System.setOut(initialOut);
-            System.out.println("IOException -> ChartMapException thrown as expected when the template process returns 666");
+            System.out.println(
+                    "IOException -> ChartMapException thrown as expected when the template process returns 666");
         }
         // test for InterruptedException using a spy
         Process p3 = Runtime.getRuntime().exec("echo", null);
@@ -223,6 +227,42 @@ class ChartMapTest {
                     ChartMapTestUtil.streamContains(o, "InterruptedException running template command"));
             System.setOut(initialOut);
             System.out.println("InterruptedException -> ChartMapException thrown as expected");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the getTemplateArray method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void getTemplateArrayTest() throws ChartMapException, IOException {
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            String chartName = "foochart";
+            Path p1 = Paths.get(targetTest, "getTemplateArrayTestFile1");
+            Files.createFile(p1);
+            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); // file is a template
+            cm.getTemplateArray(p1.toFile(), chartName); // tests that file is a template
+            assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
+            Path p2 = Paths.get(targetTest, "getTemplateArrayTestFile2");
+            Files.createFile(p2);
+            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); // file is not a template (no '#')
+            cm.getTemplateArray(p2.toFile(), chartName); // tests that line from file is long enough but is not a template
+            assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
+            Path p3 = Paths.get(targetTest, "getTemplateArrayTestFile3");
+            Files.createFile(p3);
+            Files.write(p3, " ".getBytes()); // file is not a template (too short)
+            cm.getTemplateArray(p3.toFile(), chartName); // tests that line from file is not long enough and so is not a template
+            assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
+            cm.getTemplateArray(new File("./"), chartName);  // induces an Exception but one that is not thrown
+            assertTrue(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
+            System.setOut(initialOut);
+            System.out.println("Expected logged error found");
         }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -362,7 +402,7 @@ class ChartMapTest {
      */
     @Test
     void renderTemplatesTest() throws ChartMapException, IOException {
-        Path notMapPath = Paths.get(targetTest, "notMap.yaml"); 
+        Path notMapPath = Paths.get(targetTest, "notMap.yaml");
         Files.deleteIfExists(notMapPath);
         notMapPath = Files.createFile(notMapPath);
         Files.write(notMapPath, " foo ".getBytes()); // not a Map
@@ -376,7 +416,7 @@ class ChartMapTest {
         } catch (Exception e) {
             assertFalse(true); // No exception should be thrown
         }
-        Path notKindPath = Paths.get(targetTest, "notKind.yaml"); 
+        Path notKindPath = Paths.get(targetTest, "notKind.yaml");
         Files.deleteIfExists(notKindPath);
         notKindPath = Files.createFile(notKindPath);
         Files.write(notKindPath, "notKind: foo\n".getBytes()); // something not a 'kind' object
