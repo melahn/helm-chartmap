@@ -247,33 +247,32 @@ class ChartMapTest {
                 false);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
+             // tests the getTemplateArray(File d, String s) signature
             String chartName = "foochart";
             Path p1 = Paths.get(targetTest, "getTemplateArrayTestFile1");
             Files.createFile(p1);
-            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); // file is a
-                                                                                                           // template
+            // file is a template
+            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); 
             cm.getTemplateArray(p1.toFile(), chartName); // tests that file is a template
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p2 = Paths.get(targetTest, "getTemplateArrayTestFile2");
             Files.createFile(p2);
-            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); // file
-                                                                                                                       // is
-                                                                                                                       // not
-                                                                                                                       // a
-                                                                                                                       // template
-                                                                                                                       // (no
-                                                                                                                       // '#')
-            cm.getTemplateArray(p2.toFile(), chartName); // tests that line from file is long enough but is not a
-                                                         // template
+            // file is not a template (no '#')
+            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); 
+            // tests that line from file is long enough but is not a template
+            cm.getTemplateArray(p2.toFile(), chartName); 
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p3 = Paths.get(targetTest, "getTemplateArrayTestFile3");
             Files.createFile(p3);
             Files.write(p3, " ".getBytes()); // file is not a template (too short)
-            cm.getTemplateArray(p3.toFile(), chartName); // tests that line from file is not long enough and so is not a
-                                                         // template
+            // tests that line from file is not long enough and so is not a template
+            cm.getTemplateArray(p3.toFile(), chartName); 
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
-            cm.getTemplateArray(new File("./"), chartName); // induces an Exception but one that is not thrown
-            assertTrue(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
+            cm.getTemplateArray(new File("./"), chartName); // induces an IOException but one that is not thrown
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException creating template array in . with line null"));
+            // tests the getTemplateArray(File d, File f) signature
+            cm.getTemplateArray(new File("./"), new File("./")); // induces an IOException but one that is not thrown
+            assertTrue(ChartMapTestUtil.streamContains(o, "IOException creating template array in . with line null"));
             System.setOut(initialOut);
             System.out.println("Expected logged error found");
         }

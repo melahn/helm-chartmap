@@ -1742,52 +1742,23 @@ public class ChartMap {
                 }
             }
         } catch (IOException e) {
-            logger.error(LOG_FORMAT_4, "IOException creating template array in ", f.getName(), " with line ", line);
+            logger.error("IOException creating template array in {} with line {}", f.getName(), line);
         }
         return a;
     }
 
-    /**
-     * 
-     * @param l  a line if yaml from the template file
-     * @param br a buffered reader to use to read more lines of yaml if needed
-     * @param a  a list to which a boolean to signal this is an interesting template
-     *           can be added
-     * @param c  the name of the current Helm chart being processed
-     * @return the line last read
-     * @throws IOException
-     */
-    protected String processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a, String c) throws IOException {
-        String[] s = l.split(File.separator, 3);
-        Boolean b = Boolean.FALSE;
-        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE.concat(c)) && s[1].equals("templates")
-                && !l.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
-            b = Boolean.TRUE; // the yaml files in this section are ones we care about
-        }
-        boolean endOfYamlInFile = false;
-        while (!endOfYamlInFile) { // read until you find the end of this yaml object
-            l = br.readLine();
-            // EOF or the start of a new yaml section means the current object is completely
-            // read
-            if (l == null || (l.startsWith(START_OF_TEMPLATE))) {
-                endOfYamlInFile = true;
-                a.add(b);
-            }
-        }
-        return l;
-    }
-
-    /**
+   /**
      * Parses a file containing multiple yaml files and returns a array of the file
      * names of those yaml files
      *
-     * @param f A yaml file containing multiple yaml files, each such file preceded
-     *          by a comment of the form "# Source <filename>" e.g. # Source:
+     * @param d The directory in which the templates reside
+     * @param f A yaml file containing multiple yaml objects, each such object preceded
+     *          by a comment of the form "# Source filename" e.g. # Source:
      *          helm-chartmap-test-chart/charts/helm-chartmap-test-subchart/charts/postgresql/templates/deployment.yaml
      * @return an array containing the fully qualified file names of all the
      *         deployment templates mentioned in the yaml file
      */
-    private ArrayList<String> getTemplateArray(File d, File f) {
+    protected ArrayList<String> getTemplateArray(File d, File f) {
         ArrayList<String> a = new ArrayList<>();
         String line = null;
         try (FileReader fileReader = new FileReader(f);
@@ -1812,13 +1783,43 @@ public class ChartMap {
                     line = bufferedReader.readLine();
                 }
             }
-        } catch (Exception e) {
-            logger.error(LOG_FORMAT_4, "Exception creating template array in ", f.getName(), " with line ", line);
+        } catch (IOException e) {
+            logger.error("IOException creating template array in {} with line {}", f.getName(), line);
         }
         return a;
     }
 
     /**
+     * 
+     * @param l  a line if yaml from the template file
+     * @param br a buffered reader to use to read more lines of yaml if needed
+     * @param a  a list to which a boolean to signal this is an interesting template
+     *           can be added
+     * @param c  the name of the current Helm chart being processed
+     * @return the line last read
+     * @throws IOException when an exception occurs reading the yaml file
+     */
+    protected String processTemplateYaml(String l, BufferedReader br, ArrayList<Boolean> a, String c) throws IOException {
+        String[] s = l.split(File.separator, 3);
+        Boolean b = Boolean.FALSE;
+        if (s.length > 1 && s[0].equals(START_OF_TEMPLATE.concat(c)) && s[1].equals("templates")
+                && !l.endsWith(RENDERED_TEMPLATE_FILE)) { // ignore the template file we generate
+            b = Boolean.TRUE; // the yaml files in this section are ones we care about
+        }
+        boolean endOfYamlInFile = false;
+        while (!endOfYamlInFile) { // read until you find the end of this yaml object
+            l = br.readLine();
+            // EOF or the start of a new yaml section means the current object is completely
+            // read
+            if (l == null || (l.startsWith(START_OF_TEMPLATE))) {
+                endOfYamlInFile = true;
+                a.add(b);
+            }
+        }
+        return l;
+    }
+
+     /**
      * Prints the Chart Map
      * 
      * @throws ChartMapException when an error occurs printing the chart map
