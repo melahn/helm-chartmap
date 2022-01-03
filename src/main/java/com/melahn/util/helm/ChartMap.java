@@ -836,7 +836,7 @@ public class ChartMap {
      */
     protected void resolveChartDependencies() throws ChartMapException {
         try {
-            String chartDirName = getChart();
+            String chartDirName = fetchChart();
             if (chart != null) {
                 collectDependencies(chartDirName, null);
                 applyTemplates();
@@ -850,7 +850,7 @@ public class ChartMap {
     }
 
     /**
-     * Gets a chart from a Helm repo in one of four ways ... 1. If the user
+     * Fetches a chart in one of four ways ... 1. If the user
      * specified an appr spec, pull the chart using the helm command line 2. If the
      * user specified the url of a chart package (a tgz file), download the file
      * using http and unpack it 3. If the user specified the name of a local tgz
@@ -861,7 +861,7 @@ public class ChartMap {
      * @return the name of the directory in which the chart can be found
      * @throws ChartMapException if the chart could not be gotten
      */
-    protected String getChart() throws ChartMapException {
+    protected String fetchChart() throws ChartMapException {
         String chartDirName = "";
         try {
             if (getApprSpec() != null) {
@@ -1850,13 +1850,13 @@ public class ChartMap {
                     printContainerDependencies();
                     printer.printFooter();
                 }
-                logger.info(LOG_FORMAT_3, "File ", outputFilename, " generated");
+                logger.info("File {} generated", outputFilename);
                 if (generateImage && printFormat.equals(PrintFormat.PLANTUML)) {
                     generateImage(outputFilename);
                 }
             }
         } catch (ChartMapException e) {
-            logger.error(LOG_FORMAT_2, "Exception printing Map : ", e.getMessage());
+            logger.error("Exception printing Map : {}", e.getMessage());
             throw e;
         }
     }
@@ -2048,6 +2048,10 @@ public class ChartMap {
 
     public String getApprSpec() {
         return apprSpec;
+    }
+
+    public HelmChart getChart() {
+        return chart;
     }
 
     public ChartKeyMap getCharts() {

@@ -247,26 +247,26 @@ class ChartMapTest {
                 false);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-             // tests the getTemplateArray(File d, String s) signature
+            // tests the getTemplateArray(File d, String s) signature
             String chartName = "foochart";
             Path p1 = Paths.get(targetTest, "getTemplateArrayTestFile1");
             Files.createFile(p1);
             // file is a template
-            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes()); 
+            Files.write(p1, ChartMap.START_OF_TEMPLATE.concat(chartName).concat("/templates").getBytes());
             cm.getTemplateArray(p1.toFile(), chartName); // tests that file is a template
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p2 = Paths.get(targetTest, "getTemplateArrayTestFile2");
             Files.createFile(p2);
             // file is not a template (no '#')
-            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes()); 
+            Files.write(p2, " ".concat(ChartMap.START_OF_TEMPLATE).concat(chartName).concat("/templates").getBytes());
             // tests that line from file is long enough but is not a template
-            cm.getTemplateArray(p2.toFile(), chartName); 
+            cm.getTemplateArray(p2.toFile(), chartName);
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             Path p3 = Paths.get(targetTest, "getTemplateArrayTestFile3");
             Files.createFile(p3);
             Files.write(p3, " ".getBytes()); // file is not a template (too short)
             // tests that line from file is not long enough and so is not a template
-            cm.getTemplateArray(p3.toFile(), chartName); 
+            cm.getTemplateArray(p3.toFile(), chartName);
             assertFalse(ChartMapTestUtil.streamContains(o, "Exception creating template array"));
             cm.getTemplateArray(new File("./"), chartName); // induces an IOException but one that is not thrown
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException creating template array in . with line null"));
@@ -276,6 +276,26 @@ class ChartMapTest {
             System.setOut(initialOut);
             System.out.println("Expected logged error found");
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the error cases in printMap method throws the expected exception when
+     * the chart is null. All the
+     * other cases are tested as part of the other tests in this file.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void printMapTest() throws ChartMapException {
+        ChartMap cm1 = new ChartMap();
+        cm1.printMap();
+        assertEquals(null, cm1.getChart());
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+                false);
+        cm2.print();
+        cm2.setOutputFilename("./."); /// forces the exception because it is a directory
+        assertThrows(ChartMapException.class, () -> cm2.printMap());
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -292,11 +312,12 @@ class ChartMapTest {
         String l1 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/templates/").concat(ChartMap.RENDERED_TEMPLATE_FILE);
         String l2 = "foo".concat(c).concat("/templates/").concat(ChartMap.RENDERED_TEMPLATE_FILE);
         String l3 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/");
-        String l4 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/").concat("notrenderedtemplatesfile");;
+        String l4 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/").concat("notrenderedtemplatesfile");
+        ;
         ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
                 false);
-        // Exercise all the mathematical variations one can find in the yaml line that might signal
-        // a helm template element
+        // Exercise all the mathematical variations one can find in the yaml line that
+        // might signal a helm template element
         try {
             cm.processTemplateYaml(l0, new BufferedReader(new StringReader(c)),
                     new ArrayList<>(Arrays.asList(Boolean.TRUE)), c);
@@ -998,7 +1019,7 @@ class ChartMapTest {
             ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                     true);
             ChartMap scm1 = spy(cm1);
-            doReturn(null).when(scm1).getChart();
+            doReturn(null).when(scm1).fetchChart();
             doReturn("foobar").when(scm1).getChartName();
             scm1.resolveChartDependencies();
             assertTrue(ChartMapTestUtil.streamContains(o, "Chart foobar was not found"));
@@ -1019,7 +1040,7 @@ class ChartMapTest {
                 false);
         ChartMap scm1 = spy(cm1);
         doReturn(null).when(scm1).getChart(anyString());
-        assertNull(scm1.getChart());
+        assertNull(scm1.fetchChart());
 
         // Test getChart(String c) IOException to ChartMapException
         ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputTextFilePathNRNV, false, false,
