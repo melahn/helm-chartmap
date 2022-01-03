@@ -1867,7 +1867,7 @@ public class ChartMap {
      * @param f the puml file
      * @throws ChartMapException if an error occurred generaing the image
      */
-    private void generateImage(String f) throws ChartMapException {
+    protected void generateImage(String f) throws ChartMapException {
         /**
          * PlantUML wants the full path of the input file so get the pwd so it can be
          * generated
@@ -1879,7 +1879,7 @@ public class ChartMap {
                 Files.delete(i);
                 logger.log(logLevelVerbose, LOG_FORMAT_2, i.getFileName(), " deleted");
             }
-            net.sourceforge.plantuml.SourceFileReader r = new net.sourceforge.plantuml.SourceFileReader(new File(f));
+            net.sourceforge.plantuml.SourceFileReader r = getPlantUMLReader(new File(f));
             boolean e = r.hasError();
             if (!e) {
                 List<net.sourceforge.plantuml.GeneratedImage> l = r.getGeneratedImages();
@@ -1898,6 +1898,17 @@ public class ChartMap {
                     " : ", e);
             throw new ChartMapException(e.getMessage());
         }
+    }
+
+    /**
+     * Returns a new net.sourceforge.plantuml.SourceFileReader instance.
+     * 
+     * @param f the File for the reader
+     * @return a new net.sourceforge.plantuml.SourceFileReader instance
+     * @throws IOException when an exception occurs creating the reader
+     */
+    public net.sourceforge.plantuml.SourceFileReader getPlantUMLReader(File f) throws IOException {
+        return new net.sourceforge.plantuml.SourceFileReader(f);
     }
 
     /**

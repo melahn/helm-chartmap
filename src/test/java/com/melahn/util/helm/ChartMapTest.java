@@ -300,6 +300,46 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the generateImage method
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void generateImageTest() throws ChartMapException, IOException {
+        String f = "generateImageTestFile";
+        Path p = Paths.get(targetTest,f.concat(".puml"));
+        Files.createFile(p);
+        Files.write(p, "@startuml foo".getBytes()); 
+        ChartMap cm1 = new ChartMap();
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+             // test that an empty file generates no image and the right warning
+            cm1.generateImage(p.toString());
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, String.format("Warning: Image file %s.png was not generated from %s", f, p.toString())));
+            // test that we handle net.sourceforge.plantuml.SourceFileReader.hasError using a spy
+            Files.write(p, "\n@enduml".getBytes()); 
+            net.sourceforge.plantuml.SourceFileReader r = new net.sourceforge.plantuml.SourceFileReader(new File(p.toString()));
+            net.sourceforge.plantuml.SourceFileReader sr = spy(r);
+            doReturn(true).when(sr).hasError();
+            ChartMap cm2 = new ChartMap();
+            ChartMap scm2 = spy(cm2);
+            doReturn(sr).when(scm2).getPlantUMLReader(any(File.class));
+            scm2.generateImage(f);
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "Error in net.sourceforge.plantuml.GeneratedImage trying to generate image"));
+            // test that we throw an IOException->ChartMapException when the png file cannot be created
+            assertThrows(ChartMapException.class, () -> cm1.generateImage("./."));
+            assertTrue(
+                ChartMapTestUtil.streamContains(o, "Error generating image file"));
+            System.setOut(initialOut);
+            System.out.println("Expected warnings found when trying to generate image from bad puml files");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    } 
+
+    /**
      * Tests the processTemplateYaml method.
      * 
      * @throws ChartMapException
