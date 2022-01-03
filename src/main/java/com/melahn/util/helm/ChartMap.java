@@ -1907,7 +1907,7 @@ public class ChartMap {
      * @return a new net.sourceforge.plantuml.SourceFileReader instance
      * @throws IOException when an exception occurs creating the reader
      */
-    public net.sourceforge.plantuml.SourceFileReader getPlantUMLReader(File f) throws IOException {
+    protected net.sourceforge.plantuml.SourceFileReader getPlantUMLReader(File f) throws IOException {
         return new net.sourceforge.plantuml.SourceFileReader(f);
     }
 
@@ -1916,20 +1916,20 @@ public class ChartMap {
      *
      * @param parent the parent helm chart from which recursion starts
      */
-    private void printChartDependencies(HelmChart parent) {
+    protected void printChartDependencies(HelmChart parent) {
         try {
             if (parent.getNameFull().equals(chart.getNameFull())) {
-                printer.printSectionHeader("Chart Dependencies");
+                getPrinter().printSectionHeader("Chart Dependencies");
             }
             if (parent.getDiscoveredDependencies() != null) {
                 // Print the chart to chart dependencies recursively
                 boolean stable = isStable(parent, false); // check if the parent chart is stable
                 for (HelmChart dependent : parent.getDiscoveredDependencies()) {
                     if (!chartsDependenciesPrinted.contains(parent.getNameFull() + "_" + dependent.getNameFull())) {
-                        printer.printChartToChartDependency(parent, dependent);
+                        getPrinter().printChartToChartDependency(parent, dependent);
                         // if the parent is stable and the child is not then print a message if verbose
                         if (stable && !isStable(dependent, true) && isVerbose()) {
-                            printer.printComment("WARNING: Chart " + parent.getNameFull() + " is stable but depends on "
+                            getPrinter().printComment("WARNING: Chart " + parent.getNameFull() + " is stable but depends on "
                                     + dependent.getNameFull() + " which may not be stable");
                         }
                         chartsDependenciesPrinted.add(parent.getNameFull() + "_" + dependent.getNameFull());
