@@ -1984,7 +1984,7 @@ public class ChartMap {
      *
      * @param fileName the name of the file to which the chart map will be printed
      */
-    private void detectPrintFormat(String fileName) {
+    protected void detectPrintFormat(String fileName) {
         if (fileName != null) {
             if (fileName.endsWith(".puml")) {
                 printFormat = PrintFormat.PLANTUML;

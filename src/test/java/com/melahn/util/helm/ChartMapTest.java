@@ -444,6 +444,24 @@ class ChartMapTest {
     }
 
     /**
+     * Tests that the detectPrintFormat method does not misbehave when a null is
+     * passed.
+     *
+     * @throws ChartMapException
+     */
+    @Test
+    void detectPrintFormatTest() throws ChartMapException {
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        try {
+            cm.detectPrintFormat(null);
+        } catch (Exception e) {
+            assertFalse(true); // no exception should be thrown
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests the processTemplateYaml method.
      * 
      * @throws ChartMapException
