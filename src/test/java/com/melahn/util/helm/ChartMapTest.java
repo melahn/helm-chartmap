@@ -462,6 +462,63 @@ class ChartMapTest {
     }
 
     /**
+     * Tests the isStable method.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void isStableTest() throws ChartMapException {
+        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        // this set of images should not be stable
+        Set<String> s = Stream.of("foo-stable", "foo-snapshot", "foo-alpha", "foo-beta", "foo-trial", "foo-rc")
+             .collect(Collectors.toCollection(HashSet::new));
+        String[] a = s.toArray(new String[0]);
+        HelmChart h = getTestHelmChartWithContainers(a);
+        assertFalse(cm.isStable(h, true));
+        // this set of images should be stable
+        s = Stream.of("foo-stable")
+             .collect(Collectors.toCollection(HashSet::new));
+        a = s.toArray(new String[0]);
+        h = getTestHelmChartWithContainers(a);
+        assertTrue(cm.isStable(h, true));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+    /**
+     * Helper function to return a HelmChart whose containers have images of the names
+     * provided so the isStable method can be thoroughly tested.
+     * 
+     * @param s an array of iumage names
+     * @return  a HelmChart whose containers have images of the names provided.
+     */
+    HelmChart getTestHelmChartWithContainers(String s[]) {
+        // create a HelmDeploymentContainer array to hold the images
+        HelmDeploymentContainer[] hdc = new HelmDeploymentContainer[s.length];
+        for (int i = 0; i < s.length; i++) {
+            hdc[i] = new HelmDeploymentContainer();
+            hdc[i].setImage(s[i]);
+        }
+        // put this array into a spec template spec
+        HelmDeploymentSpecTemplateSpec hdsts = new HelmDeploymentSpecTemplateSpec();
+        hdsts.setContainers(hdc);
+        // put this spec template spec into a spec template
+        HelmDeploymentSpecTemplate hdst = new HelmDeploymentSpecTemplate();
+        hdst.setSpec(hdsts);
+        // put this spec template into a deployment spec
+        HelmDeploymentSpec hds = new HelmDeploymentSpec();
+        hds.setTemplate(hdst);
+        // put this deployment spec into a deployment template
+        HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
+        hdt.setSpec(hds);
+        // ... and finally create a helm chart with this deployment template and return it
+        HelmChart h = new HelmChart();
+        Set<HelmDeploymentTemplate> dt = h.getDeploymentTemplates();
+        dt.add(hdt);
+        h.setDeploymentTemplates(dt);
+        return h;
+    }
+
+    /**
      * Tests the processTemplateYaml method.
      * 
      * @throws ChartMapException

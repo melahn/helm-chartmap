@@ -2000,7 +2000,7 @@ public class ChartMap {
      * @param h               the Helm Chart to be inspected
      * @param checkContainers check images if true
      */
-    private boolean isStable(HelmChart h, boolean checkContainers) {
+    protected boolean isStable(HelmChart h, boolean checkContainers) {
         boolean stable = true;
         if (h.getRepoUrl() != null && h.getRepoUrl().contains("/incubator")) {
             logger.log(logLevelVerbose, "chart {} does not appear to be stable", h.getNameFull());

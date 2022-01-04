@@ -3,6 +3,7 @@ package com.melahn.util.helm.model;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import com.melahn.util.helm.ChartUtil;
 
 public class HelmChart {
@@ -41,16 +42,15 @@ public class HelmChart {
     public Set<HelmDeploymentContainer> getContainers() {
         HashSet<HelmDeploymentContainer> containers = new HashSet<>();
         for (HelmDeploymentTemplate t : deploymentTemplates) {
-            HelmDeploymentContainer c=null;
+            HelmDeploymentContainer c = null;
             HelmDeploymentContainer[] hdc = t.getSpec().getTemplate().getSpec().getContainers();
-            if (hdc != null && hdc.length > 0) {
-                c = new HelmDeploymentContainer();
-                c.setImage(hdc[0].getImage());
-                c.setParent(hdc[0].getParent()); // remember the parent of the chart that caused this image to
-                                                  // be included
-            }
-            if (c !=null) {
-                containers.add(c);
+            if (hdc != null) {
+                for (int i = 0; i < hdc.length; i++) {
+                    c = new HelmDeploymentContainer();
+                    c.setImage(hdc[i].getImage());
+                    c.setParent(hdc[i].getParent());
+                    containers.add(c);
+                }
             }
         }
         return containers;
