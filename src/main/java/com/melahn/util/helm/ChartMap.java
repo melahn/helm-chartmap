@@ -1838,17 +1838,17 @@ public class ChartMap {
                 // JSON print formats are handled differently because the charts, images
                 // and dependencies are intermingled in a tree
                 if (printFormat.equals(PrintFormat.JSON)) {
-                    printer.printTree(chart);
+                    getPrinter().printTree(chart);
                 }
                 // Plantuml and Text print formats follow a common pattern of printing
                 // first the charts, then the images, then the dependencies
                 else {
-                    printer.printHeader();
+                    getPrinter().printHeader();
                     printCharts();
                     printContainers();
                     printChartDependencies(chart);
                     printContainerDependencies();
-                    printer.printFooter();
+                    getPrinter().printFooter();
                 }
                 logger.info("File {} generated", outputFilename);
                 if (generateImage && printFormat.equals(PrintFormat.PLANTUML)) {
@@ -1964,15 +1964,15 @@ public class ChartMap {
     /**
      * Prints all the referenced Containers
      */
-    private void printContainers() {
+    protected void printContainers() {
         try {
             if (imagesReferenced.size() == 1) {
-                printer.printSectionHeader("There is one referenced Docker Image");
+                getPrinter().printSectionHeader("There is one referenced Docker Image");
             } else {
-                printer.printSectionHeader("There are " + imagesReferenced.size() + " referenced Docker Images");
+                getPrinter().printSectionHeader("There are " + imagesReferenced.size() + " referenced Docker Images");
             }
             for (String s : imagesReferenced) {
-                printer.printImage(s);
+                getPrinter().printImage(s);
             }
         } catch (ChartMapException e) {
             logger.error(LOG_FORMAT_2, "Error printing images: ", e.getMessage());

@@ -417,6 +417,33 @@ class ChartMapTest {
     }
 
     /**
+     * Test the printContainers method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void printContainersTest() throws ChartMapException, IOException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    false);
+            cm.print();
+            ChartMap scm = spy(cm);
+            ChartMapPrinter cmp = new TextChartMapPrinter(cm, "foo", cm.getCharts(), new HelmChart());
+            ChartMapPrinter scmp = spy(cmp);
+            doReturn(scmp).when(scm).getPrinter();
+            doThrow(ChartMapException.class).when(scmp).printSectionHeader(any());
+            scm.printContainers();
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "Error printing images: null"));
+            System.setOut(initialOut);
+            System.out.println("Expected log error found");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests the processTemplateYaml method.
      * 
      * @throws ChartMapException
