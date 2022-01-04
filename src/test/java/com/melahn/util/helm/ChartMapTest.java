@@ -370,7 +370,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-            false);
+                    false);
             cm2.print();
             ChartMap scm2 = spy(cm2);
             ChartMapPrinter cmp2 = new TextChartMapPrinter(cm2, "foo", cm2.getCharts(), h1);
@@ -383,6 +383,33 @@ class ChartMapTest {
             scm2.printChartDependencies(h2);
             assertTrue(
                     ChartMapTestUtil.streamContains(o, "Error printing chart dependencies:"));
+            System.setOut(initialOut);
+            System.out.println("Expected log error found");
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Test the printContainerDependencies method.
+     * 
+     * @throws ChartMapException
+     * @throws IOException
+     */
+    @Test
+    void printContainerDependenciesTest() throws ChartMapException, IOException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                    false);
+            cm.print();
+            ChartMap scm = spy(cm);
+            ChartMapPrinter cmp = new TextChartMapPrinter(cm, "foo", cm.getCharts(), new HelmChart());
+            ChartMapPrinter scmp = spy(cmp);
+            doReturn(scmp).when(scm).getPrinter();
+            doThrow(ChartMapException.class).when(scmp).printChartToImageDependency(any(), any());
+            scm.printContainerDependencies();
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "Error printing image dependencies:"));
             System.setOut(initialOut);
             System.out.println("Expected log error found");
         }

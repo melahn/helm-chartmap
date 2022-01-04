@@ -1946,14 +1946,14 @@ public class ChartMap {
      * For each of the referenced charts, prints the containers referenced by the
      * chart
      */
-    private void printContainerDependencies() {
+    protected void printContainerDependencies() {
         MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
         try {
             while (it.hasNext()) {
                 it.next();
                 HelmChart h = it.getValue();
                 for (HelmDeploymentContainer c : h.getContainers()) {
-                    printer.printChartToImageDependency(h, c.getImage());
+                    getPrinter().printChartToImageDependency(h, c.getImage());
                 }
             }
         } catch (ChartMapException e) {
