@@ -800,7 +800,7 @@ public class ChartMap {
                     charts.put(h.getName(), h.getVersion(), h);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.info("Error loading charts from helm cache: {}", e.getMessage());
         }
     }

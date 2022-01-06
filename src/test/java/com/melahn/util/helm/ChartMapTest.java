@@ -42,11 +42,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melahn.util.helm.model.HelmChart;
-import com.melahn.util.helm.model.HelmChartLocalCache;
 import com.melahn.util.helm.model.HelmChartRepoLocal;
-import com.melahn.util.helm.model.HelmChartReposLocal;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
 import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
@@ -759,9 +756,7 @@ class ChartMapTest {
 
     /**
      * Tests the ChartMap.loadLocalRepos method, focusing on the corner case where
-     * an
-     * IOException is caught and converted to a thrown ChartMapException. Mockiko
-     * spying is used.
+     * an IOException is caught and converted to a thrown ChartMapException. 
      * 
      * @throws ChartMapException
      */
@@ -769,11 +764,9 @@ class ChartMapTest {
     void loadLocalReposTest() throws ChartMapException, IOException {
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
-        ChartMap scm = spy(cm);
-        ObjectMapper som = spy(ObjectMapper.class);
-        doReturn(som).when(scm).getObjectMapper();
-        doThrow(IOException.class).when(som).readValue(any(File.class), eq(HelmChartReposLocal.class));
-        assertThrows(ChartMapException.class, () -> scm.loadLocalRepos());
+        // set a bogus helm config path to induce the exception
+        cm.setHelmConfigPath("bogus");
+        assertThrows(ChartMapException.class, () -> cm.loadLocalRepos());
         System.out.println("IOException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1076,7 +1069,7 @@ class ChartMapTest {
                 true);
         cm1.loadChartsFromCache(r, f);
         assertNotNull(cm1.getCharts().get("foo", "6.6.6"));
-
+        System.out.println("tested loaded a fabricated HelmChart from the cache");
         // Test for a missing urls element in the cache
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
@@ -1088,8 +1081,8 @@ class ChartMapTest {
                 true);
         cm2.loadChartsFromCache(r, f);
         assertNotNull(cm2.getCharts().get("foo", "6.6.6"));
-
-        // Test for an empty urls array in the cache
+        System.out.println("tested for a missing urls element in the cache");
+        // Test for an empty string element in the urls array
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
         s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
@@ -1100,6 +1093,7 @@ class ChartMapTest {
                 true);
         cm3.loadChartsFromCache(r, f);
         assertNotNull(cm3.getCharts().get("foo", "6.6.6"));
+        System.out.println("tested empty string element in the urls array");
         // test for an empty urls array in the cache
         Files.deleteIfExists(p);
         f = Files.createFile(p).toFile();
@@ -1111,6 +1105,7 @@ class ChartMapTest {
                 true);
         cm4.loadChartsFromCache(r, f);
         assertNotNull(cm4.getCharts().get("foo", "6.6.6"));
+        System.out.println("tested empty urls array in the cache");
 
         // Test for an empty string element in the urls array
         Files.deleteIfExists(p);
@@ -1123,27 +1118,18 @@ class ChartMapTest {
                 true);
         cm5.loadChartsFromCache(r, f);
         assertNotNull(cm5.getCharts().get("foo", "6.6.6"));
+        System.out.println("tested empty string element in the urls array");
 
-        // Finally, force an IOException and check the log to complete all the possible
+        // Finally, force an Exception and check the log to complete all the possible
         // branches
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            Files.deleteIfExists(p);
-            f = Files.createFile(p).toFile();
-            s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
-                    .concat("\n".concat("    urls:\n    - ''\n"));
-            b = s.getBytes();
-            Files.write(p, b);
+            System.setOut(new PrintStream(o));
             ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                     false);
-            ChartMap scm6 = spy(cm6);
-            ObjectMapper som6 = spy(ObjectMapper.class);
-            doReturn(som6).when(scm6).getObjectMapper();
-            doThrow(IOException.class).when(som6).readValue(any(File.class), eq(HelmChartLocalCache.class));
-            System.setOut(new PrintStream(o));
-            scm6.loadChartsFromCache(r, f);
+            cm6.loadChartsFromCache(r, null);
             assertTrue(ChartMapTestUtil.streamContains(o, String.format("Error loading charts from helm cache: ")));
             System.setOut(initialOut);
-            System.out.println("IOException -> ChartMapException thrown as expected");
+            System.out.println("Exception -> ChartMapException thrown as expected");
         }
     }
 
@@ -1379,13 +1365,9 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
                     false, false);
-            ChartMap scm1 = spy(cm1);
-            ObjectMapper som1 = spy(ObjectMapper.class);
-            doReturn(som1).when(scm1).getObjectMapper();
-            doThrow(IOException.class).when(som1).readValue(any(File.class), eq(HelmChart.class));
             String s = "foo";
             System.setOut(new PrintStream(o));
-            scm1.createChart(s);
+            cm1.createChart(s);
             assertTrue(ChartMapTestUtil.streamContains(o, "IOException extracting Chart information from ".concat(s)
                     .concat(File.separator).concat(ChartMap.CHART_YAML)));
             System.setOut(new PrintStream(initialOut));
