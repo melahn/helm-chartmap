@@ -195,6 +195,19 @@
           <shortRevisionLength>10</shortRevisionLength>
         </configuration>
       </plugin>
+      <!-- 
+          Including the maven-jar-plugin explictly (even though I am also usimg
+          the apache-shade-plugin) is to prevent the deplicating class issue when
+          not building clean. See https://issues.apache.org/jira/browse/MSHADE-126
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.1</version>
+        <configuration>
+            <forceCreation>true</forceCreation>
+          </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -210,17 +223,6 @@
                 <exclude>META-INF/*.RSA</exclude>
               </excludes>
             </filter>
-            <!-- 
-            Remove this filter after archive-extract is deployed to maven central 
-            -->
-            <filter>
-                <artifact>com.melahn:archive-extract</artifact>
-                <excludes>
-                  <exclude>org/apache/logging/log4j/**</exclude>
-                  <exclude>org/apache/commons/compress/**</exclude>
-                  <exclude>META-INF/versions/9/**</exclude>
-                </excludes>
-              </filter>
           </filters>
         </configuration>
         <executions>
@@ -361,32 +363,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- 
-         Remove after archive-extract is deployed to maven central 
-       -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>3.0.0-M1</version>
-        <configuration>
-          <groupId>com.melahn</groupId>
-          <artifactId>archive-extract</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
-          <packaging>jar</packaging>
-          <file>/Users/melahn/development/visualstudio/test-zip-slip/target/archive-extract-1.0.0-SNAPSHOT.jar</file>
-          <generatePom>true</generatePom>
-        </configuration>
-        <executions>
-          <execution>
-            <?m2e execute onConfiguration?>
-            <id>install-jar-lib</id>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <phase>validate</phase>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -398,7 +374,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.12.2</version>
+      <version>2.13.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -466,13 +442,13 @@
       <!-- needed for static method mocking -->
       <groupId>org.mockito</groupId>
       <artifactId>mockito-inline</artifactId>
-      <version>3.9.0</version>
+      <version>4.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.melahn</groupId>
       <artifactId>archive-extract</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
         <groupId>org.sonarsource.scanner.maven</groupId>
