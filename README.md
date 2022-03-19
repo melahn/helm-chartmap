@@ -1,11 +1,16 @@
 # Chart Map
 
-![version](https://img.shields.io/badge/version-1.0.2-green)
+![GitHub last commit](https://img.shields.io/github/last-commit/melahn/helm-chartmap)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/melahn/helm-chartmap)
+![GitHub Release Date](https://img.shields.io/github/release-date/melahn/helm-chartmap)
+![Maven Central](https://img.shields.io/maven-central/v/com.melahn/helm-chartmap)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=helm-chartmap)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![GitHub Build Status](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml)
+[![Deploy](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml)
+[![Sonar Cloud Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=alert_status)](https://sonarcloud.io/dashboard?id=helm-chartmap)
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/)
+
 
 ## Overview
 

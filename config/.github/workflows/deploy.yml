@@ -1,0 +1,66 @@
+# This workflow will deploy a package to both GitHub Packages and to the Maven 
+# Central Repository. 
+# 
+# Though it could be setup to be triggered on a GitHub release 
+# create, for now it is instead started manually.
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Deployment to GitHub and Maven Central Repository'
+jobs:
+  publish:
+    name: Publish 
+    runs-on: ubuntu-latest
+    # Permissions are needed to write updated artifacts and write the package
+    permissions: 
+      contents: write
+      packages: write 
+    steps:
+      # Checkout (using V2)
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  
+      # Install Graphviz so images can be generated from PlantUML files
+      - name: Install graphviz
+        run: sudo apt-get install graphviz
+      # Setup Java 11 for publish to GitHub Packages
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
+          server-id: github
+          # The gpg-private-key is needed to sign the jars
+          gpg-private-key: ${{ secrets.GPG_JAR_KEY }} 
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      # Deploy to GitHub Packages
+      - name: Deploy to GitHub Packages
+        run: | 
+          mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} -P github deploy 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
+      # Setup Java 11 this time for publish to the Maven Central Repository
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
+          server-id: ossrh
+          # The ossrh username and password are needed to talk to Maven Central
+          server-username: MAVEN_USERNAME 
+          server-password: MAVEN_PASSWORD 
+          # The gpg-private-key is not specified here because it was already specified in the 
+          # first setup. If specified here it would cause a failure in the cleanup for the second 
+          # setup because the key would not be found (having been undone in the cleanup for the first
+          # setup)
+      # Deploy to the Maven Central Repository
+      - name: Deploy to the Maven Central Repository
+        run: | 
+          mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} -P ossrh deploy 
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
