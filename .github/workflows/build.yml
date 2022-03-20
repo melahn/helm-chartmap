@@ -34,7 +34,6 @@ jobs:
       # Get the helm repos
       - name: Get helm repos
         run: |
-          helm env
           helm version
           helm repo add alfresco-incubator	https://kubernetes-charts.alfresco.com/incubator
           helm repo add alfresco-stable   	https://kubernetes-charts.alfresco.com/stable   
@@ -46,53 +45,52 @@ jobs:
           helm repo add nuxeo             	https://chartmuseum.platform.dev.nuxeo.com/
           helm repo update
           helm repo list
-          echo "HOME=$HOME"
-          echo "HELM_CONFIG_HOME=$HELM_CONFIG_HOME"
+          helm env
           export HELM_CONFIG_HOME="/home/runner/.config/helm"
-          echo "HELM_CONFIG_HOME=$HELM_CONFIG_HOME"
+          export HELM_CACHE_HOME="/home/runner/.config/helm"
       # Install Graphviz so images can be generated from PlantUML files
-      #- name: Install graphviz
-      #  run: sudo apt-get install graphviz
+      - name: Install graphviz
+        run: sudo apt-get install graphviz
       # Setup Java 11 with a settings.xml file setup for signatures
       # Note: maven caching is done here
-      #- name: Set up JDK 11
-      #  uses: actions/setup-java@v2
-      #  with:
-      #    distribution: 'zulu'
-      #    java-version: 11
-      #    cache: 'maven'
-      #    server-id: github
-      #    gpg-private-key: ${{ secrets.GPG_JAR_KEY }} 
-      #    gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
+          cache: 'maven'
+          server-id: github
+          gpg-private-key: ${{ secrets.GPG_JAR_KEY }} 
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
       # Cache Sonar packages
-      #- name: Cache SonarCloud packages
-      #  uses: actions/cache@v2
-      #  with:
-      #    path: ~/.sonar/cache
-      #    key: ${{ runner.os }}-sonar
-      #    restore-keys: ${{ runner.os }}-sonar
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
       # Run the Verify Phase using the github profile
-      #- name: Verify
-      #  run: mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} verify -P github
-      # env: 
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #    MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
+      - name: Verify
+        run: mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} verify -P github
+       env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
       # Copy the jars and signature files 
-      #- name: Package Jars and Signatures
-      #  run: |
-      #    mkdir jars && cp target/helm-chartmap*.jar jars 
-      #    cp target/*.asc jars 
+      - name: Package Jars and Signatures
+        run: |
+          mkdir jars && cp target/helm-chartmap*.jar jars 
+          cp target/*.asc jars 
       # Upload the jars and signature files 
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: Jar and Signature Package
-      #    path: jars
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Jar and Signature Package
+          path: jars
       # Run the sonar plugin to update Sonar content
-      #- name: Update Sonar Cloud
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #  run: |
-      #    mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      - name: Update Sonar Cloud
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
 

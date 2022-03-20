@@ -674,10 +674,8 @@ public class ChartMap {
      */
     protected void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
         String m = null;
-        logger.info("In constructHelmConfigPath ... getEnv(\"HELM_CONFIG_HOME\") = {}",getEnv("HELM_CONFIG_HOME"));
         setHelmConfigPath(getEnv("HELM_CONFIG_HOME") != null ? getEnv("HELM_CONFIG_HOME")
                 : getEnv("XDG_CONFIG_HOME"));
-        logger.info("In constructHelmConfigPath ... helmConfigPath = {} ", getHelmConfigPath());  
         // When no other location is set, use a default location based on the operating
         // system
         if (getHelmConfigPath() == null && os == ChartUtil.OSType.MACOS) {
