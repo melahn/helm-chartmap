@@ -46,6 +46,9 @@ jobs:
           helm repo add nuxeo             	https://chartmuseum.platform.dev.nuxeo.com/
           helm repo update
           helm repo list
+          echo "$HOME"
+          echo "$HELM_CONFIG_HOME"
+          echo "$HELM_CACHE_HOME"
       # Install Graphviz so images can be generated from PlantUML files
       - name: Install graphviz
         run: sudo apt-get install graphviz
@@ -68,41 +71,27 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       # Run the Verify Phase using the github profile
-      - name: Verify
-        run: mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} verify -P github
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
-      # Update the generated documentation
-      - name: Generate Documentation
-        run: | 
-          if [[ `git status --porcelain` ]]; then
-              git config --global user.email "melahn@github"
-              git config --global user.name "GitHub Action (build.yml)"
-              git add doc/generated/class-diagram.png
-              git commit -m "Update Documentation as part of GitHub action"
-              git push
-          else
-              echo no git changes found
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Verify
+      #  run: mvn -B -Dgpg.passphrase=${{ secrets.GPG_JAR_PASSWORD }} verify -P github
+      # env: 
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #    MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
       # Copy the jars and signature files 
-      - name: Package Jars and Signatures
-        run: |
-          mkdir jars && cp target/helm-chartmap*.jar jars 
-          cp target/*.asc jars 
+      #- name: Package Jars and Signatures
+      #  run: |
+      #    mkdir jars && cp target/helm-chartmap*.jar jars 
+      #    cp target/*.asc jars 
       # Upload the jars and signature files 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Jar and Signature Package
-          path: jars
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: Jar and Signature Package
+      #    path: jars
       # Run the sonar plugin to update Sonar content
-      - name: Update Sonar Cloud
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      #- name: Update Sonar Cloud
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #  run: |
+      #    mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
 
