@@ -27,7 +27,23 @@ jobs:
       # Checkout (using V2)
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0  
+          fetch-depth: 0    
+      # Install helm
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v1
+      # Get the helm repos
+      - name: Get helm repos
+        run: |
+          helm repo add alfresco-incubator	https://kubernetes-charts.alfresco.com/incubator
+          helm repo add alfresco-stable   	https://kubernetes-charts.alfresco.com/stable   
+          helm repo add melahn            	https://melahn.github.io/helm-repo              
+          helm repo add stable            	https://charts.helm.sh/stable                   
+          helm repo add incubator         	https://charts.helm.sh/incubator                
+          helm repo add bitnami           	https://charts.bitnami.com/bitnami              
+          helm repo add codecentric       	https://codecentric.github.io/helm-charts       
+          helm repo add nuxeo             	https://chartmuseum.platform.dev.nuxeo.com/
+          helm repo update
+          helm repo list
       # Install Graphviz so images can be generated from PlantUML files
       - name: Install graphviz
         run: sudo apt-get install graphviz
