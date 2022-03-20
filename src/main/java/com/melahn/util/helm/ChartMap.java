@@ -511,7 +511,8 @@ public class ChartMap {
         try {
             // in v2 all the repos were nicely collected into a single yaml file in helm
             // home but in v3 the location of the repo list is now os dependent
-            String helmRepoFilename = helmConfigPath.concat("/repositories.yaml");
+            logger.info("getHelmConfigPath = {}",getHelmConfigPath());
+            String helmRepoFilename = getHelmConfigPath().concat("/repositories.yaml");
             ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             File reposYamlFile = new File(helmRepoFilename);
