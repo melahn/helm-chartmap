@@ -511,8 +511,9 @@ public class ChartMap {
         try {
             // in v2 all the repos were nicely collected into a single yaml file in helm
             // home but in v3 the location of the repo list is now os dependent
-            logger.info("getHelmConfigPath = {}",getHelmConfigPath());
-            String helmRepoFilename = getHelmConfigPath().concat("/repositories.yaml");
+            logger.debug("getHelmConfigPath = {}",getHelmConfigPath());
+            //String helmRepoFilename = getHelmConfigPath().concat("/repositories.yaml");
+            String helmRepoFilename = getEnv("HELM_REPOSITORY_CONFIG");
             ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             File reposYamlFile = new File(helmRepoFilename);
@@ -520,7 +521,8 @@ public class ChartMap {
             // in helm v2, the cache location was set but in v3, it must be synthesized from
             // an OS specific location
             HelmChartRepoLocal[] repos = localRepos.getRepositories();
-            String cacheDirname = getHelmCachePath().concat("/repository/");
+            //String cacheDirname = getHelmCachePath().concat("/repository/");
+            String cacheDirname = getEnv("HELM_REPOSITORY_CACHE");
             for (HelmChartRepoLocal r : repos) {
                 r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
             }
