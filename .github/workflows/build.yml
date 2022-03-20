@@ -48,6 +48,9 @@ jobs:
           helm env
           export HELM_CONFIG_HOME="/home/runner/.config/helm"
           export HELM_CACHE_HOME="/home/runner/.config/helm"
+      # Install the helm quay plugin so APPR downloads can be tested
+      - name: Install helm quay plugin
+        run: helm plugin install https://github.com/app-registry/quay-helmv3-plugin
       # Install Graphviz so images can be generated from PlantUML files
       - name: Install graphviz
         run: sudo apt-get install graphviz
