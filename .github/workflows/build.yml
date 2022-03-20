@@ -34,6 +34,8 @@ jobs:
       # Get the helm repos
       - name: Get helm repos
         run: |
+          echo $HELM_CONFIG_HOME
+          helm version
           helm repo add alfresco-incubator	https://kubernetes-charts.alfresco.com/incubator
           helm repo add alfresco-stable   	https://kubernetes-charts.alfresco.com/stable   
           helm repo add melahn            	https://melahn.github.io/helm-repo              
