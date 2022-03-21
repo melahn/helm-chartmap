@@ -82,6 +82,8 @@ public class ChartMap {
     private String helmCommand;
     private String helmCachePath;
     private String helmConfigPath;
+    private String helmRepositoryCachePath;
+    private String helmRepositoryConfigPath;
     protected HashSet<String> imagesReferenced = new HashSet<>();
     private HelmChartReposLocal localRepos;
     private String chartMapDebug = CHARTMAP_DEBUG_ENV_VAR;
@@ -110,7 +112,6 @@ public class ChartMap {
     protected static final String CHARTMAP_DEBUG_ENV_VAR = "CHARTMAP_DEBUG";
     protected static final String CHART_YAML = "Chart.yaml";
     protected static final String CHARTS_DIR_NAME = "charts";
-    protected static final String CHECK_OS_MSG = " %s is null. Check your OS installation.";
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
     protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
@@ -509,22 +510,12 @@ public class ChartMap {
      */
     protected void loadLocalRepos() throws ChartMapException {
         try {
-            // in v2 all the repos were nicely collected into a single yaml file in helm
-            // home but in v3 the location of the repo list is now os dependent
-            logger.debug("getHelmConfigPath = {}",getHelmConfigPath());
-            //String helmRepoFilename = getHelmConfigPath().concat("/repositories.yaml");
-            String helmRepoFilename = getEnv("HELM_REPOSITORY_CONFIG");
             ObjectMapper mapper = getObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            File reposYamlFile = new File(helmRepoFilename);
-            localRepos = mapper.readValue(reposYamlFile, HelmChartReposLocal.class);
-            // in helm v2, the cache location was set but in v3, it must be synthesized from
-            // an OS specific location
+            localRepos = mapper.readValue(new File(getHelmRepositoryConfigPath()), HelmChartReposLocal.class);
             HelmChartRepoLocal[] repos = localRepos.getRepositories();
-            //String cacheDirname = getHelmCachePath().concat("/repository/");
-            String cacheDirname = getEnv("HELM_REPOSITORY_CACHE");
             for (HelmChartRepoLocal r : repos) {
-                r.setCache(cacheDirname.concat(r.getName()).concat("-index.yaml"));
+                r.setCache(getHelmRepositoryCachePath().concat(File.separator).concat(r.getName()).concat("-index.yaml"));
             }
             printLocalRepos();
             loadLocalCharts();
@@ -599,6 +590,20 @@ public class ChartMap {
     }
 
     /**
+    * 
+     * This method was introduced to allow providing a test version of a ProcessBuilder so
+     * as to return non zero exit codes for testing.
+     * 
+     * @param c the command 
+     * @param a the arg 
+     * @return a ProcessBuilder
+     * @throws IOException if an error occurs getting the process
+     */
+    public ProcessBuilder getProcessBuilder(String c, String a) throws IOException {
+        return new ProcessBuilder(c, a);
+    }
+
+    /**
      * Sets the helm information, include the helm command, version and paths.
      * 
      * @throws ChartMapException if any of the helm information cannot be set
@@ -606,112 +611,74 @@ public class ChartMap {
     void setHelmEnvironment() throws ChartMapException {
         helmCommand = getHelmCommand();
         checkHelmVersion();
-        getHelmPaths();
+        getHelmClientInformation();
     }
 
     /**
-     * Finds the helm cache and configuration paths.
+     * Finds the helm client environment information.
      * 
-     * The logic for finding the paths is derived from the rules explained in
-     * https://helm.sh/docs/helm/helm/
-     * 
-     * @throws ChartMapException if either the cache or config directorie could not
-     *                           be found
+     * @throws ChartMapException if an error occurs finding the client information
+     *                           
      */
-    protected void getHelmPaths() throws ChartMapException {
-        ChartUtil.OSType os = ChartUtil.getOSType();
-        logger.log(logLevelVerbose, "detected Operating system was {}", os);
-        constructHelmCachePath(os);
-        constructHelmConfigPath(os);
-    }
-
-    
-    /** 
-     * Constructs the helm cache path following the rules defined by helm.
-     * 
-     * @param os the type of operating system
-     * @throws ChartMapException if a valid path could not be constructed
-     */
-    protected void constructHelmCachePath(ChartUtil.OSType os) throws ChartMapException {
-        String m = null;
-        setHelmCachePath(getEnv("HELM_CACHE_HOME") != null ? getEnv("HELM_CACHE_HOME") : getEnv("XDG_CACHE_HOME"));
-        // When no other location is set, use a default location based on the operating
-        // system
-        if (getHelmCachePath() == null && os == ChartUtil.OSType.MACOS) {
-            if (getEnv(HOME) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
-                logger.error(m);
-                throw new ChartMapException(m);
+    protected void getHelmClientInformation() throws ChartMapException {
+        // run the helm env command to get the client information
+        try {
+            Path tempEnvPath = Files.createTempFile("helm-chartmap-env", ".txt");
+            ProcessBuilder pb = getProcessBuilder(getHelmCommand(), "env");
+            pb.redirectOutput(tempEnvPath.toFile());
+            Process p = pb.start();
+            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+            int exitValue = p.exitValue();
+            if (exitValue == 0) {
+                FileReader fileReader = new FileReader(tempEnvPath.toFile());
+                // read the file and extract the useful information
+                String line = null;
+                try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                    line = bufferedReader.readLine();
+                    while (line != null) {
+                        extractHelmClientInformation(line);
+                        line = bufferedReader.readLine();
+                    }
+                }
+            } else {
+                throw new ChartMapException(
+                        String.format("Error Code: %c executing helm env command ", exitValue));
             }
-            setHelmCachePath(getEnv(HOME).concat("/Library/Caches/helm"));
-        }
-        if (getHelmCachePath() == null && os == ChartUtil.OSType.LINUX) {
-            if (getEnv(HOME) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
-                logger.error(m);
-                throw new ChartMapException(m);
-            }
-            setHelmCachePath(getEnv(HOME).concat("/.cache/helm"));
-        }
-        if (getHelmCachePath() == null && os == ChartUtil.OSType.WINDOWS) {
-            if (getEnv(TEMP) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.TEMP);
-                logger.error(m);
-                throw new ChartMapException(m);
-            }
-            setHelmCachePath(getEnv(TEMP).concat(HELM_SUBDIR));
-        }
-        if (getHelmCachePath() == null) { // None of the above
-            m = "Could not locate the helm cache path. Check that your installation of helm is complete and that you are using a supported OS.";
-            logger.error(m);
-            throw new ChartMapException(m);
-        }
-    }
-
-     /** 
-     * Constructs the helm config path following the rules defined by helm.
-     * 
-     * @param os the type of operating system
-     * @throws ChartMapException if a valid path could not be constructed
-     */
-    protected void constructHelmConfigPath(ChartUtil.OSType os) throws ChartMapException {
-        String m = null;
-        setHelmConfigPath(getEnv("HELM_CONFIG_HOME") != null ? getEnv("HELM_CONFIG_HOME")
-                : getEnv("XDG_CONFIG_HOME"));
-        // When no other location is set, use a default location based on the operating
-        // system
-        if (getHelmConfigPath() == null && os == ChartUtil.OSType.MACOS) {
-            if (getEnv(HOME) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
-                logger.error(m);
-                throw new ChartMapException(m);
-            }
-            setHelmConfigPath(getEnv(HOME).concat("/Library/Preferences/helm"));
-        }
-        if (getHelmConfigPath() == null && os == ChartUtil.OSType.LINUX) {
-            if (getEnv(HOME) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.HOME);
-                logger.error(m);
-                throw new ChartMapException(m);
-            }
-            setHelmConfigPath(getEnv("HOME").concat("/.config/helm"));
-        }
-        if (getHelmConfigPath() == null && os == ChartUtil.OSType.WINDOWS) {
-            if (getEnv(APPDATA) == null) {
-                m = String.format(ChartMap.CHECK_OS_MSG, ChartMap.APPDATA);
-                logger.error(m);
-                throw new ChartMapException(m);
-            }
-            setHelmConfigPath(getEnv(APPDATA).concat(HELM_SUBDIR));
-        }
-        if (getHelmConfigPath() == null) { // None of the above
-            m = "Could not locate the helm config path. Check that your installation of helm is complete and that you are using a supported OS.";
-            logger.error(m);
-            throw new ChartMapException(m);
+        } catch (IOException e) {
+            throw (new ChartMapException("IOException executing helm env command"));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw (new ChartMapException("IOException executing helm env command"));
         }
     }
 
     /**
+     * Extracts the relevant helm path from the string.  Note that
+     * the values returned in a line returned by the helm env command 
+     * are enclosed in double quotes so these double quotes
+     * must be stripped out so as not to cause problems later 
+     * when the values are referenced.
+     * 
+     * @param l a line containing some helm client information
+     *  in format name=\"value\"
+     */
+    private void extractHelmClientInformation(String l) {
+        String[] a = l.split("=");
+        if (a[0].equals("HELM_CACHE_HOME")) {
+            setHelmCachePath(a[1].substring(1,a[1].length()-1));
+        }
+        else if (a[0].equals("HELM_CONFIG_HOME")) {
+            setHelmConfigPath(a[1].substring(1,a[1].length()-1));
+        }
+        else if (a[0].equals("HELM_REPOSITORY_CACHE")) {
+            setHelmRepositoryCachePath(a[1].substring(1,a[1].length()-1));
+        }
+        else if (a[0].equals("HELM_REPOSITORY_CONFIG")) {
+            setHelmRepositoryConfigPath(a[1].substring(1,a[1].length()-1));
+        }
+    }
+
+     /**
      * Gets the environment variable. Using my own function for this allows testing
      * of different environment variable values using mocks and spies.  
      * 
@@ -2144,6 +2111,22 @@ public class ChartMap {
         helmConfigPath = s;
     }
 
+    public String getHelmRepositoryCachePath() {
+        return helmRepositoryCachePath;
+    }
+
+    protected void setHelmRepositoryCachePath(String s) {
+        helmRepositoryCachePath = s;
+    }
+
+    public String getHelmRepositoryConfigPath() {
+        return helmRepositoryConfigPath;
+    }
+
+    protected void setHelmRepositoryConfigPath(String s) {
+        helmRepositoryConfigPath = s;
+    }
+    
     protected void setOutputFilename(String o) {
         this.outputFilename = o;
     }
