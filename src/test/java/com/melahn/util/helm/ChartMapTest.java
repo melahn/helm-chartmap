@@ -849,14 +849,81 @@ class ChartMapTest {
      * @throws ChartMapException
      */
     @Test
-    void getHelmClientInformationTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
-        false);
-        cm.getHelmClientInformation();
-        assertNotNull(cm.getHelmCachePath());
-        assertNotNull(cm.getHelmConfigPath());
-        assertNotNull(cm.getHelmRepositoryCachePath());
-        assertNotNull(cm.getHelmRepositoryConfigPath());
+    void getHelmClientInformationTest() throws ChartMapException, InterruptedException, IOException {
+        // Test the normal case
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        cm1.getHelmClientInformation();
+        assertNotNull(cm1.getHelmCachePath());
+        assertNotNull(cm1.getHelmConfigPath());
+        assertNotNull(cm1.getHelmRepositoryCachePath());
+        assertNotNull(cm1.getHelmRepositoryConfigPath());
+        // Force File.setReadable to return false to test security protection of
+        // temporary file
+        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm2 = spy(cm2);
+        File sf2 = spy(new File("helmTempSpyRead", ".txt"));
+        doReturn(false).when(sf2).setReadable(true, true);
+        doReturn(true).when(sf2).setWritable(true, true);
+        doReturn(true).when(sf2).setExecutable(true, true);
+        doReturn(sf2).when(scm2).getTempFile(anyString(),anyString());
+        assertThrows(ChartMapException.class, () -> scm2.getHelmClientInformation());
+        System.out.println("ChartMapException thrown as expected after setReadable");
+        // Force File.setWritable to return false to test security protection of
+        // temporary file
+        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm3 = spy(cm3);
+        File sf3 = spy(new File("helmTempSpyWrite", ".txt"));
+        doReturn(true).when(sf3).setReadable(true, true);
+        doReturn(false).when(sf3).setWritable(true, true);
+        doReturn(true).when(sf3).setExecutable(true, true);
+        doReturn(sf3).when(scm3).getTempFile(anyString(),anyString());
+        assertThrows(ChartMapException.class, () -> scm3.getHelmClientInformation());
+        System.out.println("ChartMapException thrown as expected after setWritable");
+        // Force File.setExecutable to return false to test security protection of
+        // temporary file
+        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm4 = spy(cm4);
+        File sf4 = spy(new File("helmTempSpyWrite", ".txt"));
+        doReturn(true).when(sf4).setReadable(true, true);
+        doReturn(true).when(sf4).setWritable(true, true);
+        doReturn(false).when(sf4).setExecutable(true, true);
+        doReturn(sf4).when(scm4).getTempFile(anyString(),anyString());
+        assertThrows(ChartMapException.class, () -> scm4.getHelmClientInformation());
+        System.out.println("ChartMapException thrown as expected after setExecutable");
+        // Force ProcessBuilder to thrown an IOException to force helm env command failing
+        ChartMap cm5 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        ChartMap scm5 = spy(cm5);
+        doThrow(IOException.class).when(scm5).getProcessBuilder(any(), any());
+        assertThrows(ChartMapException.class, () -> scm5.getHelmClientInformation());
+        System.out.println("IOException -> ChartMapException thrown as expected");
+        // Force Process.exitValue to return a non-zero exit value
+        ChartMap cm6 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        ChartMap scm6 = spy(cm6);
+        ProcessBuilder pb6 = new ProcessBuilder("foo", "bar");
+        ProcessBuilder spb6 = spy(pb6);
+        Process p6 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to return a bad exitValue ... just watch me!!" });
+        Process sp6 = spy(p6);
+        doReturn(1).when(sp6).exitValue();
+        doReturn(sp6).when(spb6).start();
+        doReturn(spb6).when(scm6).getProcessBuilder(any(), any());
+        assertThrows(ChartMapException.class, () -> scm6.getHelmClientInformation());
+        System.out.println("IOException -> ChartMapException thrown as expected with simulated bad exit code");
+        // Force Process.start to throw an InterruptedException
+        ChartMap cm7 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        ChartMap scm7 = spy(cm7);
+        ProcessBuilder pb7 = new ProcessBuilder("foo", "bar");
+        ProcessBuilder spb7 = spy(pb7);
+        Process p7 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to throw an InterruptedException on waitFor ... just watch me!!" });
+        Process sp7 = spy(p7);
+        doThrow(InterruptedException.class).when(sp7).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doReturn(sp7).when(spb7).start();
+        doReturn(spb7).when(scm7).getProcessBuilder(any(), any());
+        assertThrows(ChartMapException.class, () -> scm7.getHelmClientInformation());
+        System.out.println("InterruptedException -> ChartMapException thrown as expected with simulated bad exit code");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -876,14 +943,14 @@ class ChartMapTest {
         String v = "6.6.6";
         // fabricate a cache yaml file with one entry
         String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat(n).concat("\n    version: ").concat(v)
-                .concat("\n".concat("    urls:\n    - https://foo\n"));
+        .concat("\n".concat("    urls:\n    - not_a_url\n"));
         String c = "loadChartsFromCacheTest.yaml";
         Path p = Paths.get(targetTestDirectory, c);
         File f = Files.createFile(p).toFile();
         byte[] b = s.getBytes();
         Files.write(p, b);
-        // create a test ChartMap and validate I can load the chart from my fabricated
-        // cache
+        // Create a test ChartMap and validate I can load the chart from my fabricated
+        // cache.  Note that it will compesate for a missing url in the local helm chart.
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 true);
         cm1.loadChartsFromCache(r, f);
@@ -1380,6 +1447,42 @@ class ChartMapTest {
         cm4.print();
         assertFalse(Files.exists(Paths.get(cm4.getTempDirName())));
         System.out.println("IOException -> ChartMapException thrown as expected attempting to remove temp dir");
+        // Force File.setReadable to return false to test security protection of
+        // temporary file
+        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm5 = spy(cm5);
+        File sf5 = spy(new File("helmTempDirSpyRead"));
+        doReturn(false).when(sf5).setReadable(true, true);
+        doReturn(true).when(sf5).setWritable(true, true);
+        doReturn(true).when(sf5).setExecutable(true, true);
+        doReturn(sf5).when(scm5).getTempDir(anyString());
+        assertThrows(ChartMapException.class, () -> scm5.createTempDir());
+        System.out.println("ChartMapException thrown as expected after setReadable");
+        // Force File.setWritable to return false to test security protection of
+        // temporary file
+        ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm6 = spy(cm6);
+        File sf6 = spy(new File("helmTempDirSpyWrite"));
+        doReturn(true).when(sf6).setReadable(true, true);
+        doReturn(false).when(sf6).setWritable(true, true);
+        doReturn(true).when(sf6).setExecutable(true, true);
+        doReturn(sf6).when(scm6).getTempDir(anyString());
+        assertThrows(ChartMapException.class, () -> scm6.createTempDir());
+        System.out.println("ChartMapException thrown as expected after setWritable");
+        // Force File.setExecutable to return false to test security protection of
+        // temporary file
+        ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+                false);
+        ChartMap scm7 = spy(cm7);
+        File sf7 = spy(new File("helmTempDirSpyWrite"));
+        doReturn(true).when(sf7).setReadable(true, true);
+        doReturn(true).when(sf7).setWritable(true, true);
+        doReturn(false).when(sf7).setExecutable(true, true);
+        doReturn(sf7).when(scm7).getTempDir(anyString());
+        assertThrows(ChartMapException.class, () -> scm7.createTempDir());
+        System.out.println("ChartMapException thrown as expected after setExecutable");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

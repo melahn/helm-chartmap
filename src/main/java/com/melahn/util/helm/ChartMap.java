@@ -619,14 +619,13 @@ public class ChartMap {
     protected void getHelmClientInformation() throws ChartMapException {
         // run the helm env command to get the client information
         try {
-            File tempEnvFile;
-            tempEnvFile = Files.createTempFile("helm-chartmap-env", ".txt").toFile();  
-            // guard against a vulnerability in the temp file by restricting to owner permissions
+            File tempEnvFile = getTempFile("helm-chartmap-env", ".txt");  
+            // Guard against a vulnerability in the temp file by restricting to owner permissions
             // Note: Not using Posix permissions here for reasons of Windows portability
             boolean br = tempEnvFile.setReadable(true, true);
             boolean bw = tempEnvFile.setWritable(true, true);
             boolean be = tempEnvFile.setExecutable(true, true);
-            if (!br && !bw && !be) {
+            if (!br || !bw || !be) {
                 throw new ChartMapException(String.format("Failure to set permissions on %s: r=%b, w=%b, e=%b ", tempEnvFile.toString(), br, bw, be));
             }
             ProcessBuilder pb = getProcessBuilder(getHelmCommand(), "env");
@@ -655,6 +654,21 @@ public class ChartMap {
             Thread.currentThread().interrupt();
             throw (new ChartMapException("IOException executing helm env command"));
         }
+    }
+
+    /**
+     * Creates a temporary file and returns that as a File solely for
+     * the purpose of testing exception conditions in the automated tests. 
+     * 
+     * @param p prefix to use
+     * @param s suffix to use
+     * 
+     * @throws IOException when an error occurs creating the temp dir
+     */
+    protected File getTempFile(String p, String s) throws IOException {
+        File f = File.createTempFile(p, s);
+        f.deleteOnExit();
+        return f;
     }
 
     /**
@@ -763,7 +777,7 @@ public class ChartMap {
                     // some chart entries don't contain the full url (ie one starting with 'http')
                     // but rather only contain a relative url and even that is not consistent. We do
                     // our best to construct a url from what we have
-                    if (h.getUrls() != null && h.getUrls().length > 0 && !h.getUrls()[0].isEmpty() && !h.getUrls()[0].substring(0, "http".length()).equals("http")) {
+                    if (h.getUrls() != null && h.getUrls().length > 0 && !h.getUrls()[0].isEmpty() && !h.getUrls()[0].startsWith("http")) {
                         String[] url = new String[1];
                         url[0] = r.getUrl();
                         if (url[0].charAt(url[0].length() - 1) != '/') {
@@ -1994,19 +2008,19 @@ public class ChartMap {
     }
 
     /**
-     * Creates a temporary used to download and expand the Helm Chart
+     * Creates a temporary directory used to download and expand the Helm Chart.
      * 
      * @throws ChartMapException when an error occurs creating the temp dir
      */
     protected void createTempDir() throws ChartMapException {
         try {
-            File tempDirectory = Files.createTempDirectory(this.getClass().getCanonicalName() + "." + "Temporary.").toFile();
-            // guard against a vulnerability in the temp directory by restricting to owner permissions
+            File tempDirectory = getTempDir(this.getClass().getCanonicalName() + "." + "Temporary.");
+            // Guard against a vulnerability in the temp directory by restricting to owner permissions
             // Note: Not using Posix permissions here for reasons of Windows portability
             boolean br = tempDirectory.setReadable(true, true);
             boolean bw = tempDirectory.setWritable(true, true);
             boolean be = tempDirectory.setExecutable(true, true);
-            if (!br && !bw && !be) {
+            if (!br || !bw || !be) {
                 throw new ChartMapException(String.format("Failure to set permissions on %s: r=%b, w=%b, e=%b ", tempDirectory.toString(), br, bw, be));
             }
             setTempDirName(tempDirectory.toString().concat(File.separator));
@@ -2015,6 +2029,17 @@ public class ChartMap {
         } catch (IOException e) {
             throw new ChartMapException(String.format(TEMP_DIR_ERROR));
         }
+    }
+
+    /**
+     * Creates a temporary directory and returns a File for that directory solely for
+     * the purpose of testing exception conditions in the automated tests. 
+     * 
+     * @param s the name of the directory
+     * @throws IOException when an error occurs creating the temp dir
+     */
+    protected File getTempDir(String s) throws IOException {
+        return Files.createTempDirectory(s).toFile();
     }
 
     /**
