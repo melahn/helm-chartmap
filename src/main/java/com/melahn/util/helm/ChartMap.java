@@ -623,14 +623,23 @@ public class ChartMap {
     protected void getHelmClientInformation() throws ChartMapException {
         // run the helm env command to get the client information
         try {
-            Path tempEnvPath = Files.createTempFile("helm-chartmap-env", ".txt");
+            File tempEnvFile;
+            tempEnvFile = Files.createTempFile("helm-chartmap-env", ".txt").toFile();  
+            // guard against a vulnerability in the temp file by restricting to owner permissions
+            // Note: Not using Posix permissions here for reasons of Windows portability
+            boolean br = tempEnvFile.setReadable(true, true);
+            boolean bw = tempEnvFile.setWritable(true, true);
+            boolean be =tempEnvFile.setExecutable(true, true);
+            if (!br && !bw && !be) {
+                throw new ChartMapException(String.format("Failure to set permissions on %s: r=%b, w=%b, e=%b ", tempEnvFile.toString(), br, bw, be));
+            }
             ProcessBuilder pb = getProcessBuilder(getHelmCommand(), "env");
-            pb.redirectOutput(tempEnvPath.toFile());
+            pb.redirectOutput(tempEnvFile);
             Process p = pb.start();
             p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
             int exitValue = p.exitValue();
             if (exitValue == 0) {
-                FileReader fileReader = new FileReader(tempEnvPath.toFile());
+                FileReader fileReader = new FileReader(tempEnvFile);
                 // read the file and extract the useful information
                 String line = null;
                 try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
