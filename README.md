@@ -11,7 +11,6 @@
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/)
 
-
 ## Overview
 
 This project generates a file that shows the recursive dependencies of a Helm Chart.  
@@ -47,7 +46,7 @@ The Chart Map jar file, along with source and javadoc, is available from **Maven
 
 Java 8 or later.  
 
-The Helm Client is required since the chart map is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.0.3-SNAPSHOT version has been tested with version 3.5.2 of the Helm Client and the helm-chartmap-1.0.2 version (available from Maven Central) has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
+The Helm Client is required since the chart map is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.0.3-SNAPSHOT version has been tested with version 3.8.1 of the Helm Client and the helm-chartmap-1.0.2 version (available from Maven Central) has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
 
 For instructions on installing the Helm Client, see <https://docs.helm.sh/using_helm/#installing-helm>.
 
