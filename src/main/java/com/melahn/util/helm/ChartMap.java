@@ -16,9 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -629,7 +625,7 @@ public class ChartMap {
             // Note: Not using Posix permissions here for reasons of Windows portability
             boolean br = tempEnvFile.setReadable(true, true);
             boolean bw = tempEnvFile.setWritable(true, true);
-            boolean be =tempEnvFile.setExecutable(true, true);
+            boolean be = tempEnvFile.setExecutable(true, true);
             if (!br && !bw && !be) {
                 throw new ChartMapException(String.format("Failure to set permissions on %s: r=%b, w=%b, e=%b ", tempEnvFile.toString(), br, bw, be));
             }
@@ -2004,10 +2000,16 @@ public class ChartMap {
      */
     protected void createTempDir() throws ChartMapException {
         try {
-            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions
-                    .asFileAttribute(PosixFilePermissions.fromString("rwxr-----"));
-            Path p = Files.createTempDirectory(this.getClass().getCanonicalName() + "." + "Temporary.", attr);
-            setTempDirName(p.toAbsolutePath().toString() + File.separator);
+            File tempDirectory = Files.createTempDirectory(this.getClass().getCanonicalName() + "." + "Temporary.").toFile();
+            // guard against a vulnerability in the temp directory by restricting to owner permissions
+            // Note: Not using Posix permissions here for reasons of Windows portability
+            boolean br = tempDirectory.setReadable(true, true);
+            boolean bw = tempDirectory.setWritable(true, true);
+            boolean be = tempDirectory.setExecutable(true, true);
+            if (!br && !bw && !be) {
+                throw new ChartMapException(String.format("Failure to set permissions on %s: r=%b, w=%b, e=%b ", tempDirectory.toString(), br, bw, be));
+            }
+            setTempDirName(tempDirectory.toString().concat(File.separator));
             logger.log(logLevelVerbose, LOG_FORMAT_3, TEMP_DIR, getTempDirName(),
                     " will be used as the temporary directory.");
         } catch (IOException e) {
