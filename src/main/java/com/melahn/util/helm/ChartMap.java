@@ -662,7 +662,7 @@ public class ChartMap {
      * 
      * @param p prefix to use
      * @param s suffix to use
-     * 
+     * @return a new temp File
      * @throws IOException when an error occurs creating the temp file
      */
     protected File getTempFile(String p, String s) throws IOException {
@@ -1988,6 +1988,8 @@ public class ChartMap {
      *
      * @param h               the Helm Chart to be inspected
      * @param checkContainers check images if true
+     * 
+     * @return true if stable, false otherwise
      */
     protected boolean isStable(HelmChart h, boolean checkContainers) {
         boolean stable = true;
@@ -2036,6 +2038,7 @@ public class ChartMap {
      * the purpose of testing exception conditions in the automated tests. 
      * 
      * @param s the name of the directory
+     * @return a new temp directory
      * @throws IOException when an error occurs creating the temp dir
      */
     protected File getTempDir(String s) throws IOException {
