@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed in Unreleased
 
 - Security Updates
-- Tested with Helm V3.5.2
-- Added more exampke charts
+- CI/CD now with GitHub Actions for build and deploy
+- Tested with Helm V3.8.3
+- Added more example charts
 - Added Sonar Cloud scan
 - Code cleanup based on Sonar Cloud scan
 
@@ -43,4 +44,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [Unreleased]: https://github.com/melahn/helm-chartmap/compare/v1.0.2...HEAD
 [1.0.2]: https://github.com/melahn/helm-chartmap/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/melahn/helm-chartmap/compare/v1.0.0...v1.0.1
-
