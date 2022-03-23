@@ -175,7 +175,7 @@ class ChartMapTest {
         // test that a bogus directory will cause an IO exception
         HelmChart h = new HelmChart();
         h.setName("fooChart");
-        assertThrows(IOException.class, () -> cm.runTemplateCommand(new File("foo"), h));
+        assertThrows(IOException.class, () -> cm.runTemplateCommand(new File(targetTest, "foo"), h));
         System.out.println("IOException thrown as expected");
         // create a templates file that will be in the way of the one to be created by
         // the runtTemplateCommand method so
@@ -208,7 +208,7 @@ class ChartMapTest {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream();
                 ByteArrayOutputStream e = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("foo"), sp2, new HelmChart()));
+            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File(targetTest, "foo"), sp2, new HelmChart()));
             assertTrue(
                     ChartMapTestUtil.streamContains(o, "Error running template command. Exit Value = 666."));
             assertTrue(
@@ -223,7 +223,7 @@ class ChartMapTest {
         doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File("foo"), sp3, new HelmChart()));
+            assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File(targetTest, "foo"), sp3, new HelmChart()));
             assertTrue(
                     ChartMapTestUtil.streamContains(o, "InterruptedException running template command"));
             System.setOut(initialOut);
@@ -370,7 +370,7 @@ class ChartMapTest {
                     false);
             cm2.print();
             ChartMap scm2 = spy(cm2);
-            ChartMapPrinter cmp2 = new TextChartMapPrinter(cm2, "foo", cm2.getCharts(), h1);
+            ChartMapPrinter cmp2 = new TextChartMapPrinter(cm2, targetTest.concat("/print-chart-dependencies"), cm2.getCharts(), h1);
             ChartMapPrinter scmp2 = spy(cmp2);
             doReturn(scmp2).when(scm2).getPrinter();
             doThrow(ChartMapException.class).when(scmp2).printSectionHeader(any());
@@ -400,7 +400,7 @@ class ChartMapTest {
                     false);
             cm.print();
             ChartMap scm = spy(cm);
-            ChartMapPrinter cmp = new TextChartMapPrinter(cm, "foo", cm.getCharts(), new HelmChart());
+            ChartMapPrinter cmp = new TextChartMapPrinter(cm, targetTest.concat("/container-dependencies-test"), cm.getCharts(), new HelmChart());
             ChartMapPrinter scmp = spy(cmp);
             doReturn(scmp).when(scm).getPrinter();
             doThrow(ChartMapException.class).when(scmp).printChartToImageDependency(any(), any());
@@ -427,7 +427,7 @@ class ChartMapTest {
                     false);
             cm.print();
             ChartMap scm = spy(cm);
-            ChartMapPrinter cmp = new TextChartMapPrinter(cm, "foo", cm.getCharts(), new HelmChart());
+            ChartMapPrinter cmp = new TextChartMapPrinter(cm, targetTest.concat("/print-containers-test"), cm.getCharts(), new HelmChart());
             ChartMapPrinter scmp = spy(cmp);
             doReturn(scmp).when(scm).getPrinter();
             doThrow(ChartMapException.class).when(scmp).printSectionHeader(any());
@@ -1029,15 +1029,15 @@ class ChartMapTest {
     void printChartsTest() throws ChartMapException, IOException {
         // Test for a single Chart
         ChartMap cm1 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
-                Paths.get("test-fakechart.txt"), true, false, false);
+                Paths.get(targetTest, "test-fakechart.txt"), true, false, false);
         cm1.print();
         assertTrue(
-                ChartMapTestUtil.fileContains(Paths.get("test-fakechart.txt"), "There is one referenced Helm Chart"));
+                ChartMapTestUtil.fileContains(Paths.get(targetTest, "test-fakechart.txt"), "There is one referenced Helm Chart"));
         // Force a ChartMapException using a spy
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             ChartMap cm2 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
-                    Paths.get("test-fakechart.txt"), true, false, false);
+                    Paths.get(targetTest, "test-fakechart.txt"), true, false, false);
             ChartMap scm2 = spy(cm2);
             IChartMapPrinter sp2 = spy(IChartMapPrinter.class);
             doReturn(sp2).when(scm2).getPrinter();
@@ -1087,10 +1087,11 @@ class ChartMapTest {
      */
     void lambdaWrapper() throws IOException, RuntimeException {
         // Force the lambdaExceptionWrapper to throw a RuntimeException
-        Files.deleteIfExists(Paths.get("test-extract", "f"));
-        Files.deleteIfExists(Paths.get("test-extract"));
-        Path d = Files.createDirectories(Paths.get("test-extract"));
-        Files.createFile(Paths.get("test-extract", "f"));
+        Path testExtractPath = Paths.get(targetTest, "test-extract");
+        Files.deleteIfExists(Paths.get(testExtractPath.toString(), "f"));
+        Files.deleteIfExists(testExtractPath);
+        Path d = Files.createDirectories(testExtractPath);
+        Files.createFile(Paths.get(testExtractPath.toString(), "f"));
         try (Stream<Path> walk = Files.walk(d, 1)) {
             walk.filter(Files::isRegularFile).collect(Collectors.toList())
                     .forEach(ChartMap.lambdaExceptionWrapper(p -> raiseException(new RuntimeException())));
@@ -1189,12 +1190,16 @@ class ChartMapTest {
                     .thenThrow(IOException.class);
             ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false,
                     false);
+            // force the creation of the temp dir so test artifacts don't accumulate in the project directory
+            cm1.createTempDir();
             assertThrows(ChartMapException.class, () -> cm1.downloadChart("http://example.com"));
             System.out.println("IOException -> ChartMapException thrown as expected");
         }
         // Test a bad http rc using a url that's guraranteed not to exist. See
         // https://github.com/Readify/httpstatus.
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, testAPPRChart, testOutputAPPRPumlPath, true, false, false);
+        // force the creation of the temp dir so test artifacts don't accumulate in the project directory
+        cm2.createTempDir();
         assertThrows(ChartMapException.class, () -> cm2.downloadChart("https://httpstat.us/404"));
         System.out.println("ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1452,7 +1457,7 @@ class ChartMapTest {
         ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm5 = spy(cm5);
-        File sf5 = spy(new File("helmTempDirSpyRead"));
+        File sf5 = spy(new File(targetTest, "helmTempDirSpyRead"));
         doReturn(false).when(sf5).setReadable(true, true);
         doReturn(true).when(sf5).setWritable(true, true);
         doReturn(true).when(sf5).setExecutable(true, true);
@@ -1464,7 +1469,7 @@ class ChartMapTest {
         ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm6 = spy(cm6);
-        File sf6 = spy(new File("helmTempDirSpyWrite"));
+        File sf6 = spy(new File(targetTest, "helmTempDirSpyWrite"));
         doReturn(true).when(sf6).setReadable(true, true);
         doReturn(false).when(sf6).setWritable(true, true);
         doReturn(true).when(sf6).setExecutable(true, true);
@@ -1476,7 +1481,7 @@ class ChartMapTest {
         ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
                 false);
         ChartMap scm7 = spy(cm7);
-        File sf7 = spy(new File("helmTempDirSpyWrite"));
+        File sf7 = spy(new File(targetTest, "helmTempDirSpyWrite"));
         doReturn(true).when(sf7).setReadable(true, true);
         doReturn(true).when(sf7).setWritable(true, true);
         doReturn(false).when(sf7).setExecutable(true, true);

@@ -663,7 +663,7 @@ public class ChartMap {
      * @param p prefix to use
      * @param s suffix to use
      * 
-     * @throws IOException when an error occurs creating the temp dir
+     * @throws IOException when an error occurs creating the temp file
      */
     protected File getTempFile(String p, String s) throws IOException {
         File f = File.createTempFile(p, s);
