@@ -86,14 +86,13 @@ class ChartMapIntegrationTest {
      */
     @Test
     void normalHttpTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-c", "wordpress:8.1.2", "-e", testEnvFileName, "-o", "wordpress_8_1_2.txt");
+        args = Arrays.asList("-c", "wordpress:8.1.2", "-e", testEnvFileName, "-o", outputFileName);
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, targetTestPath, logFilePath);
         assertTrue(Files.exists(outputFilePath));
         Files.delete(outputFilePath);
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
-
 
     /**
      * Tests debug in the shaded jar.
