@@ -1,4 +1,4 @@
-@startuml
+@startuml architecture
 
 skinparam linetype ortho
 skinparam shadowing false
