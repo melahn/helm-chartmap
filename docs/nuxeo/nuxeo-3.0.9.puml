@@ -1,0 +1,21 @@
+@startuml
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam usecaseBorderColor black
+skinparam usecaseArrowColor LightSlateGray
+skinparam artifactBorderColor black
+skinparam artifactArrowColor LightSlateGray
+
+title Chart Map for nuxeo:3.0.9
+
+'There is one referenced Helm Chart
+artifact "nuxeo:3.0.9\n====\n\tnuxeo\n====\n\t3.0.9\n====\napplication\n====\n\thttps://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_9 #LightSeaGreen
+
+'There is one referenced Docker Image
+usecase "Image\n====\n\tdocker-private.packages.nuxeo.com\n====\n\tnuxeo/nuxeo:2021\n====\n\t2021" as docker_private_packages_nuxeo_com_nuxeo_nuxeo_2021 #LightSkyBlue
+
+'Chart Dependencies
+nuxeo_3_0_9--[#orange]-|>docker_private_packages_nuxeo_com_nuxeo_nuxeo_2021
+
+center footer Generated on 2022/03/23 15:38:58 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+@enduml

@@ -16,16 +16,16 @@
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-shared-file-store",
+      "name": "alfresco/alfresco-transform-misc",
       "type": "image",
-      "version": "0.5.3"
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-transform-misc",
+      "name": "alfresco/alfresco-shared-file-store",
       "type": "image",
-      "version": "2.1.0"
+      "version": "0.5.3"
     },
     {
       "repoHost": "Docker Hub",
@@ -70,25 +70,107 @@
       "version": "6.2.0"
     },
     {
-      "maintainers": [{"name": "databus23"}],
-      "keywords": [
-        "postgresql",
-        "postgres",
-        "database",
-        "sql"
+      "children": [
+        {
+          "maintainers": [{"name": "Alfresco"}],
+          "keywords": [
+            "alfresco",
+            "keycloak",
+            "identity-service"
+          ],
+          "children": [{
+            "maintainers": [{
+              "name": "Bitnami",
+              "email": "containers@bitnami.com"
+            }],
+            "keywords": [
+              "keycloak",
+              "access-management"
+            ],
+            "children": [{
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "jboss/keycloak",
+              "type": "image",
+              "version": "4.8.3.Final"
+            }],
+            "name": "keycloak:4.3.0",
+            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+            "type": "chart",
+            "shortName": "keycloak",
+            "version": "4.3.0"
+          }],
+          "name": "alfresco-identity-service:1.1.0",
+          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
+          "type": "chart",
+          "shortName": "alfresco-identity-service",
+          "version": "1.1.0"
+        },
+        {
+          "maintainers": [
+            {
+              "name": "jackzampolin",
+              "email": "jack.zampolin@gmail.com"
+            },
+            {
+              "name": "mgoodness",
+              "email": "mgoodness@gmail.com"
+            },
+            {
+              "name": "chancez",
+              "email": "chance.zibolski@coreos.com"
+            }
+          ],
+          "keywords": [
+            "ingress",
+            "nginx"
+          ],
+          "children": [
+            {
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "k8s.gcr.io/defaultbackend",
+              "type": "image",
+              "version": "1.3"
+            },
+            {
+              "repoHost": "quay.io",
+              "children": [],
+              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
+              "type": "image",
+              "version": "0.12.0"
+            }
+          ],
+          "name": "nginx-ingress:0.14.0",
+          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
+          "type": "chart",
+          "shortName": "nginx-ingress",
+          "version": "0.14.0"
+        },
+        {
+          "keywords": [
+            "activemq",
+            "message broker"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-activemq",
+            "type": "image",
+            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
+          }],
+          "name": "activemq:1.1.1",
+          "description": "A Helm chart Providing Apache ActiveMQ.",
+          "type": "chart",
+          "shortName": "activemq",
+          "version": "1.1.1"
+        }
       ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "postgres",
-        "type": "image",
-        "version": "11.4"
-      }],
-      "name": "postgresql:0.9.3",
-      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "name": "alfresco-infrastructure:4.1.1",
+      "description": "A Helm chart Providing the required Alfresco infrastructure for the Digital Business Platform. This includes activemq, alfresco-identity-service, nginx-ingress and a persistent volume to use with the DBP chart.",
       "type": "chart",
-      "shortName": "postgresql",
-      "version": "0.9.3"
+      "shortName": "alfresco-infrastructure",
+      "version": "4.1.1"
     },
     {
       "keywords": [
@@ -152,6 +234,27 @@
       "version": "3.0.2"
     },
     {
+      "maintainers": [{"name": "databus23"}],
+      "keywords": [
+        "postgresql",
+        "postgres",
+        "database",
+        "sql"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "postgres",
+        "type": "image",
+        "version": "11.4"
+      }],
+      "name": "postgresql:0.9.3",
+      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "type": "chart",
+      "shortName": "postgresql",
+      "version": "0.9.3"
+    },
+    {
       "keywords": [
         "search",
         "search services",
@@ -172,119 +275,6 @@
       "type": "chart",
       "shortName": "alfresco-search",
       "version": "1.0.3"
-    },
-    {
-      "children": [
-        {
-          "keywords": [
-            "activemq",
-            "message broker"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-activemq",
-            "type": "image",
-            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
-          }],
-          "name": "activemq:1.1.1",
-          "description": "A Helm chart Providing Apache ActiveMQ.",
-          "type": "chart",
-          "shortName": "activemq",
-          "version": "1.1.1"
-        },
-        {
-          "maintainers": [{"name": "Alfresco"}],
-          "keywords": [
-            "alfresco",
-            "keycloak",
-            "identity-service"
-          ],
-          "children": [{
-            "maintainers": [
-              {
-                "name": "unguiculus",
-                "email": "unguiculus@gmail.com"
-              },
-              {
-                "name": "thomasdarimont",
-                "email": "thomas.darimont+github@gmail.com"
-              }
-            ],
-            "keywords": [
-              "sso",
-              "idm",
-              "openid connect",
-              "saml",
-              "kerberos",
-              "ldap"
-            ],
-            "children": [{
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "jboss/keycloak",
-              "type": "image",
-              "version": "4.8.3.Final"
-            }],
-            "name": "keycloak:4.3.0",
-            "description": "Open Source Identity and Access Management For Modern Applications and Services",
-            "type": "chart",
-            "shortName": "keycloak",
-            "version": "4.3.0"
-          }],
-          "name": "alfresco-identity-service:1.1.0",
-          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
-          "type": "chart",
-          "shortName": "alfresco-identity-service",
-          "version": "1.1.0"
-        },
-        {
-          "maintainers": [
-            {
-              "name": "jackzampolin",
-              "email": "jack.zampolin@gmail.com"
-            },
-            {
-              "name": "mgoodness",
-              "email": "mgoodness@gmail.com"
-            },
-            {
-              "name": "chancez",
-              "email": "chance.zibolski@coreos.com"
-            }
-          ],
-          "keywords": [
-            "ingress",
-            "nginx"
-          ],
-          "children": [
-            {
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "k8s.gcr.io/defaultbackend",
-              "type": "image",
-              "version": "1.3"
-            },
-            {
-              "repoHost": "quay.io",
-              "children": [],
-              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
-              "type": "image",
-              "version": "0.12.0"
-            }
-          ],
-          "name": "nginx-ingress:0.14.0",
-          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
-          "type": "chart",
-          "shortName": "nginx-ingress",
-          "version": "0.14.0"
-        }
-      ],
-      "name": "alfresco-infrastructure:4.1.1",
-      "description": "A Helm chart Providing the required Alfresco infrastructure for the Digital Business Platform. This includes activemq, alfresco-identity-service, nginx-ingress and a persistent volume to use with the DBP chart.",
-      "type": "chart",
-      "shortName": "alfresco-infrastructure",
-      "version": "4.1.1"
     }
   ],
   "name": "alfresco-content-services:3.0.8",

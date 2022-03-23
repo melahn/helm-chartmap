@@ -1,0 +1,95 @@
+Chart Map for alfresco-identity-service:6.0.0
+
+There are 5 referenced Helm Charts
+----------------------------------
+Chart: common:1.4.1
+	apiVersion: v2
+	appVersion: 1.4.1
+	created: 2021-02-23T14:16:25.700860051Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 7e4300b0cd0a7912f6f51186e8819d586207ef162b0fbc3fab70ee2226520180
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,http://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.4.1.tgz
+	version: 1.4.1
+Chart: keycloak:16.1.0
+	apiVersion: v2
+	appVersion: 15.1.1
+	created: 2022-01-28T15:39:33.404910369Z
+	dependencies: postgresql:10.3.13
+	description: Open Source Identity and Access Management For Modern Applications and Services
+	digest: 5db348b3ab151180414f15d23d4148fdcd269fe1365915800c148d7d81fd2472
+	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
+	keywords: sso,idm,openid connect,saml,kerberos,ldap
+	maintainers: unguiculus:unguiculus@gmail.com,thomasdarimont:thomas.darimont+github@gmail.com
+	repo url: https://codecentric.github.io/helm-charts
+	name: keycloak
+	sources: https://github.com/codecentric/helm-charts,https://github.com/jboss-dockerfiles/keycloak,https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+	urls: https://github.com/codecentric/helm-charts/releases/download/keycloak-16.1.0/keycloak-16.1.0.tgz
+	version: 16.1.0
+Chart: postgresql:10.3.13
+	apiVersion: v2
+	appVersion: 11.11.0
+	created: 2021-03-12T04:38:23.009599681Z
+	dependencies: common:1.4.1
+	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+	digest: 9b7ac83baa2b4736891c044cfe1c5f7608d8c94dc3fc008aea5571bd1f8b297f
+	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+	keywords: postgresql,postgres,database,sql,replication,cluster
+	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
+	repo url: https://charts.bitnami.com/bitnami
+	name: postgresql
+	sources: https://github.com/bitnami/bitnami-docker-postgresql,https://www.postgresql.org/
+	urls: https://charts.bitnami.com/bitnami/postgresql-10.3.13.tgz
+	version: 10.3.13
+Chart: alfresco-identity-service:6.0.0
+	apiVersion: v2
+	appVersion: 1.7.0
+	created: Not specified
+	dependencies: keycloak:16.1.0, common:1.11.3
+	description: The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.
+	digest: Not specified
+	icon: Not specified
+	keywords: alfresco,keycloak,identity-service
+	maintainers: Alfresco
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-identity-service
+	sources: https://github.com/Alfresco/alfresco-identity-service
+	urls: Not specified
+	version: 6.0.0
+Chart: common:1.11.3
+	apiVersion: v2
+	appVersion: 1.11.3
+	created: 2022-03-03T08:19:58.96280898Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 9bc6ca7fb45f3a88e09623669e2ecc89b52a7793f40092cd5472ce10758c5504
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.11.3.tgz
+	version: 1.11.3
+
+There are 2 referenced Docker Images
+------------------------------------
+Image: quay.io/alfresco/alfresco-identity-service:1.7.0
+Image: docker.io/bitnami/postgresql:11.11.0-debian-10-r31
+
+Chart Dependencies
+------------------
+alfresco-identity-service:6.0.0 depends on keycloak:16.1.0
+keycloak:16.1.0 depends on postgresql:10.3.13
+postgresql:10.3.13 depends on common:1.4.1
+alfresco-identity-service:6.0.0 depends on common:1.11.3
+keycloak:16.1.0 uses quay.io/alfresco/alfresco-identity-service:1.7.0
+postgresql:10.3.13 uses docker.io/bitnami/postgresql:11.11.0-debian-10-r31
+
+Generated on 2022/03/23 15:41:50 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

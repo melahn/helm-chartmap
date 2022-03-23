@@ -1,0 +1,29 @@
+@startuml
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam usecaseBorderColor black
+skinparam usecaseArrowColor LightSlateGray
+skinparam artifactBorderColor black
+skinparam artifactArrowColor LightSlateGray
+
+title Chart Map for alfresco-identity-service:5.0.0
+
+'There are 4 referenced Helm Charts
+artifact "common:1.4.1\n====\n\tcommon\n====\n\t1.4.1\n====\nlibrary\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: common\nhelper\ntemplate\nfunction\nbitnami" as common_1_4_1 #DarkSeaGreen
+artifact "alfresco-identity-service:5.0.0\n====\n\talfresco-identity-service\n====\n\t5.0.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_5_0_0 #Chartreuse
+artifact "postgresql:10.3.13\n====\n\tpostgresql\n====\n\t10.3.13\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami, desaintmartin\n====\n\tKeywords: postgresql\npostgres\ndatabase\nsql\nreplication\ncluster" as postgresql_10_3_13 #LightSteelBlue
+artifact "keycloak:15.0.0\n====\n\tkeycloak\n====\n\t15.0.0\n====\napplication\n====\n\thttps://codecentric.github.io/helm-charts\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_15_0_0 #LightBlue
+
+'There are 2 referenced Docker Images
+usecase "Image\n====\n\tquay.io\n====\n\talfresco/alfresco-identity-service:1.6.0\n====\n\t1.6.0" as quay_io_alfresco_alfresco_identity_service_1_6_0 #Azure
+usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/postgresql:11.11.0-debian-10-r31\n====\n\t11.11.0-debian-10-r31" as docker_io_bitnami_postgresql_11_11_0_debian_10_r31 #DarkSalmon
+
+'Chart Dependencies
+alfresco_identity_service_5_0_0--[#green]-|>keycloak_15_0_0
+keycloak_15_0_0--[#green]-|>postgresql_10_3_13
+postgresql_10_3_13--[#green]-|>common_1_4_1
+postgresql_10_3_13--[#orange]-|>docker_io_bitnami_postgresql_11_11_0_debian_10_r31
+keycloak_15_0_0--[#orange]-|>quay_io_alfresco_alfresco_identity_service_1_6_0
+
+center footer Generated on 2022/03/23 15:41:44 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+@enduml

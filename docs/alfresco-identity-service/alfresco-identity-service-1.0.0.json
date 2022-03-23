@@ -7,16 +7,12 @@
   ],
   "children": [{
     "maintainers": [{
-      "name": "unguiculus",
-      "email": "unguiculus@gmail.com"
+      "name": "Bitnami",
+      "email": "containers@bitnami.com"
     }],
     "keywords": [
-      "sso",
-      "idm",
-      "openid connect",
-      "saml",
-      "kerberos",
-      "ldap"
+      "keycloak",
+      "access-management"
     ],
     "children": [{
       "repoHost": "Docker Hub",
@@ -26,7 +22,7 @@
       "version": "4.5.0.Final"
     }],
     "name": "keycloak:4.0.3",
-    "description": "Open Source Identity and Access Management For Modern Applications and Services",
+    "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
     "type": "chart",
     "shortName": "keycloak",
     "version": "4.0.3"

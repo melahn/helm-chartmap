@@ -19,5 +19,5 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-identity-service\n
 alfresco_identity_service_2_0_0--[#green]-|>keycloak_6_0_0
 keycloak_6_0_0--[#orange]-|>alfresco_alfresco_identity_service_1_2
 
-center footer Generated on 2021/06/16 12:46:56 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/23 15:41:06 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

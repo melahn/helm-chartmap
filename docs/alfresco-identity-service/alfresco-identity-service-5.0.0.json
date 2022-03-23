@@ -1,0 +1,100 @@
+{
+  "maintainers": [{"name": "Alfresco"}],
+  "keywords": [
+    "alfresco",
+    "keycloak",
+    "identity-service"
+  ],
+  "children": [{
+    "maintainers": [
+      {
+        "name": "unguiculus",
+        "email": "unguiculus@gmail.com"
+      },
+      {
+        "name": "thomasdarimont",
+        "email": "thomas.darimont+github@gmail.com"
+      }
+    ],
+    "keywords": [
+      "sso",
+      "idm",
+      "openid connect",
+      "saml",
+      "kerberos",
+      "ldap"
+    ],
+    "children": [
+      {
+        "repoHost": "quay.io",
+        "children": [],
+        "name": "alfresco/alfresco-identity-service:1.6.0",
+        "type": "image",
+        "version": "1.6.0"
+      },
+      {
+        "maintainers": [
+          {
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          },
+          {
+            "name": "desaintmartin",
+            "email": "cedric@desaintmartin.fr"
+          }
+        ],
+        "keywords": [
+          "postgresql",
+          "postgres",
+          "database",
+          "sql",
+          "replication",
+          "cluster"
+        ],
+        "children": [
+          {
+            "repoHost": "docker.io",
+            "children": [],
+            "name": "bitnami/postgresql:11.11.0-debian-10-r31",
+            "type": "image",
+            "version": "11.11.0-debian-10-r31"
+          },
+          {
+            "maintainers": [{
+              "name": "Bitnami",
+              "email": "containers@bitnami.com"
+            }],
+            "keywords": [
+              "common",
+              "helper",
+              "template",
+              "function",
+              "bitnami"
+            ],
+            "children": [],
+            "name": "common:1.4.1",
+            "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+            "type": "chart",
+            "shortName": "common",
+            "version": "1.4.1"
+          }
+        ],
+        "name": "postgresql:10.3.13",
+        "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+        "type": "chart",
+        "shortName": "postgresql",
+        "version": "10.3.13"
+      }
+    ],
+    "name": "keycloak:15.0.0",
+    "description": "Open Source Identity and Access Management For Modern Applications and Services",
+    "type": "chart",
+    "shortName": "keycloak",
+    "version": "15.0.0"
+  }],
+  "name": "alfresco-identity-service:5.0.0",
+  "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
+  "type": "chart",
+  "shortName": "alfresco-identity-service",
+  "version": "5.0.0"
+}

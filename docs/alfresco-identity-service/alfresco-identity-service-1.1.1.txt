@@ -18,19 +18,19 @@ Chart: alfresco-identity-service:1.1.1
 	urls: Not specified
 	version: 1.1.1
 Chart: keycloak:4.3.0
-	apiVersion: v1
-	appVersion: 4.8.3.Final
-	created: 2020-10-15T15:46:18.46301-04:00
+	apiVersion: v2
+	appVersion: 14.0.0
+	created: 2021-08-19T11:05:43.02444256Z
 	dependencies: None
-	description: Open Source Identity and Access Management For Modern Applications and Services
-	digest: fc74a8d9172b8b4647f383a8b087c3d27f95b68b587b97088dddacc102d9c5d7
-	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
-	keywords: sso,idm,openid connect,saml,kerberos,ldap
-	maintainers: unguiculus:unguiculus@gmail.com,thomasdarimont:thomas.darimont+github@gmail.com
-	repo url: https://charts.helm.sh/stable
+	description: Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.
+	digest: 8967dfa5a2cd1381d1b48a1daa0a2d89de8a4fb17221f0ed11764bc3087e8e4e
+	icon: https://bitnami.com/assets/stacks/keycloak/img/keycloak-stack-220x234.png
+	keywords: keycloak,access-management
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
 	name: keycloak
-	sources: https://github.com/jboss-dockerfiles/keycloak
-	urls: https://charts.helm.sh/stable/packages/keycloak-4.3.0.tgz
+	sources: https://github.com/bitnami/bitnami-docker-keycloak,https://github.com/keycloak/keycloak
+	urls: https://charts.bitnami.com/bitnami/keycloak-4.3.0.tgz
 	version: 4.3.0
 
 There is one referenced Docker Image
@@ -42,4 +42,4 @@ Chart Dependencies
 alfresco-identity-service:1.1.1 depends on keycloak:4.3.0
 keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 
-Generated on 2021/06/16 12:46:38 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/23 15:40:48 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

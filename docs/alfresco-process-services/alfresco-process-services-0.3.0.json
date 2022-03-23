@@ -1,0 +1,63 @@
+{
+  "maintainers": [{"name": "Alfresco"}],
+  "children": [
+    {
+      "repoHost": "quay.io",
+      "children": [],
+      "name": "alfresco/alfresco-process-services-admin:1.11.0",
+      "type": "image",
+      "version": "1.11.0"
+    },
+    {
+      "repoHost": "quay.io",
+      "children": [],
+      "name": "alfresco/alfresco-process-workspace-app:1.3.4",
+      "type": "image",
+      "version": "1.3.4"
+    },
+    {
+      "repoHost": "quay.io",
+      "children": [],
+      "name": "alfresco/alfresco-process-services:1.11.0",
+      "type": "image",
+      "version": "1.11.0"
+    },
+    {
+      "maintainers": [
+        {
+          "name": "Bitnami",
+          "email": "containers@bitnami.com"
+        },
+        {
+          "name": "desaintmartin",
+          "email": "cedric@desaintmartin.fr"
+        }
+      ],
+      "keywords": [
+        "postgresql",
+        "postgres",
+        "database",
+        "sql",
+        "replication",
+        "cluster"
+      ],
+      "children": [{
+        "repoHost": "docker.io",
+        "children": [],
+        "name": "bitnami/postgresql:11.7.0-debian-10-r26",
+        "type": "image",
+        "version": "11.7.0-debian-10-r26"
+      }],
+      "name": "postgresql:8.6.4",
+      "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "type": "chart",
+      "shortName": "postgresql",
+      "version": "8.6.4"
+    }
+  ],
+  "name": "alfresco-process-services:0.3.0",
+  "description": "A Helm chart for Alfresco Process Services",
+  "type": "chart",
+  "shortName": "alfresco-process-services",
+  "version": "0.3.0"
+}
