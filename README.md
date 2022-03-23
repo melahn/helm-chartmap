@@ -343,6 +343,10 @@ java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2
 * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples or setting it as a system environment variable is useful when creating large images to avoid image truncation.
 * [Graphviz](https://www.graphviz.org/) is a prerequisite
 
+## Security
+
+A [security issue](https://github.com/FasterXML/jackson-databind/issues/2816) has recently been reported with [com.fasterxml.jackson.core](https://github.com/FasterXML/jackson-databind). While it is marked as high severity, based on the discussion this would seem to be a misclassification. In any case, as soon as there is an artifact that contains the fix (possibly 2.13.3), the pom dependency will be updated.
+
 ## Issues
 
 If you find any problems please open an [issue](https://github.com/melahn/helm-chartmap/issues).
