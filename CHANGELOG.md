@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Security Updates
 - Tested with Helm V3.5.2
-- Replaced Wordpress example in docs with a recent version (10.6.10)
+- Added more exampke charts
 - Added Sonar Cloud scan
 - Code cleanup based on Sonar Cloud scan
 
