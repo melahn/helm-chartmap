@@ -280,6 +280,8 @@ representation of the Helm Chart using one of several *ChartMapPrinter* classes,
 such as the *PlantUMLChartMapPrinter*. The end-user can then enjoy the result using an image
 viewer, a text viewer or [helm-inspector](https://github.com/melahn/helm-inspector).
 
+## Build Notes
+
 ### Maven Commands
 
 #### Building the jar from source and running tests
@@ -341,10 +343,10 @@ java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2
 * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples or setting it as a system environment variable is useful when creating large images to avoid image truncation.
 * [Graphviz](https://www.graphviz.org/) is a prerequisite
 
-### Issues
+## Issues
 
 If you find any problems please open an [issue](https://github.com/melahn/helm-chartmap/issues).
 
-### License
+## License
 
 Apache 2.0
