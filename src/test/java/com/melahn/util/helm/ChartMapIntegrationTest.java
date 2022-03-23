@@ -69,7 +69,7 @@ class ChartMapIntegrationTest {
      * @throws IOException
      */
     @Test
-    void normalTest() throws InterruptedException, IOException {
+    void normalLocalTest() throws InterruptedException, IOException {
         args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, targetTestPath, logFilePath);
@@ -77,6 +77,23 @@ class ChartMapIntegrationTest {
         Files.delete(outputFilePath);
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+
+    /**
+     * Tests with http download, normal case in the shaded jar.
+     * 
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    @Test
+    void normalHttpTest() throws InterruptedException, IOException {
+        args = Arrays.asList("-c", "wordpress:8.1.2", "-e", testEnvFileName, "-o", "wordpress_8_1_2.txt");
+        utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
+                className, targetTestPath, logFilePath);
+        assertTrue(Files.exists(outputFilePath));
+        Files.delete(outputFilePath);
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
 
     /**
      * Tests debug in the shaded jar.
