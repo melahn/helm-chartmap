@@ -16,16 +16,16 @@
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-shared-file-store",
+      "name": "alfresco/alfresco-transform-misc",
       "type": "image",
-      "version": "0.5.3"
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-transform-misc",
+      "name": "alfresco/alfresco-shared-file-store",
       "type": "image",
-      "version": "2.1.0"
+      "version": "0.5.3"
     },
     {
       "repoHost": "Docker Hub",
@@ -44,16 +44,16 @@
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-tika",
+      "name": "alfresco/alfresco-content-repository",
       "type": "image",
-      "version": "2.1.0"
+      "version": "6.2.0.2"
     },
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-content-repository",
+      "name": "alfresco/alfresco-tika",
       "type": "image",
-      "version": "6.2.0.2"
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
@@ -70,47 +70,22 @@
       "version": "6.2.0"
     },
     {
-      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
       "keywords": [
-        "syncservice",
         "alfresco",
-        "application"
+        "digital workspace"
       ],
-      "children": [
-        {
-          "repoHost": "quay.io",
-          "children": [],
-          "name": "alfresco/service-sync:3.3.1",
-          "type": "image",
-          "version": "3.3.1"
-        },
-        {
-          "maintainers": [{"name": "databus23"}],
-          "keywords": [
-            "postgresql",
-            "postgres",
-            "database",
-            "sql"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "postgres",
-            "type": "image",
-            "version": "10.1"
-          }],
-          "name": "postgresql:0.9.3",
-          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-          "type": "chart",
-          "shortName": "postgresql",
-          "version": "0.9.3"
-        }
-      ],
-      "name": "alfresco-sync-service:3.0.2",
-      "description": "Alfresco Syncservice",
+      "children": [{
+        "repoHost": "quay.io",
+        "children": [],
+        "name": "alfresco/alfresco-digital-workspace:1.4.0",
+        "type": "image",
+        "version": "1.4.0"
+      }],
+      "name": "alfresco-digital-workspace:2.2.1",
+      "description": "A Helm chart for deploying Alfresco Digital Workspace application",
       "type": "chart",
-      "shortName": "alfresco-sync-service",
-      "version": "3.0.2"
+      "shortName": "alfresco-digital-workspace",
+      "version": "2.2.1"
     },
     {
       "keywords": [
@@ -156,66 +131,50 @@
       "version": "0.9.3"
     },
     {
+      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
       "keywords": [
+        "syncservice",
         "alfresco",
-        "digital workspace"
+        "application"
       ],
-      "children": [{
-        "repoHost": "quay.io",
-        "children": [],
-        "name": "alfresco/alfresco-digital-workspace:1.4.0",
-        "type": "image",
-        "version": "1.4.0"
-      }],
-      "name": "alfresco-digital-workspace:2.2.1",
-      "description": "A Helm chart for deploying Alfresco Digital Workspace application",
+      "children": [
+        {
+          "repoHost": "quay.io",
+          "children": [],
+          "name": "alfresco/service-sync:3.3.1",
+          "type": "image",
+          "version": "3.3.1"
+        },
+        {
+          "maintainers": [{"name": "databus23"}],
+          "keywords": [
+            "postgresql",
+            "postgres",
+            "database",
+            "sql"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "postgres",
+            "type": "image",
+            "version": "10.1"
+          }],
+          "name": "postgresql:0.9.3",
+          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+          "type": "chart",
+          "shortName": "postgresql",
+          "version": "0.9.3"
+        }
+      ],
+      "name": "alfresco-sync-service:3.0.2",
+      "description": "Alfresco Syncservice",
       "type": "chart",
-      "shortName": "alfresco-digital-workspace",
-      "version": "2.2.1"
+      "shortName": "alfresco-sync-service",
+      "version": "3.0.2"
     },
     {
       "children": [
-        {
-          "maintainers": [
-            {
-              "name": "jackzampolin",
-              "email": "jack.zampolin@gmail.com"
-            },
-            {
-              "name": "mgoodness",
-              "email": "mgoodness@gmail.com"
-            },
-            {
-              "name": "chancez",
-              "email": "chance.zibolski@coreos.com"
-            }
-          ],
-          "keywords": [
-            "ingress",
-            "nginx"
-          ],
-          "children": [
-            {
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "k8s.gcr.io/defaultbackend",
-              "type": "image",
-              "version": "1.3"
-            },
-            {
-              "repoHost": "quay.io",
-              "children": [],
-              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
-              "type": "image",
-              "version": "0.12.0"
-            }
-          ],
-          "name": "nginx-ingress:0.14.0",
-          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
-          "type": "chart",
-          "shortName": "nginx-ingress",
-          "version": "0.14.0"
-        },
         {
           "keywords": [
             "activemq",
@@ -268,6 +227,47 @@
           "type": "chart",
           "shortName": "alfresco-identity-service",
           "version": "1.1.0"
+        },
+        {
+          "maintainers": [
+            {
+              "name": "jackzampolin",
+              "email": "jack.zampolin@gmail.com"
+            },
+            {
+              "name": "mgoodness",
+              "email": "mgoodness@gmail.com"
+            },
+            {
+              "name": "chancez",
+              "email": "chance.zibolski@coreos.com"
+            }
+          ],
+          "keywords": [
+            "ingress",
+            "nginx"
+          ],
+          "children": [
+            {
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "k8s.gcr.io/defaultbackend",
+              "type": "image",
+              "version": "1.3"
+            },
+            {
+              "repoHost": "quay.io",
+              "children": [],
+              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
+              "type": "image",
+              "version": "0.12.0"
+            }
+          ],
+          "name": "nginx-ingress:0.14.0",
+          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
+          "type": "chart",
+          "shortName": "nginx-ingress",
+          "version": "0.14.0"
         }
       ],
       "name": "alfresco-infrastructure:4.1.1",
