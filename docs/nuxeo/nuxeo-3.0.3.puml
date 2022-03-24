@@ -17,5 +17,5 @@ usecase "Image\n====\n\tdocker.packages.nuxeo.com\n====\n\tnuxeo/nuxeo:latest\n=
 'Chart Dependencies
 nuxeo_3_0_3--[#orange]-|>docker_packages_nuxeo_com_nuxeo_nuxeo_latest
 
-center footer Generated on 2022/03/24 19:47:56 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/24 20:07:09 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

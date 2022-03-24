@@ -205,4 +205,4 @@ keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 alfresco-sync-service:3.0.2 uses quay.io/alfresco/service-sync:3.3.1
 activemq:1.1.1 uses alfresco/alfresco-activemq:5.15.8-java-8-oracle-centos-7-87b15e37ce8b
 
-Generated on 2022/03/24 19:48:20 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/24 20:07:30 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
