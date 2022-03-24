@@ -79,12 +79,12 @@ jobs:
       # Regenerate the example chart maps and commit them
       - name: Generate Example Chart Maps
         run: | 
+          cd resource/script
+          ./generatedoccharts.sh
+          cd ../..
           if [[ `git status --porcelain` ]]; then
               git config --global user.email "melahn@github"
               git config --global user.name "GitHub Action (build.yml)"
-              cd resource/script
-              ./generatedoccharts.sh
-              cd ../..
               git add docs
               git commit -m "Update Example Chart Maps as part of GitHub build"
               git push
