@@ -8,6 +8,16 @@
 [![GitHub Build Status](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml)
 [![Deploy](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml)
 [![Sonar Cloud Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=alert_status)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Sonar Cloud Test Coverage](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=helm-chartmap)
+[![Sonar Cloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=helm-chartmap)
+[![Sonar Cloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=vulnerabilities)](https://sonarcloud.io/component_measures/metric/security_rating/list?id=helm-chartmap)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=code_smells)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=ncloc)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=security_rating)](https://sonarcloud.io/dashboard?id=helm-chartmap)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=sqale_index)](https://sonarcloud.io/dashboard?helm-chartmap)
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/)
 
