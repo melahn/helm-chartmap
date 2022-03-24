@@ -341,6 +341,56 @@
                 </excludes>
               </filter>
                 <!--
+                    filter out redundancies coming in from the archive extract jar
+                -->
+                <filter>
+                    <artifact>com.melahn:archive-extract</artifact>
+                    <excludes>
+                      <exclude>log4j2.xml</exclude>
+                      <exclude>Log4j-charsets.properties</exclude>
+                      <exclude>Log4j-config.xsd</exclude>
+                      <exclude>Log4j-events.dtd</exclude>
+                      <exclude>Log4j-events.xsd</exclude>
+                      <exclude>Log4j-levels.xsd</exclude>
+                      <exclude>Log4j-events.dtd</exclude>
+                      <exclude>org/apache/logging/log4j/**</exclude>
+                      <exclude>org/apache/commons/compress/**</exclude>
+                      <exclude>META-INF/versions/9/**</exclude>
+                      <exclude>META-INF/maven/org.apache.commons/commons-compress/pom.properties</exclude>
+                      <exclude>META-INF/maven/org.apache.commons/commons-compress/pom.xml</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/pom.properties</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/pom.xml</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/pom.properties</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/pom.xml</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/log4j-api/pom.properties</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/log4j-api/pom.xml</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/log4j-core/pom.properties</exclude>
+                      <exclude>META-INF/maven/org.apache.logging.log4j/log4j-core/pom.xml</exclude>
+                      <exclude>META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat</exclude>
+                    </excludes>
+                  </filter>
+                <!--
+                    filter out redundancies coming in from the com.fasterxml.jackson jars
+                -->
+                <filter>
+                    <artifact>com.fasterxml.jackson.core:*</artifact>
+                    <excludes>
+                        <exclude>META-INF/versions/9/module-info.class</exclude>
+                    </excludes>excludes>
+                </filter>filter>
+                <filter>
+                    <artifact>com.fasterxml.jackson.databind:*</artifact>
+                    <excludes>
+                        <exclude>META-INF/versions/9/module-info.class</exclude>
+                    </excludes>excludes>
+                </filter>filter>
+                <filter>
+                    <artifact>com.fasterxml.jackson.dataformat:*</artifact>
+                    <excludes>
+                        <exclude>META-INF/versions/9/module-info.class</exclude>
+                    </excludes>excludes>
+                </filter>filter>
+                <!--
                     filter out the resources.properties because it is 
                     only needed to conpute the name of the shaded jar
                     for running tests
@@ -351,6 +401,17 @@
                     <exclude>**/resources.properties</exclude>
                   </excludes>
                 </filter>
+                <!-- 
+                    This is necessary because the httpclient component depends on 
+                    the commons-logging component but not all the dependencies
+                    will be found as class dependencies, notably the impl classes.
+                -->
+                <filter>
+                    <artifact>commons-logging:commons-logging</artifact>
+                    <includes>
+                      <include>**</include>
+                    </includes>
+                </filter>
                 <!--
                     explictly include all the log4j elements to
                     avoid the 'ERROR StatusLogger Unrecognized format specifier'
@@ -359,21 +420,10 @@
                     hull in particular, non-classfile elements
                 -->
                 <filter>
-                  <artifact>org.apache.logging.log4j:log4j-core</artifact>
-                  <excludes>
-                    <exclude>META-INF/MANIFEST.MF</exclude>
-                  </excludes>
-                  <includes>
-                    <include>**</include>
-                  </includes>
-                </filter>
-                <!-- 
-                    This is necessary because the httpclient component depends on 
-                    the commons-logging component but not all the dependencies
-                    will be found as class dependencies, notably the impl classes.
-                -->
-                <filter>
-                    <artifact>commons-logging:commons-logging</artifact>
+                    <artifact>org.apache.logging.log4j:log4j-core</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
                     <includes>
                       <include>**</include>
                     </includes>
@@ -388,16 +438,58 @@
                   </excludes>
                 </filter>
                 <filter>
+                    <artifact>com.melahn:archive-extract:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
                   <artifact>commons-cli:*:*:*</artifact>
                   <excludes>
                     <exclude>META-INF/MANIFEST.MF</exclude>
                   </excludes>
                 </filter>
                 <filter>
+                    <artifact>commons-codec:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
+                    <artifact>commons-logging:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
+                    <artifact>com.fasterxml.jackson.core:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
+                    <artifact>com.fasterxml.jackson.dataformat:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
                   <artifact>net.sourceforge.plantuml:*:*:*</artifact>
                   <excludes>
                     <exclude>META-INF/MANIFEST.MF</exclude>
                   </excludes>
+                </filter>
+                <filter>
+                    <artifact>org.json:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
+                </filter>
+                <filter>
+                    <artifact>org.yaml:*:*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/MANIFEST.MF</exclude>
+                    </excludes>
                 </filter>
               </filters>
               <transformers>
@@ -426,6 +518,10 @@
                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                   <resource>META-INF/DEPENDENCIES</resource>
                 </transformer>
+                <!--
+                    Aggregate Services
+                -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
             </configuration>
           </execution>
