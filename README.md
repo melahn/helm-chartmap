@@ -33,10 +33,10 @@ create an interaction visualization of the Helm Chart based using the tree view 
 such a JSON file here &#8594; <https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.json> and you can see
 an example of how it can be visualized with helm inspector here &#8594; <https://melahn.github.io/helm-inspector/src/?chart=./examples/alfresco-dbp-1.5.0>
 
-The PlantUML file can be turned into an image.  You can see an example of that here &#8594; <https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.png>.
+The PlantUML file can be turned into an image. You can see an example of that here &#8594; <https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.png>.
 For more information about PlantUML, see <http://plantuml.com/>.  
 
-The text file provides a simple text summary of the charts and images used, and the dependencies.  It also
+The text file provides a simple text summary of the charts and images used, and the dependencies. It also
 detects anomalies such as a stable chart depending on an incubator chart.
 You can see an example of a text file generated from Chart Map here &#8594; <https://melahn.github.io/helm-chartmap/alfresco-dbp/alfresco-dbp-1.5.0.txt>.
 
@@ -63,7 +63,7 @@ For instructions on installing the Helm Client, see <https://docs.helm.sh/using_
 
 The helm client command is determined by first using the value of the environment
 variable *HELM_BIN*. If not found, then the value *helm* is used and it is assumed that
-the executable *helm* will be found in the PATH.  It is arguably more secure to set *HELM_BIN* explictly since that way you prevent the security exposure of some other (unknown) executable named *helm* being found in the PATH.  
+the executable *helm* will be found in the PATH. It is arguably more secure to set *HELM_BIN* explictly since that way you prevent the security exposure of some other (unknown) executable named *helm* being found in the PATH.  
 
 The location of the helm cache and configuration directories is derived using the rules defined in
 [Helm Documentation](https://helm.sh/docs/helm/helm/).
@@ -120,14 +120,14 @@ Flags:
   * **-e** \<filename\>
     * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format.
   * **-g**
-    * Generate image.  Whenever specified, an image file is generated from the PlantUML file.  This is only applicable if
+    * Generate image. Whenever specified, an image file is generated from the PlantUML file. This is only applicable if
       the filename of the generated output file has the extension 'puml'.
   * **-r**
-    * Refresh.  If specified, the Helm command *helm update dependencies* will be run before generating the chart map
+    * Refresh. If specified, the Helm command *helm update dependencies* will be run before generating the chart map
   * **-v**
-    * Verbose.  If specified, some extra command line output is shown
+    * Verbose. If specified, some extra command line output is shown
   * **-h**
-    * Help.  Whenever specified, any other parameters are ignored.  When no parameters are specified, **-h** is assumed.
+    * Help. Whenever specified, any other parameters are ignored.  When no parameters are specified, **-h** is assumed.
 
 #### Example Commands
 
@@ -183,13 +183,17 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
 ##### Parameters
 
 * *option*
-  * The format of the Helm Chart
+  * The format of the Helm Chart.  One of...
+    * ChartOption.APPRSPEC
+    * ChartOption.CHARTNAME
+    * ChartOption.FILENAME
+    * ChartOption.URL
 * *chart*
   * The name of the Helm Chart in one of the formats specified by the option parameter
 * *outputFilename*
   * The name of the file to which to write the generated Chart Map.  Note the file is overwritten if it exists.
 * *envSpecFilename*
-  * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;.  See the example environment specification provided in resource/example-env-spec.yaml to understand the format.
+  * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;.  See the [example environment specification](./resource/example/example-env-spec.yaml) to understand the format.
 * *switches*
   * An array containing the following boolean values
     * *switches[0]* *generate*
@@ -201,7 +205,7 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
 
 ##### Throws
 
-* *com.melahn.util.helm.Exception*
+* *com.melahn.util.helm.ChartMapException*
 
 #### print
 
@@ -217,13 +221,14 @@ Prints a *ChartMap*
 
 ##### Throws in print command
 
-* *java.io.Exception*
+* *com.melahn.util.helm.ChartMapException*
 
 #### Java Example
 
 ``` java
 import com.melahn.util.helm.ChartMap;
-import ChartOption;
+import com.melahn.util.helm.ChartMapException;
+import com.melahn.util.helm.ChartOption;
 
 public class ChartMapExample {
     public static void printExampleChartMap(String[] args) {
@@ -233,18 +238,16 @@ public class ChartMapExample {
                     "src/test/resource/testChartFile.tgz",
                     "my-chartmap.puml",
                     "resource/example/example-env-spec.yaml",
-                    true,
-                    false,
-                    true);
+                    new boolean[] { true, true, false });
             testMap.print();
-        } catch (Exception e) {
-            System.out.println("Exception generating chart map: " + e.getMessage());
+        } catch (ChartMapException e) {
+            System.out.println("ChartMapException generating chart map: ".concat(e.getMessage()));
         }
     }
 }
 ```
 
-More examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/org/com.melahn.util.helm/ChartMapTest.java).
+Many more examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/org/com.melahn.util.helm/ChartMapTest.java).
 
 ### Examples of Generated Files
 
@@ -254,13 +257,13 @@ More examples illustrating the use of the Java interface can be found in [ChartM
 
 Note that the colors chosen for a chart are randomly selected from a standard set of PlantUML
 colors (see [PlantUML Colors](http://plantuml.com/color)) using a method that will depict
-Helm Charts or Docker Files that differ only by their version using the same color.   For example 'postgresql:0.8.5'
+Helm Charts or Docker Files that differ only by their version using the same color. For example 'postgresql:0.8.5'
 and 'postgresql:0.8.7' will be depicted with the same color.  This will make it easier to spot
 cases you may want to optimize a deployment to use a common Helm Chart or Docker Image instead.
 
-Helm Charts are depicted as rectangular objects.   Docker Images are depicted as ovals.
+Helm Charts are depicted as rectangular objects. Docker Images are depicted as ovals.
 
-Dependencies of Helm Charts on other Helm Charts are shown as green lines.   Dependencies of Helm Charts on Docker Images are shown as orange lines.
+Dependencies of Helm Charts on other Helm Charts are shown as green lines. Dependencies of Helm Charts on Docker Images are shown as orange lines.
 
 #### Example PlantUML File generated by Chartmap
 
