@@ -21,7 +21,7 @@ Chart: alfresco-content-services:3.0.8
 	apiVersion: Not specified
 	appVersion: 6.2.0.2
 	created: Not specified
-	dependencies: alfresco-sync-service:3.0.2, alfresco-search:1.0.3, postgresql:0.9.3, alfresco-digital-workspace:2.2.1, alfresco-infrastructure:4.1.1
+	dependencies: alfresco-sync-service:3.0.2, alfresco-digital-workspace:2.2.1, alfresco-search:1.0.3, postgresql:0.9.3, alfresco-infrastructure:4.1.1
 	description: A Helm chart for deploying Alfresco Content Services
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -178,9 +178,9 @@ Chart Dependencies
 ------------------
 alfresco-content-services:3.0.8 depends on alfresco-sync-service:3.0.2
 alfresco-sync-service:3.0.2 depends on postgresql:0.9.3
+alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
 alfresco-content-services:3.0.8 depends on alfresco-search:1.0.3
 alfresco-content-services:3.0.8 depends on postgresql:0.9.3
-alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
 alfresco-content-services:3.0.8 depends on alfresco-infrastructure:4.1.1
 alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
 alfresco-infrastructure:4.1.1 depends on activemq:1.1.1
@@ -205,4 +205,4 @@ keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 alfresco-sync-service:3.0.2 uses quay.io/alfresco/service-sync:3.3.1
 activemq:1.1.1 uses alfresco/alfresco-activemq:5.15.8-java-8-oracle-centos-7-87b15e37ce8b
 
-Generated on 2022/03/24 11:37:13 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/24 12:03:14 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

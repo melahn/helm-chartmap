@@ -29,5 +29,5 @@ wordpress_13_1_4--[#orange]-|>docker_io_bitnami_wordpress_5_9_2_debian_10_r9
 mariadb_10_4_2--[#orange]-|>docker_io_bitnami_mariadb_10_5_15_debian_10_r30
 memcached_6_0_7--[#orange]-|>docker_io_bitnami_memcached_1_6_14_debian_10_r34
 
-center footer Generated on 2022/03/24 11:42:28 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/24 12:08:23 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
