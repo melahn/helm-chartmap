@@ -15,8 +15,8 @@ artifact "alfresco-infrastructure:4.1.1\n====\n\talfresco-infrastructure\n====\n
 artifact "alfresco-search:1.0.3\n====\n\talfresco-search\n====\n\t1.0.3\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: search\nsearch services\nalfresco search services\ninsight\ninsight engine\nalfresco insight engine" as alfresco_search_1_0_3 #GhostWhite
 artifact "alfresco-identity-service:1.1.0\n====\n\talfresco-identity-service\n====\n\t1.1.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
 artifact "alfresco-digital-workspace:2.2.1\n====\n\talfresco-digital-workspace\n====\n\t2.2.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: alfresco\ndigital workspace" as alfresco_digital_workspace_2_2_1 #DodgerBlue
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: keycloak\naccess-management" as keycloak_4_3_0 #LightBlue
 artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: jackzampolin, mgoodness, chancez\n====\n\tKeywords: ingress\nnginx" as nginx_ingress_0_14_0 #DarkSalmon
+artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: keycloak\naccess-management" as keycloak_4_3_0 #LightBlue
 artifact "alfresco-sync-service:3.0.2\n====\n\talfresco-sync-service\n====\n\t3.0.2\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco Apps Repo Team\n====\n\tKeywords: syncservice\nalfresco\napplication" as alfresco_sync_service_3_0_2 #CadetBlue
 artifact "activemq:1.1.1\n====\n\tactivemq\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: activemq\nmessage broker" as activemq_1_1_1 #LightBlue
 
@@ -43,32 +43,32 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-tika\n====\n\t2.1.
 'Chart Dependencies
 alfresco_content_services_3_0_8--[#green]-|>alfresco_sync_service_3_0_2
 alfresco_sync_service_3_0_2--[#green]-|>postgresql_0_9_3
+alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
 alfresco_content_services_3_0_8--[#green]-|>alfresco_digital_workspace_2_2_1
 alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
-alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
 alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
-alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
 alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
 alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
+alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
+alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_libreoffice_2_1_0
-alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_transform_misc_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_shared_file_store_0_5_3
+alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_transform_misc_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_pdf_renderer_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>quay_io_alfresco_alfresco_transform_router_1_1_0
-alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_tika_2_1_0
+alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_imagemagick_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_share_6_2_0
 alfresco_search_1_0_3--[#orange]-|>alfresco_alfresco_search_services_1_4_0
 alfresco_digital_workspace_2_2_1--[#orange]-|>quay_io_alfresco_alfresco_digital_workspace_1_4_0
-keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
+keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2022/03/23 15:39:14 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/24 11:37:28 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

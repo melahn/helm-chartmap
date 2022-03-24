@@ -76,4 +76,4 @@ postgresql:9.1.1 depends on common:0.3.1
 postgresql:9.1.1 uses docker.io/bitnami/postgresql:11.8.0-debian-10-r61
 keycloak:9.9.5 uses quay.io/alfresco/alfresco-identity-service:1.4.0
 
-Generated on 2022/03/23 15:41:12 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/24 11:39:39 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

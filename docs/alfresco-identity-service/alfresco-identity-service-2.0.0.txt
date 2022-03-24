@@ -42,4 +42,4 @@ Chart Dependencies
 alfresco-identity-service:2.0.0 depends on keycloak:6.0.0
 keycloak:6.0.0 uses alfresco/alfresco-identity-service:1.2
 
-Generated on 2022/03/23 15:41:00 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/24 11:39:21 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
