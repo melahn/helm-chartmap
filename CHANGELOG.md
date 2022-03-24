@@ -10,11 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed in Unreleased
 
 - Security Updates
+- Added many more test cases to achieve 100% test coverage
 - CI/CD now with GitHub Actions for build and deploy
-- Tested with Helm V3.8.3
+- Added deploy to GitHub Packages as well as Maven Central
+- Upgraded to Helm Version 3
 - Added more example charts
+- Added script to generate helm chart examples
 - Added Sonar Cloud scan
-- Code cleanup based on Sonar Cloud scan
+- Now using archive extract to avoid zip slip vulnerability
+- Much code grooming to elminate lint errors and reduce cognitive complexity
 
 ## [1.0.2] - 2020-04-26
 
