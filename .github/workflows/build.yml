@@ -76,6 +76,23 @@ jobs:
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_JAR_PASSWORD }}
+      # Regenerate the example chart maps and commit them
+      - name: Generate Example Chart Maps
+        run: | 
+          if [[ `git status --porcelain` ]]; then
+              git config --global user.email "melahn@github"
+              git config --global user.name "GitHub Action (build.yml)"
+              cd resource/script
+              ./generatedoccharts.sh
+              cd ../..
+              git add docs
+              git commit -m "Update Example Chart Maps as part of GitHub build"
+              git push
+          else
+              echo no git changes found
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Copy the jars and signature files 
       - name: Package Jars and Signatures
         run: |
