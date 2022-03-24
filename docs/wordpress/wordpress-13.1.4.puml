@@ -20,14 +20,14 @@ usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/memcached:1.6.14-debian-10-r3
 usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/wordpress:5.9.2-debian-10-r9\n====\n\t5.9.2-debian-10-r9" as docker_io_bitnami_wordpress_5_9_2_debian_10_r9 #Darkorange
 
 'Chart Dependencies
-wordpress_13_1_4--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#green]-|>mariadb_10_4_2
 mariadb_10_4_2--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#green]-|>memcached_6_0_7
 memcached_6_0_7--[#green]-|>common_1_12_0
+wordpress_13_1_4--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#orange]-|>docker_io_bitnami_wordpress_5_9_2_debian_10_r9
 mariadb_10_4_2--[#orange]-|>docker_io_bitnami_mariadb_10_5_15_debian_10_r30
 memcached_6_0_7--[#orange]-|>docker_io_bitnami_memcached_1_6_14_debian_10_r34
 
-center footer Generated on 2022/03/24 12:08:23 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/24 19:53:14 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
