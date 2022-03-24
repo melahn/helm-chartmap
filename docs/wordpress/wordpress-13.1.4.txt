@@ -6,7 +6,7 @@ Chart: wordpress:13.1.4
 	apiVersion: v2
 	appVersion: 5.9.2
 	created: Not specified
-	dependencies: common:1.12.0, memcached:6.0.7, mariadb:10.4.2
+	dependencies: common:1.12.0, mariadb:10.4.2, memcached:6.0.7
 	description: WordPress is the world's most popular blogging and content management platform. Powerful yet simple, everyone from students to global corporations use it to build beautiful, functional websites.
 	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
@@ -17,21 +17,6 @@ Chart: wordpress:13.1.4
 	sources: https://github.com/bitnami/bitnami-docker-wordpress,https://wordpress.org/
 	urls: Not specified
 	version: 13.1.4
-Chart: memcached:6.0.7
-	apiVersion: v2
-	appVersion: 1.6.14
-	created: 2022-03-17T10:41:49.39845277Z
-	dependencies: common:1.12.0
-	description: Memcached is an high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
-	digest: 62a3bdd35fc1e85a62f4cbf50363b4161aaabfaf9973f483f49f4536308de37c
-	icon: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-220x234.png
-	keywords: memcached,cache
-	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
-	name: memcached
-	sources: https://github.com/bitnami/bitnami-docker-memcached,http://memcached.org/
-	urls: https://charts.bitnami.com/bitnami/memcached-6.0.7.tgz
-	version: 6.0.7
 Chart: mariadb:10.4.2
 	apiVersion: v2
 	appVersion: 10.5.15
@@ -47,6 +32,21 @@ Chart: mariadb:10.4.2
 	sources: https://github.com/bitnami/bitnami-docker-mariadb,https://github.com/prometheus/mysqld_exporter,https://mariadb.org
 	urls: https://charts.bitnami.com/bitnami/mariadb-10.4.2.tgz
 	version: 10.4.2
+Chart: memcached:6.0.7
+	apiVersion: v2
+	appVersion: 1.6.14
+	created: 2022-03-17T10:41:49.39845277Z
+	dependencies: common:1.12.0
+	description: Memcached is an high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
+	digest: 62a3bdd35fc1e85a62f4cbf50363b4161aaabfaf9973f483f49f4536308de37c
+	icon: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-220x234.png
+	keywords: memcached,cache
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: memcached
+	sources: https://github.com/bitnami/bitnami-docker-memcached,http://memcached.org/
+	urls: https://charts.bitnami.com/bitnami/memcached-6.0.7.tgz
+	version: 6.0.7
 Chart: common:1.12.0
 	apiVersion: v2
 	appVersion: 1.12.0
@@ -72,12 +72,12 @@ Image: docker.io/bitnami/wordpress:5.9.2-debian-10-r9
 Chart Dependencies
 ------------------
 wordpress:13.1.4 depends on common:1.12.0
-wordpress:13.1.4 depends on memcached:6.0.7
-memcached:6.0.7 depends on common:1.12.0
 wordpress:13.1.4 depends on mariadb:10.4.2
 mariadb:10.4.2 depends on common:1.12.0
+wordpress:13.1.4 depends on memcached:6.0.7
+memcached:6.0.7 depends on common:1.12.0
 wordpress:13.1.4 uses docker.io/bitnami/wordpress:5.9.2-debian-10-r9
-memcached:6.0.7 uses docker.io/bitnami/memcached:1.6.14-debian-10-r34
 mariadb:10.4.2 uses docker.io/bitnami/mariadb:10.5.15-debian-10-r30
+memcached:6.0.7 uses docker.io/bitnami/memcached:1.6.14-debian-10-r34
 
-Generated on 2022/03/23 15:42:54 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/24 11:42:15 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
