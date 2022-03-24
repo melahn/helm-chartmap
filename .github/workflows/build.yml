@@ -87,7 +87,8 @@ jobs:
               git config --global user.name "GitHub Action (build.yml)"
               git add docs
               git commit -m "Update Example Chart Maps as part of GitHub build"
-              git push
+              git pull origin master
+              git push origin master
           else
               echo no git changes found
           fi
