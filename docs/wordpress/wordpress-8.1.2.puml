@@ -21,5 +21,5 @@ wordpress_8_1_2--[#green]-|>mariadb_7_3_6
 mariadb_7_3_6--[#orange]-|>docker_io_bitnami_mariadb_10_3_21_debian_10_r0
 wordpress_8_1_2--[#orange]-|>docker_io_bitnami_wordpress_5_3_2_debian_10_r0
 
-center footer Generated on 2022/03/24 20:11:07 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/24 21:12:57 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

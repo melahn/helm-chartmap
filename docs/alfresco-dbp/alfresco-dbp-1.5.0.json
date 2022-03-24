@@ -72,6 +72,24 @@
         },
         {
           "keywords": [
+            "alfresco",
+            "digital workspace"
+          ],
+          "children": [{
+            "repoHost": "quay.io",
+            "children": [],
+            "name": "alfresco/alfresco-digital-workspace:1.3.0",
+            "type": "image",
+            "version": "1.3.0"
+          }],
+          "name": "alfresco-digital-workspace:2.2.0",
+          "description": "A Helm chart for deploying Alfresco Digital Workspace application",
+          "type": "chart",
+          "shortName": "alfresco-digital-workspace",
+          "version": "2.2.0"
+        },
+        {
+          "keywords": [
             "search",
             "search services",
             "alfresco search services",
@@ -258,24 +276,6 @@
           "type": "chart",
           "shortName": "alfresco-sync-service",
           "version": "1.1.1"
-        },
-        {
-          "keywords": [
-            "alfresco",
-            "digital workspace"
-          ],
-          "children": [{
-            "repoHost": "quay.io",
-            "children": [],
-            "name": "alfresco/alfresco-digital-workspace:1.3.0",
-            "type": "image",
-            "version": "1.3.0"
-          }],
-          "name": "alfresco-digital-workspace:2.2.0",
-          "description": "A Helm chart for deploying Alfresco Digital Workspace application",
-          "type": "chart",
-          "shortName": "alfresco-digital-workspace",
-          "version": "2.2.0"
         }
       ],
       "name": "alfresco-content-services:2.1.3",
