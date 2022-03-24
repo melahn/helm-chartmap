@@ -4,6 +4,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/melahn/helm-chartmap)
 ![GitHub Release Date](https://img.shields.io/github/release-date/melahn/helm-chartmap)
 ![Maven Central](https://img.shields.io/maven-central/v/com.melahn/helm-chartmap)
+![GitHub issues](https://img.shields.io/github/issues/melahn/helm-chartmap)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![GitHub Build Status](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml)
 [![Deploy](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml)
