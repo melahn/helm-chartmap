@@ -301,7 +301,7 @@ viewer, a text viewer or [helm-inspector](https://github.com/melahn/helm-inspect
 #### Building the jar from source and running tests
 
 1. git clone this repository
-2  Run Maven
+2. run maven
 
 ``` maven
 mvn clean install 
