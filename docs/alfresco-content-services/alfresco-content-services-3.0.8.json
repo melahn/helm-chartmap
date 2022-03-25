@@ -44,16 +44,16 @@
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-content-repository",
+      "name": "alfresco/alfresco-tika",
       "type": "image",
-      "version": "6.2.0.2"
+      "version": "2.1.0"
     },
     {
       "repoHost": "Docker Hub",
       "children": [],
-      "name": "alfresco/alfresco-tika",
+      "name": "alfresco/alfresco-content-repository",
       "type": "image",
-      "version": "2.1.0"
+      "version": "6.2.0.2"
     },
     {
       "repoHost": "Docker Hub",
@@ -88,111 +88,7 @@
       "version": "2.2.1"
     },
     {
-      "keywords": [
-        "search",
-        "search services",
-        "alfresco search services",
-        "insight",
-        "insight engine",
-        "alfresco insight engine"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "alfresco/alfresco-search-services",
-        "type": "image",
-        "version": "1.4.0"
-      }],
-      "name": "alfresco-search:1.0.3",
-      "description": "A Helm chart for deploying Alfresco Search",
-      "type": "chart",
-      "shortName": "alfresco-search",
-      "version": "1.0.3"
-    },
-    {
-      "maintainers": [{"name": "databus23"}],
-      "keywords": [
-        "postgresql",
-        "postgres",
-        "database",
-        "sql"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "postgres",
-        "type": "image",
-        "version": "11.4"
-      }],
-      "name": "postgresql:0.9.3",
-      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-      "type": "chart",
-      "shortName": "postgresql",
-      "version": "0.9.3"
-    },
-    {
-      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
-      "keywords": [
-        "syncservice",
-        "alfresco",
-        "application"
-      ],
       "children": [
-        {
-          "repoHost": "quay.io",
-          "children": [],
-          "name": "alfresco/service-sync:3.3.1",
-          "type": "image",
-          "version": "3.3.1"
-        },
-        {
-          "maintainers": [{"name": "databus23"}],
-          "keywords": [
-            "postgresql",
-            "postgres",
-            "database",
-            "sql"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "postgres",
-            "type": "image",
-            "version": "10.1"
-          }],
-          "name": "postgresql:0.9.3",
-          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-          "type": "chart",
-          "shortName": "postgresql",
-          "version": "0.9.3"
-        }
-      ],
-      "name": "alfresco-sync-service:3.0.2",
-      "description": "Alfresco Syncservice",
-      "type": "chart",
-      "shortName": "alfresco-sync-service",
-      "version": "3.0.2"
-    },
-    {
-      "children": [
-        {
-          "keywords": [
-            "activemq",
-            "message broker"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-activemq",
-            "type": "image",
-            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
-          }],
-          "name": "activemq:1.1.1",
-          "description": "A Helm chart Providing Apache ActiveMQ.",
-          "type": "chart",
-          "shortName": "activemq",
-          "version": "1.1.1"
-        },
         {
           "maintainers": [{"name": "Alfresco"}],
           "keywords": [
@@ -227,6 +123,24 @@
           "type": "chart",
           "shortName": "alfresco-identity-service",
           "version": "1.1.0"
+        },
+        {
+          "keywords": [
+            "activemq",
+            "message broker"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-activemq",
+            "type": "image",
+            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
+          }],
+          "name": "activemq:1.1.1",
+          "description": "A Helm chart Providing Apache ActiveMQ.",
+          "type": "chart",
+          "shortName": "activemq",
+          "version": "1.1.1"
         },
         {
           "maintainers": [
@@ -275,6 +189,92 @@
       "type": "chart",
       "shortName": "alfresco-infrastructure",
       "version": "4.1.1"
+    },
+    {
+      "keywords": [
+        "search",
+        "search services",
+        "alfresco search services",
+        "insight",
+        "insight engine",
+        "alfresco insight engine"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "alfresco/alfresco-search-services",
+        "type": "image",
+        "version": "1.4.0"
+      }],
+      "name": "alfresco-search:1.0.3",
+      "description": "A Helm chart for deploying Alfresco Search",
+      "type": "chart",
+      "shortName": "alfresco-search",
+      "version": "1.0.3"
+    },
+    {
+      "maintainers": [{"name": "Alfresco Apps Repo Team"}],
+      "keywords": [
+        "syncservice",
+        "alfresco",
+        "application"
+      ],
+      "children": [
+        {
+          "repoHost": "quay.io",
+          "children": [],
+          "name": "alfresco/service-sync:3.3.1",
+          "type": "image",
+          "version": "3.3.1"
+        },
+        {
+          "maintainers": [{"name": "databus23"}],
+          "keywords": [
+            "postgresql",
+            "postgres",
+            "database",
+            "sql"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "postgres",
+            "type": "image",
+            "version": "10.1"
+          }],
+          "name": "postgresql:0.9.3",
+          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+          "type": "chart",
+          "shortName": "postgresql",
+          "version": "0.9.3"
+        }
+      ],
+      "name": "alfresco-sync-service:3.0.2",
+      "description": "Alfresco Syncservice",
+      "type": "chart",
+      "shortName": "alfresco-sync-service",
+      "version": "3.0.2"
+    },
+    {
+      "maintainers": [{"name": "databus23"}],
+      "keywords": [
+        "postgresql",
+        "postgres",
+        "database",
+        "sql"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "postgres",
+        "type": "image",
+        "version": "11.4"
+      }],
+      "name": "postgresql:0.9.3",
+      "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "type": "chart",
+      "shortName": "postgresql",
+      "version": "0.9.3"
     }
   ],
   "name": "alfresco-content-services:3.0.8",

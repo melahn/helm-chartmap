@@ -42,15 +42,15 @@ usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-tika\n====\n\t2.1.
 
 'Chart Dependencies
 alfresco_content_services_3_0_8--[#green]-|>alfresco_digital_workspace_2_2_1
-alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
-alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
-alfresco_content_services_3_0_8--[#green]-|>alfresco_sync_service_3_0_2
-alfresco_sync_service_3_0_2--[#green]-|>postgresql_0_9_3
 alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
 alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
 alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
+alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
 alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
+alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
+alfresco_content_services_3_0_8--[#green]-|>alfresco_sync_service_3_0_2
+alfresco_sync_service_3_0_2--[#green]-|>postgresql_0_9_3
+alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_libreoffice_2_1_0
@@ -58,8 +58,8 @@ alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_transform_misc_2_
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_shared_file_store_0_5_3
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_pdf_renderer_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>quay_io_alfresco_alfresco_transform_router_1_1_0
-alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_tika_2_1_0
+alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_imagemagick_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_share_6_2_0
 alfresco_search_1_0_3--[#orange]-|>alfresco_alfresco_search_services_1_4_0
@@ -70,5 +70,5 @@ keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2022/03/24 21:08:51 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/25 22:39:56 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

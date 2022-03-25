@@ -19,11 +19,11 @@ usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/wordpress:5.6.2-debian-10-r8\
 usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/mariadb:10.5.9-debian-10-r0\n====\n\t10.5.9-debian-10-r0" as docker_io_bitnami_mariadb_10_5_9_debian_10_r0 #DarkGoldenRod
 
 'Chart Dependencies
+wordpress_10_6_10--[#green]-|>common_1_4_1
 wordpress_10_6_10--[#green]-|>mariadb_9_3_4
 mariadb_9_3_4--[#green]-|>common_1_4_0
-wordpress_10_6_10--[#green]-|>common_1_4_1
 mariadb_9_3_4--[#orange]-|>docker_io_bitnami_mariadb_10_5_9_debian_10_r0
 wordpress_10_6_10--[#orange]-|>docker_io_bitnami_wordpress_5_6_2_debian_10_r8
 
-center footer Generated on 2022/03/24 21:13:15 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/25 22:44:09 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
