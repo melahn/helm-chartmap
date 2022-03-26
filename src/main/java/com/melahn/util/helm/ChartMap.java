@@ -484,7 +484,7 @@ public class ChartMap {
      * @return a string containing some help
      */
     public static String getHelp() {
-        return "\nUsage:\n\n".concat("java -jar helm-chartmap-1.0.3.jar\n").concat("\nFlags:\n")
+        return "\nUsage:\n\n".concat("java -jar helm-chartmap-1.1.0.jar\n").concat("\nFlags:\n")
                 .concat("\t-a\t<apprspec>\tA name and version of a chart as an appr specification\n")
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
                 .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
