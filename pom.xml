@@ -291,26 +291,6 @@
         <version>3.0.0-M5</version>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>create</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <doCheck>false</doCheck>
-          <doUpdate>true</doUpdate>
-          <useLastCommittedRevision>true</useLastCommittedRevision>
-          <scmConnectionUrl>scm:git:https://github.com/melahn/helm-chartmap.git</scmConnectionUrl>
-          <shortRevisionLength>10</shortRevisionLength>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.2.4</version>
@@ -392,7 +372,7 @@
                 </filter>filter>
                 <!--
                     filter out the resources.properties because it is 
-                    only needed to conpute the name of the shaded jar
+                    only needed to compute the name of the shaded jar
                     for running tests
                 -->
                 <filter>
@@ -404,7 +384,7 @@
                 <!-- 
                     This is necessary because the httpclient component depends on 
                     the commons-logging component but not all the dependencies
-                    will be found as class dependencies, notably the impl classes.
+                    will be found as transitive hull dependencies, notably the impl classes.
                 -->
                 <filter>
                     <artifact>commons-logging:commons-logging</artifact>
@@ -653,7 +633,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20211205</version>
+      <version>20220320</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.plantuml</groupId>
