@@ -23,67 +23,7 @@
       "version": "1.3.4"
     },
     {
-      "maintainers": [{
-        "name": "Bitnami",
-        "email": "containers@bitnami.com"
-      }],
-      "keywords": [
-        "postgresql",
-        "database",
-        "sql",
-        "replication",
-        "cluster"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "postgres",
-        "type": "image",
-        "version": "9.4.6"
-      }],
-      "name": "postgresql:1.0.0",
-      "description": "Chart for PostgreSQL",
-      "type": "chart",
-      "shortName": "postgresql",
-      "version": "1.0.0"
-    },
-    {
       "children": [
-        {
-          "maintainers": [{"name": "Alfresco"}],
-          "keywords": [
-            "alfresco",
-            "keycloak",
-            "identity-service"
-          ],
-          "children": [{
-            "maintainers": [{
-              "name": "Bitnami",
-              "email": "containers@bitnami.com"
-            }],
-            "keywords": [
-              "keycloak",
-              "access-management"
-            ],
-            "children": [{
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "jboss/keycloak",
-              "type": "image",
-              "version": "4.8.3.Final"
-            }],
-            "name": "keycloak:4.3.0",
-            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
-            "type": "chart",
-            "shortName": "keycloak",
-            "version": "4.3.0"
-          }],
-          "name": "alfresco-identity-service:1.1.0",
-          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
-          "type": "chart",
-          "shortName": "alfresco-identity-service",
-          "version": "1.1.0"
-        },
         {
           "maintainers": [
             {
@@ -126,6 +66,41 @@
           "version": "0.14.0"
         },
         {
+          "maintainers": [{"name": "Alfresco"}],
+          "keywords": [
+            "alfresco",
+            "keycloak",
+            "identity-service"
+          ],
+          "children": [{
+            "maintainers": [{
+              "name": "Bitnami",
+              "email": "containers@bitnami.com"
+            }],
+            "keywords": [
+              "keycloak",
+              "access-management"
+            ],
+            "children": [{
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "jboss/keycloak",
+              "type": "image",
+              "version": "4.8.3.Final"
+            }],
+            "name": "keycloak:4.3.0",
+            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+            "type": "chart",
+            "shortName": "keycloak",
+            "version": "4.3.0"
+          }],
+          "name": "alfresco-identity-service:1.1.0",
+          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
+          "type": "chart",
+          "shortName": "alfresco-identity-service",
+          "version": "1.1.0"
+        },
+        {
           "keywords": [
             "activemq",
             "message broker"
@@ -149,6 +124,31 @@
       "type": "chart",
       "shortName": "alfresco-infrastructure",
       "version": "4.1.1"
+    },
+    {
+      "maintainers": [{
+        "name": "Bitnami",
+        "email": "containers@bitnami.com"
+      }],
+      "keywords": [
+        "postgresql",
+        "database",
+        "sql",
+        "replication",
+        "cluster"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "postgres",
+        "type": "image",
+        "version": "9.4.6"
+      }],
+      "name": "postgresql:1.0.0",
+      "description": "Chart for PostgreSQL",
+      "type": "chart",
+      "shortName": "postgresql",
+      "version": "1.0.0"
     }
   ],
   "name": "alfresco-process-services:0.2.0",

@@ -51,7 +51,7 @@ Chart: wordpress:10.6.10
 	apiVersion: v2
 	appVersion: 5.6.2
 	created: Not specified
-	dependencies: common:1.4.1, mariadb:9.3.4
+	dependencies: mariadb:9.3.4, common:1.4.1
 	description: Web publishing platform for building blogs and websites.
 	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
@@ -70,10 +70,10 @@ Image: docker.io/bitnami/mariadb:10.5.9-debian-10-r0
 
 Chart Dependencies
 ------------------
-wordpress:10.6.10 depends on common:1.4.1
 wordpress:10.6.10 depends on mariadb:9.3.4
 mariadb:9.3.4 depends on common:1.4.0
+wordpress:10.6.10 depends on common:1.4.1
 mariadb:9.3.4 uses docker.io/bitnami/mariadb:10.5.9-debian-10-r0
 wordpress:10.6.10 uses docker.io/bitnami/wordpress:5.6.2-debian-10-r8
 
-Generated on 2022/03/25 22:43:59 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/26 18:35:31 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
