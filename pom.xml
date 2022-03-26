@@ -611,10 +611,13 @@
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>2.13.2</version>
     </dependency>
+    <!--
+         jackson-databind 2.13.2.1 contains the fix for CVE-2020-36518
+    -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2</version>
+      <version>2.13.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
