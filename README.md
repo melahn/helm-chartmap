@@ -357,6 +357,15 @@ java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/IdeaProjects/plantuml/target/plantuml-1.2
 * Setting the optional property *PLANTUML_LIMIT_SIZE=8192* as illustrated in the above examples or setting it as a system environment variable is useful when creating large images to avoid image truncation.
 * [Graphviz](https://www.graphviz.org/) is a prerequisite
 
+### Warnings
+
+When the shaded jar is built by the maven-shade-plugin there is a warning produced like this...
+
+```text
+     target/classes (Is a directory)
+```
+
+This warning is due to a long-standing issue where the shade plugin checks if a classpath element is a jar, and if it is not, swallows useful error information.  It instead prints out this meaningless warning.  See <https://issues.apache.org/jira/browse/MSHADE-376> for more details. See <https://github.com/melahn/maven-shade-plugin> if you want to install your own version of the plugin, with a fix that eliminates this warning
 ## Security
 
 A [security issue](https://github.com/FasterXML/jackson-databind/issues/2816) has recently been reported with [com.fasterxml.jackson.core](https://github.com/FasterXML/jackson-databind). While it is marked as high severity, based on the discussion this would seem to be a misclassification. In any case, as soon as there is an artifact that contains the fix (possibly 2.13.3), the pom dependency will be updated.
