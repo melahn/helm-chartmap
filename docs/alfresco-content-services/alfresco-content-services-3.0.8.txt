@@ -21,7 +21,7 @@ Chart: alfresco-content-services:3.0.8
 	apiVersion: Not specified
 	appVersion: 6.2.0.2
 	created: Not specified
-	dependencies: alfresco-sync-service:3.0.2, alfresco-digital-workspace:2.2.1, postgresql:0.9.3, alfresco-infrastructure:4.1.1, alfresco-search:1.0.3
+	dependencies: alfresco-infrastructure:4.1.1, postgresql:0.9.3, alfresco-search:1.0.3, alfresco-sync-service:3.0.2, alfresco-digital-workspace:2.2.1
 	description: A Helm chart for deploying Alfresco Content Services
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -36,7 +36,7 @@ Chart: alfresco-infrastructure:4.1.1
 	apiVersion: v1
 	appVersion: Not specified
 	created: 2020-07-08T12:03:13.30180831Z
-	dependencies: nginx-ingress:0.14.0, activemq:1.1.1, alfresco-identity-service:1.1.0
+	dependencies: activemq:1.1.1, alfresco-identity-service:1.1.0, nginx-ingress:0.14.0
 	description: A Helm chart Providing the required Alfresco infrastructure for the Digital Business Platform. This includes activemq, alfresco-identity-service, nginx-ingress and a persistent volume to use with the DBP chart.
 	digest: 65bb324a6af05a2b2e87bf3f3817596fbac565a74b47440ad7b0459c30e9b201
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -176,21 +176,21 @@ Image: alfresco/alfresco-tika:2.1.0
 
 Chart Dependencies
 ------------------
-alfresco-content-services:3.0.8 depends on alfresco-sync-service:3.0.2
-alfresco-sync-service:3.0.2 depends on postgresql:0.9.3
-alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
-alfresco-content-services:3.0.8 depends on postgresql:0.9.3
 alfresco-content-services:3.0.8 depends on alfresco-infrastructure:4.1.1
-alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
 alfresco-infrastructure:4.1.1 depends on activemq:1.1.1
 alfresco-infrastructure:4.1.1 depends on alfresco-identity-service:1.1.0
 alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
+alfresco-infrastructure:4.1.1 depends on nginx-ingress:0.14.0
+alfresco-content-services:3.0.8 depends on postgresql:0.9.3
 alfresco-content-services:3.0.8 depends on alfresco-search:1.0.3
+alfresco-content-services:3.0.8 depends on alfresco-sync-service:3.0.2
+alfresco-sync-service:3.0.2 depends on postgresql:0.9.3
+alfresco-content-services:3.0.8 depends on alfresco-digital-workspace:2.2.1
 postgresql:0.9.3 uses postgres:11.4
 postgresql:0.9.3 uses postgres:10.1
 alfresco-content-services:3.0.8 uses alfresco/alfresco-libreoffice:2.1.0
-alfresco-content-services:3.0.8 uses alfresco/alfresco-transform-misc:2.1.0
 alfresco-content-services:3.0.8 uses alfresco/alfresco-shared-file-store:0.5.3
+alfresco-content-services:3.0.8 uses alfresco/alfresco-transform-misc:2.1.0
 alfresco-content-services:3.0.8 uses alfresco/alfresco-pdf-renderer:2.1.0
 alfresco-content-services:3.0.8 uses quay.io/alfresco/alfresco-transform-router:1.1.0
 alfresco-content-services:3.0.8 uses alfresco/alfresco-content-repository:6.2.0.2
@@ -205,4 +205,4 @@ keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 alfresco-sync-service:3.0.2 uses quay.io/alfresco/service-sync:3.3.1
 activemq:1.1.1 uses alfresco/alfresco-activemq:5.15.8-java-8-oracle-centos-7-87b15e37ce8b
 
-Generated on 2022/03/26 18:31:01 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/27 22:04:12 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
