@@ -130,20 +130,21 @@ Flags:
 ##### Generating a Chartmap using a chart reference
 
 ``` java
-java -jar helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -o wordpress-10.6.10.txt  -v
+java -jar target/helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -o wordpress-10.6.10.txt  -v
 ```
 
 ##### Generating a Chartmap using a file specification
 
 ``` java
-java -jar helm-chartmap-1.1.0.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -v 
+java -jar target/helm-chartmap-1.1.0.jar -f "./src/test/resource/test-chart-file.tgz" -o test-chart-file.puml -v -e "./resource/example/example-env-spec.yaml"
 
+Note in this example, the *-e* flag is set to provide an Environment Specification so that certain values expected by the helm chart will be found.
 ```
 
 ##### Generating a Chartmap using a url specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.1.0.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -g -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar target/helm-chartmap-1.1.0.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -g -v
 
 ```
 
@@ -152,7 +153,7 @@ Note in this example, the *-g* flag is set to automatically generate the image f
 ##### Generating a Chartmap using an appr specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.1.0.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar target/helm-chartmap-1.1.0.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o  alfresco-dbp.puml -v
 
 ```
 
