@@ -49,7 +49,7 @@
     <sonar.organization>melahn</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
-  
+
   <dependencies>
     <!--
          jackson-databind 2.13.2.1 contains the fix for CVE-2020-36518
@@ -83,7 +83,7 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
       <version>4.4</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
@@ -98,7 +98,7 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.5.13</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
@@ -180,7 +180,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -198,7 +198,7 @@
           <optimize>true</optimize>
           <compilerArgument>-Xlint:unchecked</compilerArgument>
         </configuration>
-      </plugin>      
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -220,7 +220,7 @@
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M5</version>
-      </plugin>            
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -253,7 +253,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
       <!-- 
           Including the maven-jar-plugin explictly (even though I am also usimg
           the apache-shade-plugin) is to prevent the deplicating class issue when
@@ -350,25 +350,13 @@
                   <excludes>
                     <exclude>META-INF/versions/9/module-info.class</exclude>
                   </excludes>
-                  excludes>
                 </filter>
-                filter>
-                <filter>
-                  <artifact>com.fasterxml.jackson.databind:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/versions/9/module-info.class</exclude>
-                  </excludes>
-                  excludes>
-                </filter>
-                filter>
                 <filter>
                   <artifact>com.fasterxml.jackson.dataformat:*</artifact>
                   <excludes>
                     <exclude>META-INF/versions/9/module-info.class</exclude>
                   </excludes>
-                  excludes>
                 </filter>
-                filter>
                 <!--
                     filter out the resources.properties because it is 
                     only needed to compute the name of the shaded jar
@@ -558,10 +546,10 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>
