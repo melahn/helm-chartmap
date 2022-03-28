@@ -137,9 +137,9 @@ java -jar target/helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -o wordpress-10.
 
 ``` java
 java -jar target/helm-chartmap-1.1.0.jar -f "./src/test/resource/test-chart-file.tgz" -o test-chart-file.puml -v -e "./resource/example/example-env-spec.yaml"
+```
 
 Note in this example, the *-e* flag is set to provide an Environment Specification so that certain values expected by the helm chart will be found.
-```
 
 ##### Generating a Chartmap using a url specification
 
