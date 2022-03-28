@@ -65,10 +65,7 @@ The helm client command is determined by first using the value of the environmen
 variable *HELM_BIN*. If not found, then the value *helm* is used and it is assumed that
 the executable *helm* will be found in the PATH. It is arguably more secure to set *HELM_BIN* explictly since that way you prevent the security exposure of some other (unknown) executable named *helm* being found in the PATH.  
 
-The location of the helm cache and configuration directories is derived using the rules defined in
-[Helm Documentation](https://helm.sh/docs/helm/helm/).
-
-The junit test cases rely on the environment variable *HELM_HOME* being set.
+The location of the helm cache and configuration directories is derived using the [helm env command.](https://helm.sh/docs/helm/helm_env/)
 
 ## Using Chart Map
 
