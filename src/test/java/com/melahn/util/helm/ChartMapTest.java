@@ -1679,12 +1679,9 @@ class ChartMapTest {
                 .concat("\t-g\t\t\tGenerate image from PlantUML file\n").concat("\t-r\t\t\tRefresh\n")
                 .concat("\t-v\t\t\tVerbose\n").concat("\t-h\t\t\tHelp\n")
                 .concat("\nSee https://github.com/melahn/helm-chartmap for more information\n");
-        try {
-            String helpText = ChartMap.getHelp();
-            assert (helpText.equals(helpTextExpected));
-        } catch (Exception e) {
-            fail("testHelp failed:" + e.getMessage());
-        }
+        String helpText = ChartMap.getHelp();
+        assertEquals (helpText, helpTextExpected);
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
