@@ -66,6 +66,24 @@
           "version": "0.14.0"
         },
         {
+          "keywords": [
+            "activemq",
+            "message broker"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-activemq",
+            "type": "image",
+            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
+          }],
+          "name": "activemq:1.1.1",
+          "description": "A Helm chart Providing Apache ActiveMQ.",
+          "type": "chart",
+          "shortName": "activemq",
+          "version": "1.1.1"
+        },
+        {
           "maintainers": [{"name": "Alfresco"}],
           "keywords": [
             "alfresco",
@@ -99,24 +117,6 @@
           "type": "chart",
           "shortName": "alfresco-identity-service",
           "version": "1.1.0"
-        },
-        {
-          "keywords": [
-            "activemq",
-            "message broker"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-activemq",
-            "type": "image",
-            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
-          }],
-          "name": "activemq:1.1.1",
-          "description": "A Helm chart Providing Apache ActiveMQ.",
-          "type": "chart",
-          "shortName": "activemq",
-          "version": "1.1.1"
         }
       ],
       "name": "alfresco-infrastructure:4.1.1",
