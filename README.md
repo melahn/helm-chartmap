@@ -48,7 +48,7 @@ The Chart Map jar file, along with source and javadoc, is available from **Maven
 <dependency>
   <groupId>com.melahn</groupId>
   <artifactId>helm-chartmap</artifactId>
-  <version>1.0.2</version>
+  <version>1.1.0</version>
 </dependency>
 
 ```
@@ -57,7 +57,7 @@ The Chart Map jar file, along with source and javadoc, is available from **Maven
 
 Java 8 or later.  
 
-The Helm Client is required since the chart map is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.0.3-SNAPSHOT version has been tested with version 3.8.1 of the Helm Client and the helm-chartmap-1.0.2 version (available from Maven Central) has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
+The Helm Client is required since the chart map is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.1.0 version has been tested with version 3.8.1 of the Helm Client and the helm-chartmap-1.0.2 version has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
 
 For instructions on installing the Helm Client, see <https://docs.helm.sh/using_helm/#installing-helm>.
 
@@ -74,8 +74,7 @@ The junit test cases rely on the environment variable *HELM_HOME* being set.
 
 ### Setup
 
-1. Download the executable jar from the [resource directory](./resource/jar),
-or from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.0.2/helm-chartmap-1.0.2.jar)
+1. Download the executable jar from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.1.0/helm-chartmap-1.1.0.jar)
 or build it yourself from source (see below).
 2. Run the command line, or write a Java program using the API, to generate a chart. See Syntax and Examples below.
 
@@ -84,7 +83,7 @@ If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&
 ### Command Line Syntax
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar
+java -jar helm-chartmap-1.1.0.jar
 
 Flags:
   -a  <apprspec>  A name and version of a chart as an appr specification
@@ -134,20 +133,20 @@ Flags:
 ##### Generating a Chartmap using a chart reference
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -o wordpress-10.6.10.txt  -v
+java -jar helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -o wordpress-10.6.10.txt  -v
 ```
 
 ##### Generating a Chartmap using a file specification
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -v 
+java -jar helm-chartmap-1.1.0.jar -f "/Users/melahn/helm/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -v 
 
 ```
 
 ##### Generating a Chartmap using a url specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -g -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.1.0.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-3.0.8.tgz" -o  alfresco-content-services-3.0.8.puml -g -v
 
 ```
 
@@ -156,7 +155,7 @@ Note in this example, the *-g* flag is set to automatically generate the image f
 ##### Generating a Chartmap using an appr specification
 
 ``` java
-java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.0.2.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o  alfresco-dbp.puml -v
+java -DPLANTUML_LIMIT_SIZE=8192 -jar helm-chartmap-1.1.0.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o  alfresco-dbp.puml -v
 
 ```
 
@@ -334,7 +333,7 @@ Having generated some PlantUML files, if you want to generate image files from t
 That will cause Chartmap to automatically generate a PNG file for you.  For example,
 
 ``` java
-java -jar helm-chartmap-1.0.2.jar -c "wordpress:10.6.10" -r -v -g -o "wordpress-10.6.10.puml" -d "/Users/melahn/.helm"
+java -jar helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -r -v -g -o "wordpress-10.6.10.puml" -d "/Users/melahn/.helm"
 ```
 
 * You can use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
