@@ -2,7 +2,7 @@
 #
 # It uses relative directories based on the source directory containing the script file so it should
 # be executed in that directory or the relative directories should be modified to your preference
-jarfile=../../target/helm-chartmap-1.1.0-SNAPSHOT.jar
+jarfile=../../target/helm-chartmap-1.1.0.jar
 docdir=../../docs
 pumlopt=-DPLANTUML_LIMIT_SIZE=8192
 
