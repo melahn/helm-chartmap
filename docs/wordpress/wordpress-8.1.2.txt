@@ -44,4 +44,4 @@ wordpress:8.1.2 depends on mariadb:7.3.6
 mariadb:7.3.6 uses docker.io/bitnami/mariadb:10.3.21-debian-10-r0
 wordpress:8.1.2 uses docker.io/bitnami/wordpress:5.3.2-debian-10-r0
 
-Generated on 2022/03/29 18:33:17 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/29 19:04:13 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
