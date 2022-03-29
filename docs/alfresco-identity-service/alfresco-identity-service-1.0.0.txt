@@ -42,4 +42,4 @@ Chart Dependencies
 alfresco-identity-service:1.0.0 depends on keycloak:4.0.3
 keycloak:4.0.3 uses jboss/keycloak:4.5.0.Final
 
-Generated on 2022/03/28 18:05:55 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/29 17:43:21 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

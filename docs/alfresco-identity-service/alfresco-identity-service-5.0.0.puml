@@ -25,5 +25,5 @@ postgresql_10_3_13--[#green]-|>common_1_4_1
 postgresql_10_3_13--[#orange]-|>docker_io_bitnami_postgresql_11_11_0_debian_10_r31
 keycloak_15_0_0--[#orange]-|>quay_io_alfresco_alfresco_identity_service_1_6_0
 
-center footer Generated on 2022/03/28 18:07:30 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/29 17:45:22 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
