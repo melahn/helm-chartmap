@@ -26,4 +26,4 @@ Chart Dependencies
 ------------------
 nuxeo:3.0.3 uses docker.packages.nuxeo.com/nuxeo/nuxeo:latest
 
-Generated on 2022/03/29 17:41:33 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/03/29 18:28:47 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

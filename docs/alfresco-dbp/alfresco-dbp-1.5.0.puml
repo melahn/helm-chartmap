@@ -58,10 +58,10 @@ alfresco_content_services_2_1_3--[#green]-|>postgresql_0_9_3
 alfresco_content_services_2_1_3--[#green]-|>alfresco_digital_workspace_2_2_0
 alfresco_content_services_2_1_3--[#green]-|>alfresco_sync_service_1_1_1
 alfresco_sync_service_1_1_1--[#green]-|>postgresql_0_9_3
-alfresco_dbp_1_5_0--[#green]-|>alfresco_infrastructure_4_1_1
 alfresco_dbp_1_5_0--[#green]-|>alfresco_process_services_0_2_0
 alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
 alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_dbp_1_5_0--[#green]-|>alfresco_infrastructure_4_1_1
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_admin_1_10_0
@@ -84,5 +84,5 @@ keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
 
-center footer Generated on 2022/03/29 17:43:14 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/29 18:30:18 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
