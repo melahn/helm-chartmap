@@ -70,5 +70,5 @@ keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2022/03/29 19:00:56 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/03/29 19:39:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
