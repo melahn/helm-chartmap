@@ -10,15 +10,7 @@
 [![GitHub Deploy Status](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/deploy.yml)
 [![Sonar Cloud Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=alert_status)](https://sonarcloud.io/dashboard?id=helm-chartmap)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=coverage)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=bugs)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=helm-chartmap&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=helm-chartmap)
 
 See some examples &#8594; [https://melahn.github.io/helm-chartmap/](https://melahn.github.io/helm-chartmap/)
 
