@@ -323,7 +323,7 @@ Having generated some PlantUML files, if you want to generate image files from t
 That will cause Chartmap to automatically generate a PNG file for you.  For example,
 
 ``` java
-java -jar helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -r -v -g -o "wordpress-10.6.10.puml" -d "/Users/melahn/.helm"
+java -jar helm-chartmap-1.1.0.jar -c "wordpress:10.6.10" -r -v -g -o "wordpress-10.6.10.puml" 
 ```
 
 * You can use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
