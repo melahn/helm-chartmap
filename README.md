@@ -236,7 +236,7 @@ public class ChartMapExample {
 }
 ```
 
-Many more examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/org/com.melahn.util.helm/ChartMapTest.java).
+Many more examples illustrating the use of the Java interface can be found in [ChartMapTest.java](./src/test/java/com/melahn/util/helm/ChartMapTest.java).
 
 ### Examples of Generated Files
 
