@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Remove reference to prebuilt jar
+- Bad link in the README.md pointing to more examples of the Java constructor
+
 ## [1.1.0] - 2022-03-29
 
 - Security Updates
@@ -14,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD now with GitHub Actions for build and deploy
 - Added deploy to GitHub Packages as well as Maven Central
 - Upgraded to Helm Version 3
+- Removed -d option
 - Added and updated example charts
 - Added script to generate helm chart examples
 - Added Sonar Cloud scan
