@@ -297,7 +297,7 @@ mvn clean install
 
 ```
 
-Note: The [prebuilt jar](resource/jar/chartmap-1.0.1.jar) that is included in the ./resources directory targets Java 8 for the widest compatibiity. You can target a different
+Note: The helm-chartmap jar targets Java 8 for the widest compatibiity. You can target a different
 version of Java by modifying the configuration in the maven-compiler-plugin to use a different target like in the example below.
 
 ``` xml
