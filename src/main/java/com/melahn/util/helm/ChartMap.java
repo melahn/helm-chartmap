@@ -111,7 +111,7 @@ public class ChartMap {
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
     protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    protected static final int PROCESS_TIMEOUT = 100000; 
+    protected static final int PROCESS_TIMEOUT = 300000; 
     protected static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; 
     protected static final String START_OF_TEMPLATE = "# Source: ";
     protected static final String TEMP = "TEMP";
@@ -852,6 +852,7 @@ public class ChartMap {
      */
     protected String fetchChart() throws ChartMapException {
         String chartDirName = "";
+        HelmChart h = null;
         try {
             if (getApprSpec() != null) {
                 chartDirName = pullChart(getApprSpec());
@@ -860,14 +861,13 @@ public class ChartMap {
             } else if (getChartFilename() != null) {
                 chartDirName = getChart(getChartFilename());
             } else {
-                HelmChart h = charts.get(getChartName(), chartVersion);
+                h = charts.get(getChartName(), chartVersion);
                 if (h == null) {
                     throw (new ChartMapException(
                             "chart ".concat(getChartName().concat(":").concat(chartVersion).concat(" not found"))));
                 }
                 chartDirName = downloadChart(h.getUrls()[0]);
             }
-            updateLocalRepo(chartDirName);
         } catch (ChartMapException e) {
             logger.error("Error getting chart: {}", e.getMessage());
             throw (e);
@@ -1034,9 +1034,11 @@ public class ChartMap {
      * user has specified the refresh parameter on the command line or method call.
      *
      * @param dirName The name of the directory containing the chart
+     * @param chartName The name of the chart (just fior logging)
      * @throws ChartMapException if an error occurs updating the local repo
      */
-    protected void updateLocalRepo(String dirName) throws ChartMapException {
+    protected void updateLocalRepo(String dirName, String chartName) throws ChartMapException {
+        logger.log(logLevelVerbose, "Updating Helm dependencies for {} in directory {}", chartName, dirName);
         // if the user wants us to update the Helm dependencies, do so
         if (this.isRefreshLocalRepo()) {
             String[] c = {"helm", "dep", "update"};
@@ -1053,10 +1055,15 @@ public class ChartMap {
                         "InterruptedException while executing helm dep update");
             }
             if (exitValue != 0) {
-                throw new ChartMapException("Exception updating chart repo in " + dirName + ".  Exit code: " + exitValue
-                        + ".  Possibly you cannot access one of your remote charts repos.");
+                throw new ChartMapException("Exception updating chart repo in "
+                .concat(dirName)
+                .concat(" for chart ")
+                .concat(chartName)
+                .concat(".  Exit code: "
+                .concat(Integer.toString(exitValue))
+                .concat(".  Possibly you cannot access one of your remote charts repos.")));
             } else {
-                logger.log(logLevelVerbose, "Updated Helm dependencies");
+                logger.log(logLevelVerbose, "Updated Helm dependencies for {}", chartName);
             }
         }
     }
@@ -1177,7 +1184,7 @@ public class ChartMap {
      * 
      * @throws ChartMapException when an error occurs collecting dependencies
      */
-    protected void collectDependencies(String chartDirName, HelmChart h) throws ChartMapException { 
+    protected void collectDependencies(String chartDirName, HelmChart h) throws ChartMapException {
         HelmChart parentHelmChart = null;
         try {
             if (h != null) {
@@ -1190,29 +1197,37 @@ public class ChartMap {
                     if (h != null) {
                         parentHelmChart = charts.get(h.getName(), h.getVersion());
                         chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
+                        // helm dep update is not recursive (see
+                        // https://github.com/helm/helm/issues/2247) so run the command at each level
+                        //
+                        // Note: the updateLocalRepo function does check for the -r flag
+                        updateLocalRepo(chartDirName.concat(File.separator).concat(directory), h.getNameFull());
                     }
                     File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
                     if (chartFile.exists()) {
                         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        // this reference is not in the map
                         HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);
                         HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
                                 currentHelmChartFromDisk.getVersion());
                         if (currentHelmChart == null) {
-                            // this is most likely because the local Helm charts are out of date and should
-                            // be refreshed
-                            throw new ChartMapException(String.format("A dependency on %s:%s  was found but that "
-                                    + "chart was not found in the local Helm charts cache. "
-                                    + "Check to make sure all the helm repos are in your local cache by running the 'helm repo list' command. "
-                                    + "Try running the command again with the '-r' option.",
-                                    currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion()));
+                            // If the chart was not found in the charts map, which can happen if this is a
+                            // subchart not pulled from any repo) then put it there.
+
+                            // Note: this can also happen if the user's repo cache is stale and needs to be
+                            // updated with a helm repo update but there is no obvious way to know that is
+                            // the case. But I can least log the fact.
+                            logger.log(logLevelVerbose, "Chart {} was not found in the local helm repo.",
+                                    currentHelmChartFromDisk.getNameFull());
+                            charts.put(currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion(),
+                                    currentHelmChartFromDisk);
+                            currentHelmChart = currentHelmChartFromDisk;
                         }
                         handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart),
                                 chartDirName, directory, currentHelmChart, parentHelmChart);
-                    } 
-                } 
-            } 
+                    }
+                }
+            }
         } catch (IOException e) {
             String m = String.format("IOException getting Dependencies: %s", e.getMessage());
             logger.error(m);
