@@ -1624,10 +1624,10 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm2.print());
         System.out.println("ChartMapException thrown as expected");
     }
-/*
+
     @Test
     void UrlTest() throws ChartMapException { // test normal path
-        ChartMap cm = createTestMap(ChartOption.URL, testChartUrl, testOutputChartUrlPumlPath, true, false, false);
+        ChartMap cm = createTestMap(ChartOption.URL, testChartUrl, testOutputChartUrlPumlPath, false, true, false);
         cm.print();
         assertTrue(Files.exists(testOutputChartUrlPumlPath));
         assertTrue(Files.exists(testOutputChartUrlPngPath)); // test null chart name
@@ -1635,7 +1635,7 @@ class ChartMapTest {
                 () -> createTestMap(ChartOption.URL, null, testOutputChartUrlPumlPath, true, false, false));
         System.out.println("ChartMapException thrown as expected with a null chart name");
     }
-*/
+
     @Test
     void chartNameTest() throws ChartMapException {
         // test normal path without using createTestMap utility function because I want
