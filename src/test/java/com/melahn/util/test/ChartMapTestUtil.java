@@ -124,7 +124,7 @@ public class ChartMapTestUtil {
         pb.redirectErrorStream(true);
         pb.redirectOutput(Redirect.appendTo(l.toFile()));
         Process process = pb.start();
-        final int waitTime = 20;
+        final int waitTime = 120;
         process.waitFor(waitTime, TimeUnit.SECONDS);
         return process.exitValue();
     }

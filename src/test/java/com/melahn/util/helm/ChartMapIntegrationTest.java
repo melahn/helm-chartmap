@@ -34,6 +34,7 @@ class ChartMapIntegrationTest {
     private final Path outputFilePath = Paths.get(TARGET_TEST_DIR_NAME, "testChartFileRV.txt");
     private final String testEnvFileName = "../../resource/example/example-env-spec.yaml";
     private final String testInputFileName = "../../src/test/resource/test-chart-file.tgz";
+    private static String testFakeChartFileName = "src/test/resource/test-fakechart.tgz";
     private final String targetTestDirName = "target/integration-test";
     private final Path targetTestPath = Paths.get(targetTestDirName);
     private final ChartMapTestUtil utility = new ChartMapTestUtil();
@@ -70,7 +71,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void normalLocalTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
+        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName, "-r");
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, targetTestPath, logFilePath);
         assertTrue(Files.exists(outputFilePath));
@@ -102,7 +103,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void debugTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName, "-z");
+        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName, "-z", "-r");
         Files.deleteIfExists(logFilePath);
         utility.createProcess(args,
                 new String[][] { new String[] { ChartMap.CHARTMAP_DEBUG_ENV_VAR, "Y" }, new String[] {} }, null,
@@ -122,7 +123,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void badEnvTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", testInputFileName, "-e", "nofilehere.yaml", "-o", outputFileName);
+        args = Arrays.asList("-f", testFakeChartFileName, "-e", "nofilehere.yaml", "-o", outputFileName);
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, TARGET_TEST_PATH, logFilePath);
         assertNotEquals(0, utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null,
@@ -139,7 +140,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void badOptionTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-BADOPTION", "-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
+        args = Arrays.asList("-BADOPTION", "-f", testFakeChartFileName, "-e", testEnvFileName, "-o", outputFileName);
         assertNotEquals(0, utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null,
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath));
         assertFalse(Files.exists(outputFilePath));
@@ -154,7 +155,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void multipleOptionTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", "-a", "-u", "-c", testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
+        args = Arrays.asList("-f", "-a", "-u", "-c", testFakeChartFileName, "-e", testEnvFileName, "-o", outputFileName);
         assertNotEquals(0, utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null,
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath));
         assertTrue(ChartMapTestUtil.fileContains(logFilePath,
@@ -171,7 +172,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void missingOptionTest() throws InterruptedException, IOException {
-        args = Arrays.asList(testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
+        args = Arrays.asList(testInputFileName, "-e", testFakeChartFileName, "-o", outputFileName);
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, TARGET_TEST_PATH, logFilePath);
         assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));

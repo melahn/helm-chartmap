@@ -87,6 +87,7 @@ class ChartMapTest {
     private static Path testOneFileZipPath = Paths.get("src/test/resource/test-onefile.tgz");
     private static Path testEnvFilePath = Paths.get("resource/example/example-env-spec.yaml");
     private static String testInputFileName = "src/test/resource/test-chart-file.tgz";
+    private static String testFakeChartFileName = "src/test/resource/test-fakechart.tgz";
     private static String testChartName = "nginx:9.3.0";
     private static String testAPPRChart = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
     private static String testChartUrl = "https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz";
@@ -127,7 +128,7 @@ class ChartMapTest {
      */
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
@@ -148,7 +149,7 @@ class ChartMapTest {
      */
     @Test
     void processWeightsTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testChartName, testOutputTextFilePathNRNV, false, true,
                 false);
         ChartMap scm = spy(cm);
         doReturn(0).when(scm).getWeight(anyString());
@@ -170,7 +171,7 @@ class ChartMapTest {
      */
     @Test
     void runTemplateCommandTest() throws ChartMapException, InterruptedException, IOException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         // test that a bogus directory will cause an IO exception
         HelmChart h = new HelmChart();
@@ -240,7 +241,7 @@ class ChartMapTest {
      */
     @Test
     void getTemplateArrayTest() throws ChartMapException, IOException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
@@ -288,7 +289,7 @@ class ChartMapTest {
         ChartMap cm1 = new ChartMap();
         cm1.printMap();
         assertEquals(null, cm1.getChart());
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRNV, false, false,
                 false);
         cm2.print();
         cm2.setOutputFilename("./."); /// forces the exception because it is a directory
@@ -350,7 +351,7 @@ class ChartMapTest {
     @Test
     void printChartDependenciesTest() throws ChartMapException, IOException {
         // test for null getDiscoveredDependencies
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, false,
+        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, testChartName, testOutputChartNamePumlPath, true, true,
                 false);
         cm1.print();
         HelmChart h1 = new HelmChart();
@@ -1303,7 +1304,7 @@ class ChartMapTest {
     @Test
     void collectDependenciesTest() throws ChartMapException, IOException {
         // Test the currentDirectory.list returns null case
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, true,
                 false);
         HelmChart h = new HelmChart();
         h.setName("foo");
@@ -1316,7 +1317,7 @@ class ChartMapTest {
         cm1.collectDependencies(f1.toString(), h);
         assertEquals(i1, cm1.getChartsReferenced().size());
         // Test the chart file does not exist case
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, true,
                 false);
         cm2.print();
         int i2 = cm2.getChartsReferenced().size();
@@ -1332,7 +1333,7 @@ class ChartMapTest {
         Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             ChartMap cm3 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false,
-                    false, false);
+                    true, false);
             cm3.print();
             Files.createFile(p3);
             System.setOut(new PrintStream(o));
@@ -1342,7 +1343,7 @@ class ChartMapTest {
             System.out.println("ChartMapException thrown as expected");
         }
         // Test the Chart.yaml file references a chart that does not exist
-        ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, false,
+        ChartMap cm4 = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, false, true,
                 false);
         cm4.print();
         String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat("foo").concat("\n    version: ")
@@ -1497,15 +1498,18 @@ class ChartMapTest {
                 true);
         testMap.print();
         assertTrue(Files.exists(testOutputPumlFilePathRV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void pumlChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputPumlFilePathNRV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputPumlFilePathNRV, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(testOutputPumlFilePathNRV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
+
 
     @Test
     void pumlChartRefreshNoVerboseTest() throws ChartMapException {
@@ -1513,15 +1517,17 @@ class ChartMapTest {
                 false);
         testMap.print();
         assertTrue(Files.exists(testOutputPumlFilePathRNV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void pumlChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputPumlFilePathNRNV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputPumlFilePathNRNV, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(testOutputPumlFilePathNRNV));
         assertTrue(Files.exists(testOutputPngFilePathNRNV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -1530,16 +1536,16 @@ class ChartMapTest {
                 true);
         testMap.print();
         assertTrue(Files.exists(testOutputTextFilePathRV));
-        assertTrue(ChartMapTestUtil.fileContains(testOutputTextFilePathRV,
-                "WARNING: Chart alfresco-content-services:1.0.3 is stable but depends on alfresco-search:0.0.4 which may not be stable"));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void textChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRV, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(testOutputTextFilePathNRV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -1548,16 +1554,16 @@ class ChartMapTest {
                 false);
         testMap.print();
         assertTrue(Files.exists(testOutputTextFilePathRNV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void textChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputTextFilePathNRNV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputTextFilePathNRNV, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(testOutputTextFilePathNRNV));
-        // todo compare NR generated files with time stamp removed with a known good
-        // result for a better test
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -1566,16 +1572,16 @@ class ChartMapTest {
                 true);
         testMap.print();
         assertTrue(Files.exists(testOutputJSONFilePathRV));
-
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void JSONChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputJSONFilePathNRV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputJSONFilePathNRV, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(testOutputJSONFilePathNRV));
-
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -1584,14 +1590,16 @@ class ChartMapTest {
                 false);
         testMap.print();
         assertTrue(Files.exists(testOutputJSONFilePathRNV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
     void JSONChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputJSONFilePathNRNV, true,
+        ChartMap testMap = createTestMap(ChartOption.FILENAME, testFakeChartFileName, testOutputJSONFilePathNRNV, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(testOutputJSONFilePathNRNV));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
@@ -1809,18 +1817,18 @@ class ChartMapTest {
     @Test
     void PlantUMLChartMapPrinterTest() throws Exception {
         ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName, testOutputPumlFilePathNRNV, true,
-                false, false);
+                true, false);
         testMap.createTempDir();
         testMap.loadLocalRepos();
         testMap.resolveChartDependencies();
         ChartKeyMap ckm = testMap.chartsReferenced;
-        HelmChart h = ckm.get("alfresco-content-services", "1.0.3");
+        HelmChart h = ckm.get("alfresco-content-services", "5.2.0");
         h.setRepoUrl(null);
-        ckm.put("alfresco-content-services", "1.0.3", h);
+        ckm.put("alfresco-content-services", "5.2.0", h);
         HashSet<String> ir1 = testMap.imagesReferenced;
         HashSet<String> ir2 = new HashSet<String>();
         for (String i : ir1) {
-            if (i.equals("alfresco/alfresco-imagemagick:1.2")) {
+            if (i.equals("alfresco/alfresco-imagemagick:2.5.7")) {
                 i = i.replace(':', 'X');
             }
             ir2.add(i);
@@ -1830,7 +1838,7 @@ class ChartMapTest {
         for (HelmDeploymentTemplate t : templates) {
             HelmDeploymentContainer[] hdc = t.getSpec().getTemplate().getSpec().getContainers();
             for (HelmDeploymentContainer c : hdc) {
-                if (c.getImage().equals("alfresco/alfresco-imagemagick:1.2")) {
+                if (c.getImage().equals("alfresco/alfresco-imagemagick:2.5.7")) {
                     c.setImage(c.getImage().replace(':', 'X'));
                 }
             }
@@ -1838,7 +1846,7 @@ class ChartMapTest {
         h.setDeploymentTemplates(templates);
         testMap.printMap();
         assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "Unknown Repo URL"));
-        assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX1_2"));
+        assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX2_5_7"));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
