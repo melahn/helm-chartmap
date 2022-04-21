@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Handle case where there is a chart referenced in dependencies that only exists as a sub-chart
+- Use 'helm dep update' recursively when -r parameter used
+- Update test chart to eliminate references to outdated helm chart repos
 - Remove reference to prebuilt jar
 - Bad link in the README.md pointing to more examples of the Java constructor
 

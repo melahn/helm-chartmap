@@ -1627,7 +1627,7 @@ class ChartMapTest {
 
     @Test
     void UrlTest() throws ChartMapException { // test normal path
-        ChartMap cm = createTestMap(ChartOption.URL, testChartUrl, testOutputChartUrlPumlPath, true, false, false);
+        ChartMap cm = createTestMap(ChartOption.URL, testChartUrl, testOutputChartUrlPumlPath, true, true, false);
         cm.print();
         assertTrue(Files.exists(testOutputChartUrlPumlPath));
         assertTrue(Files.exists(testOutputChartUrlPngPath)); // test null chart name
