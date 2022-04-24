@@ -33,8 +33,11 @@ class ChartMapIntegrationTest {
     private final String outputFileName = "testChartFileRV.txt";
     private final Path outputFilePath = Paths.get(TARGET_TEST_DIR_NAME, "testChartFileRV.txt");
     private final String testEnvFileName = "../../resource/example/example-env-spec.yaml";
-    private final String testInputFileName = "../../src/test/resource/test-chart-file.tgz";
     private static String testFakeChartFileName = "src/test/resource/test-fakechart.tgz";
+    // use testInputFileName111 for test cases where you must use the refresh flag since it contains subcharts that are not in any helm repo
+    private static String testInputFileName1 = "../../src/test/resource/test-chart-file-1.tgz";
+    // use testInputFileName12 for test cases where you must not use the refresh flag since it contains old helm chart repo names
+    private static String testInputFileName2 = "../../src/test/resource/test-chart-file-2.tgz";
     private final String targetTestDirName = "target/integration-test";
     private final Path targetTestPath = Paths.get(targetTestDirName);
     private final ChartMapTestUtil utility = new ChartMapTestUtil();
@@ -71,7 +74,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void normalLocalTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName, "-r");
+        args = Arrays.asList("-f", testInputFileName1, "-e", testEnvFileName, "-o", outputFileName, "-r");
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, targetTestPath, logFilePath);
         assertTrue(Files.exists(outputFilePath));
@@ -103,7 +106,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void debugTest() throws InterruptedException, IOException {
-        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName, "-z", "-r");
+        args = Arrays.asList("-f", testInputFileName1, "-e", testEnvFileName, "-o", outputFileName, "-z", "-r");
         Files.deleteIfExists(logFilePath);
         utility.createProcess(args,
                 new String[][] { new String[] { ChartMap.CHARTMAP_DEBUG_ENV_VAR, "Y" }, new String[] {} }, null,
@@ -172,7 +175,7 @@ class ChartMapIntegrationTest {
      */
     @Test
     void missingOptionTest() throws InterruptedException, IOException {
-        args = Arrays.asList(testInputFileName, "-e", testFakeChartFileName, "-o", outputFileName);
+        args = Arrays.asList(testInputFileName2, "-e", testFakeChartFileName, "-o", outputFileName);
         utility.createProcess(args, new String[][] { new String[] {}, new String[] {} }, null, JaCocoAgentString,
                 className, TARGET_TEST_PATH, logFilePath);
         assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));
@@ -221,7 +224,7 @@ class ChartMapIntegrationTest {
     @Test
     void constructGetHelmCommandTest() throws ChartMapException, InterruptedException, IOException {
         // The helm command is found in HELM_BIN
-        args = Arrays.asList("-f", testInputFileName, "-e", testEnvFileName, "-o", outputFileName);
+        args = Arrays.asList("-f", testInputFileName2, "-e", testEnvFileName, "-o", outputFileName);
         utility.createProcess(args, new String[][] {
                 new String[] { ChartMap.CHARTMAP_DEBUG_ENV_VAR, "Y", "HELM_BIN", "helm" }, new String[] {} }, null,
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath);
