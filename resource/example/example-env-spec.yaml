@@ -2,6 +2,7 @@
 environment:
   global.tracking.auth : 'secret'
   global.tracking.sharedsecret : 'foo-secret'
+  global.keycloak.clientSecret : 'foo-secret'
   alfresco-api-gateway.keycloakURL : 'http://localhost-k8s/auth'
   alfresco-content-services.alfresco-digital-workspace.enabled : 'true'
   alfresco-content-services.alfresco-infrastructure.enabled : 'false'
@@ -21,5 +22,5 @@ environment:
   alfresco-sync-service.syncservice.enabled : 'true'
   postgresql-syncservice.enabled  : 'true'
   keycloakURL : 'http://localhost-k8s/auth'
-  keycloak.persistence.deployPostgres : 'true'
   keycloak.persistence.dbVendor : 'postgres'
+  keycloak.persistence.deployPostgres : 'true'
