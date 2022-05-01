@@ -458,20 +458,22 @@ public class ChartMap {
     }
 
     /**
-     * Parses a Chart Name of the format <chart-name><chart version> and sets the
+     * Parses a Chart Name of the format &lt;chart-name&gt;:&lt;chart version&gt; and sets the
      * values of chartName and chartVersion
      * 
      * Note: I base the regular expression on the Chart name rules described in
      * https://helm.sh/docs/chart_best_practices/conventions/ I don't enforce semver
-     * in the version portion
+     * in the version portion, so versions like 1.0.0-ea are allowed.
      *
      * @param c the Chart Name
      * @throws ChartMapException if the Chart Name was malformed
      */
-    private void parseChartName(String c) throws ChartMapException {
-        if (!c.matches("[a-z][-a-z0-9]+:[._-a-zA-Z0-9]+")) {
-            throw new ChartMapException(
+    protected void parseChartName(String c) throws ChartMapException {
+        if (!c.matches("[a-z][-a-z0-9]+:[a-zA-Z0-9._-]+")) {
+            ChartMapException e = new ChartMapException(
                     "Chart Name invalid: " + c + ". I was expecting something like helm-test-chart:1.0.2");
+            logger.error(e.getMessage());
+            throw e;
         }
         String[] chartNameParts = c.split(":");
         setChartName(chartNameParts[0]);
@@ -790,7 +792,7 @@ public class ChartMap {
                 }
             }
         } catch (Exception e) {
-            logger.info("Error loading charts from helm cache: {}", e.getMessage());
+            logger.error("Error loading charts from helm cache: {}", e.getMessage());
         }
     }
 

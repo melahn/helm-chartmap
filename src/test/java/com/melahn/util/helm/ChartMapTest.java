@@ -1,6 +1,7 @@
 package com.melahn.util.helm;
 
 import static com.melahn.util.test.ChartMapTestUtil.isWindows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -339,6 +340,40 @@ class ChartMapTest {
             System.setOut(initialOut);
             System.out.println("Expected warnings found when trying to generate image from bad puml files");
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests the parseChartName method.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void parseChartNameTest() throws ChartMapException {
+        String c1 = "foo:1.0.0";
+        ChartMap cm1 = new ChartMap();
+        assertDoesNotThrow(() -> cm1.parseChartName(c1));
+        assertEquals("foo", cm1.getChartName());
+        assertEquals("1.0.0", cm1.getChartVersion());
+        System.out.println(String.format("%s is a valid chart name", c1));
+        ChartMap cm2 = new ChartMap();
+        String c2 = "foo:1.0.0-ea";
+        assertDoesNotThrow(() -> cm2.parseChartName(c2));
+        assertEquals("foo", cm2.getChartName());
+        assertEquals("1.0.0-ea", cm2.getChartVersion());
+        System.out.println(String.format("%s is a valid chart name even though it is not SemVer compliant", c2));
+        ChartMap cm3 = new ChartMap();
+        String c3 = "foo:1.0.0@ea";
+        assertThrows(ChartMapException.class, () -> cm3.parseChartName(c3));
+        System.out.println(String.format("%s is not a valid chart name", c3));
+        ChartMap cm4 = new ChartMap();
+        String c4 = ":1.0.0";
+        assertThrows(ChartMapException.class, () -> cm4.parseChartName(c4));
+        System.out.println(String.format("%s is not a valid chart name", c4));
+        ChartMap cm5 = new ChartMap();
+        String c5 = "foo";
+        assertThrows(ChartMapException.class, () -> cm5.parseChartName(c5));
+        System.out.println(String.format("%s is not a valid chart name", c5));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
