@@ -100,6 +100,8 @@ public class ChartMap {
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
+    private static final String PLANTUML_LIMIT_SIZE = "8192";
+    private static final String PLANTUML_LIMIT_SIZE_NAME = "PLANTUML_LIMIT_SIZE";
     private static final int REFRESH_SWITCH = 1;
     private static final String TEMP_DIR = "Temporary Directory ";
     private static final int VERBOSE_SWITCH = 2;
@@ -1879,6 +1881,14 @@ public class ChartMap {
          * generated
          */
         String d = System.getProperty("user.dir");
+        // The system property PLANTUML_LIMIT_SIZE allows complex PlantUML images to be
+        // created without cropping. It can be directly controlled by the user by setting 
+        // the system property or indirectly using the same named env var. Here I set 
+        // the property to a nice big number, if the user has not set a preferred value.
+        if (System.getenv(PLANTUML_LIMIT_SIZE_NAME) != null &&
+            System.getProperty(PLANTUML_LIMIT_SIZE_NAME) != null) {
+            System.setProperty(PLANTUML_LIMIT_SIZE_NAME, PLANTUML_LIMIT_SIZE);
+        }
         Path i = Paths.get(f.replace("puml", "png"));
         try {
             if (Files.exists(i)) {
@@ -1886,8 +1896,7 @@ public class ChartMap {
                 logger.log(logLevelVerbose, LOG_FORMAT_2, i.getFileName(), " deleted");
             }
             net.sourceforge.plantuml.SourceFileReader r = getPlantUMLReader(new File(f));
-            boolean e = r.hasError();
-            if (!e) {
+            if (!r.hasError()) {
                 List<net.sourceforge.plantuml.GeneratedImage> l = r.getGeneratedImages();
                 if (!l.isEmpty()) {
                     File p = l.get(0).getPngFile();
