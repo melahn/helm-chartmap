@@ -1885,9 +1885,15 @@ public class ChartMap {
         // created without cropping. It can be directly controlled by the user by setting 
         // the system property or indirectly using the same named env var. Here I set 
         // the property to a nice big number, if the user has not set a preferred value.
-        if (System.getenv(PLANTUML_LIMIT_SIZE_NAME) != null &&
-            System.getProperty(PLANTUML_LIMIT_SIZE_NAME) != null) {
+        String plantUMLPriorLimitValue = System.getProperty(PLANTUML_LIMIT_SIZE_NAME) != null?
+            System.getProperty(PLANTUML_LIMIT_SIZE_NAME):
+            System.getenv(PLANTUML_LIMIT_SIZE_NAME);
+        if (plantUMLPriorLimitValue == null) {
             System.setProperty(PLANTUML_LIMIT_SIZE_NAME, PLANTUML_LIMIT_SIZE);
+            logger.log(logLevelVerbose,"{} set to {}", PLANTUML_LIMIT_SIZE_NAME, PLANTUML_LIMIT_SIZE);
+        }
+        else {
+            logger.log(logLevelVerbose,"{} was already set to {}", PLANTUML_LIMIT_SIZE_NAME, plantUMLPriorLimitValue);
         }
         Path i = Paths.get(f.replace("puml", "png"));
         try {
@@ -1905,7 +1911,7 @@ public class ChartMap {
                     logger.warn(LOG_FORMAT_4, "Warning: Image file ", i.getFileName(), " was not generated from ", f);
                 }
             } else {
-                logger.error(LOG_FORMAT_4,
+                logger.error(LOG_FORMAT_4, 
                         "Error in net.sourceforge.plantuml.GeneratedImage trying to generate image from ", d, "/", f);
             }
         } catch (IOException e) {

@@ -1469,6 +1469,28 @@ class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    /** 
+     * Tests the PLANTUML_LIMIT_SIZE when set as a system property. See the integration test function for the 
+     * other cases which rely on the system environment being set.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void plantUMLLimitSizeTest() throws ChartMapException, IOException, InterruptedException {
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName2, testOutputPumlFilePathNRNV, true,
+                    false, true);
+            String e = "4000";
+            System.setProperty("PLANTUML_LIMIT_SIZE", e);
+            System.setOut(new PrintStream(o));
+            cm1.print();
+            System.setOut(new PrintStream(initialOut));
+            assertTrue(ChartMapTestUtil.streamContains(o, String.format("PLANTUML_LIMIT_SIZE was already set to %s", e)));
+            System.out.println("PLANTUML_LIMIT_SIZE as a system property detected correctly"); 
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
     /**
      * Tests the creation and removal of the temp directory used by ChartMap.
      * 

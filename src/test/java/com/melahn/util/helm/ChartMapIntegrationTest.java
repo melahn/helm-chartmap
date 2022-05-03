@@ -30,8 +30,8 @@ class ChartMapIntegrationTest {
     private final String JaCocoAgentString = JaCocoAgentPath.toString()
             .concat(".jar=destfile=../jacoco.exec,append=true");
     private final Path logFilePath = Paths.get(TARGET_TEST_DIR_NAME, "sub-process-out.txt");
-    private final String outputFileName = "testChartFileRV.txt";
-    private final Path outputFilePath = Paths.get(TARGET_TEST_DIR_NAME, "testChartFileRV.txt");
+    private final String outputFileName = "testChartFile.puml";
+    private final Path outputFilePath = Paths.get(TARGET_TEST_DIR_NAME, "testChartFile.puml");
     private final String testEnvFileName = "../../resource/example/example-env-spec.yaml";
     private static String testFakeChartFileName = "src/test/resource/test-fakechart.tgz";
     // use testInputFileName111 for test cases where you must use the refresh flag since it contains subcharts that are not in any helm repo
@@ -195,6 +195,31 @@ class ChartMapIntegrationTest {
                 JaCocoAgentString, className, TARGET_TEST_PATH, logFilePath);
         assertTrue(ChartMapTestUtil.fileContains(logFilePath, "Usage:"));
         assertFalse(Files.exists(outputFilePath));
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /** 
+     * Tests different combinations of PLANTUML_LIMIT_SIZE.
+     * 
+     * See the unit test function for the other case which relies
+     * on a system property being set.
+     * 
+     * @throws ChartMapException
+     */
+    @Test
+    void plantUMLLimitSizeTest() throws ChartMapException, IOException, InterruptedException {
+        // Test the normal case, PLANTUML_LIMIT_SIZE not defined at all
+        args = Arrays.asList("-f", testInputFileName2, "-e", testEnvFileName, "-o", outputFileName, "-g", "-v");
+        utility.createProcess(args, new String[][] { new String[] {}, new String[] {"PLANTUML_LIMIT_SIZE"} }, null, JaCocoAgentString,
+                className, TARGET_TEST_PATH, logFilePath);
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath,"PLANTUML_LIMIT_SIZE set to 8192"));
+        assertTrue(Files.exists(outputFilePath));
+        // Test env var PLANTUML_LIMIT_SIZE set to 8000
+        String e = "8000";
+        utility.createProcess(args, new String[][] { new String[] {"PLANTUML_LIMIT_SIZE", e}, new String[] {} }, null, JaCocoAgentString,
+                className, TARGET_TEST_PATH, logFilePath);
+        assertTrue(ChartMapTestUtil.fileContains(logFilePath, String.format("PLANTUML_LIMIT_SIZE was already set to %s", e)));
+        assertTrue(Files.exists(outputFilePath));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
