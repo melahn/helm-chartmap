@@ -173,12 +173,12 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
             repoHost = i.substring(0, i.indexOf('/'));
             imageName = i.substring(i.indexOf('/') + 1, i.length());
         }
-        body += "\\t" + repoHost;
+        body += repoHost;
         body += getSeparator();
-        body += "\\t" + imageName;
+        body += imageName;
         body += getSeparator();
         String version = i.contains(":")?i.substring(i.indexOf(':') + 1, i.length()) : "?";
-        body += "\\t" + version;
+        body += version;
         return body;
     }
 
