@@ -20,6 +20,7 @@ environment:
   alfresco-process-services.alfresco-infrastructure.alfresco-api-gateway.keycloakURL : 'http://localhost-k8s/auth'
   alfresco-process-services.processEngine.environment.IDENTITY_SERVICE_AUTH : 'http://localhost-k8s/auth'
   alfresco-sync-service.syncservice.enabled : 'true'
+  insightzeppelin.enabled: 'true'
   postgresql-syncservice.enabled  : 'true'
   keycloakURL : 'http://localhost-k8s/auth'
   keycloak.persistence.dbVendor : 'postgres'
