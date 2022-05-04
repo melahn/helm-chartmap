@@ -140,19 +140,15 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return text that can be used for the body of a PlantUML artifact
      */
     private String getComponentBody(HelmChart chart) {
-        String body = getSeparator();
-        body += "\\t" + chart.getName();
-        body += getSeparator();
-        body += "\\t" + chart.getVersion();
-        body += getSeparator();
-        body += getChartType(chart);
-        body += getSeparator();
-        body += "\\t" + (chart.getRepoUrl()==null? "Unknown Repo URL":chart.getRepoUrl());
-        body += getSeparator();
-        body += "\\t" + getMaintainers(chart.getMaintainers());
-        body += getSeparator();
-        body += "\\t" + getKeywords(chart.getKeywords());
-        return body;
+        StringBuilder sb = new StringBuilder(getSeparator());
+        sb.append("\\tType: ").append(getChartType(chart));
+        sb.append(getSeparator());
+        sb.append("\\tRepo: ").append(chart.getRepoUrl()==null? "Unknown Repo URL":chart.getRepoUrl());
+        sb.append(getSeparator());
+        sb.append("\\t").append(getMaintainers(chart.getMaintainers()));
+        sb.append(getSeparator());
+        sb.append("\\t").append(getKeywords(chart.getKeywords()));
+        return sb.toString();
     }
 
     /**
@@ -163,8 +159,6 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      */
     private static String getImageBody(String i) {
         String imageName = null;
-        String body = "Image";
-        body += getSeparator();
         String repoHost = "Docker Hub";
         int count = i.length() - i.replace("/", "").length();
         if (count < 2) { // e.g. postgres:9.6.2 or alfresco/process-services:1.8.0
@@ -173,13 +167,14 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
             repoHost = i.substring(0, i.indexOf('/'));
             imageName = i.substring(i.indexOf('/') + 1, i.length());
         }
-        body += repoHost;
-        body += getSeparator();
-        body += imageName;
-        body += getSeparator();
-        String version = i.contains(":")?i.substring(i.indexOf(':') + 1, i.length()) : "?";
-        body += version;
-        return body;
+        StringBuilder sb = new StringBuilder("Image");
+        sb.append(getSeparator());
+        sb.append(repoHost);
+        sb.append(getSeparator());
+        sb.append(imageName);
+        sb.append(getSeparator());
+        sb.append(i.contains(":")?i.substring(i.indexOf(':') + 1, i.length()) : "?");
+        return sb.toString();
     }
 
     /**
