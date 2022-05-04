@@ -66,9 +66,9 @@ The location of the helm cache and configuration directories is derived using th
 ### Setup
 
 1. Download the executable jar from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.1.0/helm-chartmap-1.1.0.jar)
-or build it yourself from source (see below).
-2. Run the command line,
-3. Write a Java program using the API, to generate a chart.
+or build it yourself from source (see below)
+2. Run the command line
+3. Write a Java program using the API, to generate a chart
 
 See Syntax and Examples below.
 
@@ -145,7 +145,7 @@ java -jar target/helm-chartmap-1.1.0.jar -u "http://kubernetes-charts.alfresco.c
 
 Note in this example, the *-g* flag is set to automatically generate the image from the PlantUML file.
 
-Also note that the system property *PLANTUML_LIMIT_SIZE* allows the generation of complex PlantUML images without cropping. It can be set directly on the command line using the '-D' argument or by setting it using the same named system environment variable.
+Also note that the system property *PLANTUML_LIMIT_SIZE* allows the generation of complex PlantUML images without cropping. It can be set directly on the command line using the '-D' argument or by setting it indirectly using the same named system environment variable. By default, Chart Map sets the property to 8192, which is enough to handle any chart encountered so far.
 
 ##### Generating a Chartmap using an appr specification
 
