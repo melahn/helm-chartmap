@@ -50,6 +50,7 @@ import com.melahn.util.helm.model.HelmDeploymentSpec;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplate;
 import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
+import com.melahn.util.helm.model.HelmMaintainer;
 import com.melahn.util.test.ChartMapTestUtil;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -1886,16 +1887,17 @@ class ChartMapTest {
 
     @Test
     void PlantUMLChartMapPrinterTest() throws Exception {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, testInputFileName1, testOutputPumlFilePathNRNV, true,
+        // Test bad values for repo and images when print puml files
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, testInputFileName1, testOutputPumlFilePathNRNV, true,
                 true, false);
-        testMap.createTempDir();
-        testMap.loadLocalRepos();
-        testMap.resolveChartDependencies();
-        ChartKeyMap ckm = testMap.chartsReferenced;
+        cm1.createTempDir();
+        cm1.loadLocalRepos();
+        cm1.resolveChartDependencies();
+        ChartKeyMap ckm = cm1.chartsReferenced;
         HelmChart h = ckm.get("alfresco-content-services", "5.2.0");
         h.setRepoUrl(null);
         ckm.put("alfresco-content-services", "5.2.0", h);
-        HashSet<String> ir1 = testMap.imagesReferenced;
+        HashSet<String> ir1 = cm1.imagesReferenced;
         HashSet<String> ir2 = new HashSet<String>();
         for (String i : ir1) {
             if (i.equals("alfresco/alfresco-imagemagick:2.5.7")) {
@@ -1903,7 +1905,7 @@ class ChartMapTest {
             }
             ir2.add(i);
         }
-        testMap.imagesReferenced = ir2;
+        cm1.imagesReferenced = ir2;
         Set<HelmDeploymentTemplate> templates = h.getDeploymentTemplates();
         for (HelmDeploymentTemplate t : templates) {
             HelmDeploymentContainer[] hdc = t.getSpec().getTemplate().getSpec().getContainers();
@@ -1914,9 +1916,18 @@ class ChartMapTest {
             }
         }
         h.setDeploymentTemplates(templates);
-        testMap.printMap();
+        cm1.printMap();
         assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "Unknown Repo URL"));
         assertTrue(ChartMapTestUtil.fileContains(testOutputPumlFilePathNRNV, "alfresco_alfresco_imagemagickX2_5_7"));
+        System.out.println("Tested bad values for repo and images tested for PlantUML format");
+        // Test odd combinations of maintainer and keywords
+        String m = PlantUmlChartMapPrinter.getMaintainers(new HelmMaintainer[0]);
+        assertEquals("Maintainers: ", m);
+        String k = PlantUmlChartMapPrinter.getKeywords(new String[0]);
+        assertEquals("Keywords: ", k);
+        k = PlantUmlChartMapPrinter.getKeywords(new String[]{"one"});
+        assertEquals("Keywords: one", k);
+        System.out.println("Tested odd values for maintainers and keywords for PlantUML format");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

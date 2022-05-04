@@ -10,7 +10,7 @@ import com.melahn.util.helm.model.HelmMaintainer;
  */
 public class PlantUmlChartMapPrinter extends ChartMapPrinter {
 
-    private String[] colors;
+    private static String[] colors;
     private static final String SEPARATOR = "\\n====\\n";
 
     /**
@@ -161,7 +161,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param i the name of a Docker Image
      * @return text that can be used for the body of a PlantUML artifact
      */
-    private String getImageBody(String i) {
+    private static String getImageBody(String i) {
         String imageName = null;
         String body = "Image";
         body += getSeparator();
@@ -187,7 +187,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @return PlantUML text for a separator
      */
-    private String getSeparator() {
+    private static String getSeparator() {
         return SEPARATOR;
     }
 
@@ -195,19 +195,15 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * Get the maintainers for a Helm Chart, nicely formatted
      *
      * @param m an array of maintainers discovered in a Helm Chart
-     * @return a formatted String of the maintainers separated by commas
+     * @return a formatted String of the maintainers one per line
      */
-    private String getMaintainers(HelmMaintainer[] m) {
+    protected static String getMaintainers(HelmMaintainer[] m) {
         StringBuilder maintainers = new StringBuilder("Maintainers: ");
-        boolean first = true;
-        if (m != null) {
+        if (m != null && m.length == 1) {
+            maintainers.append(m[0].getName());
+        } else if (m != null && m.length > 1) {
             for (HelmMaintainer hm : m) {
-                if (first) {
-                    maintainers.append(hm.getName());
-                    first = false;
-                } else {
-                    maintainers.append(", " + hm.getName());
-                }
+                maintainers.append("\\n\\t\\t").append(hm.getName());
             }
         }
         return maintainers.toString();
@@ -219,17 +215,13 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @param k an array of keywords discovered from a Helm Chart
      * @return a formatted String of the keywords one per line
      */
-    private String getKeywords(String[] k) {
+    protected static String getKeywords(String[] k) {
         StringBuilder keywords = new StringBuilder("Keywords: ");
-        boolean first = true;
-        if (k != null) {
+        if (k != null && k.length == 1) {
+            keywords.append(k[0]);
+        } else if (k != null && k.length > 1) {
             for (String aKeyword : k) {
-                if (first) {
-                    keywords.append(aKeyword);
-                    first = false;
-                } else {
-                    keywords.append("\\n").append(aKeyword);
-                }
+                keywords.append("\\n\\t\\t").append(aKeyword);
             }
         }
         return keywords.toString();
@@ -243,7 +235,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return the name of the artifact where the characters that would violate
      *         PlantUML naming rules are replaced with underscores
      */
-    private String getNameAsPlantUmlReference(String s) {
+    private static String getNameAsPlantUmlReference(String s) {
         String reference = s.replace(':', '_');
         reference = reference.replace('.', '_');
         reference = reference.replace('-', '_');
@@ -257,7 +249,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return a PlantUML color attribute chosen from the colors table
      */
 
-    private String getChartArtifactColor(HelmChart h) {
+    private static String getChartArtifactColor(HelmChart h) {
         int hashValue = hashHelmChartName(h);
         return "#" + colors[hashValue];
     }
@@ -284,7 +276,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @return a calculated hash value aa an unsigned int
      */
-    private int hashHelmChartName(HelmChart h) {
+    private static int hashHelmChartName(HelmChart h) {
         int hashCode = (h.getName().hashCode() * Integer.MAX_VALUE) / (Integer.MAX_VALUE / (getColors().length) * 2);
         hashCode = Math.abs(hashCode);
         return hashCode;
@@ -301,7 +293,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      *
      * @return a calculated hash value as an unsigned int
      */
-    private int hashImageName(String i) {
+    private static int hashImageName(String i) {
         String[] s = i.split(":");
         String baseName = s[0];
         int hashCode = (baseName.hashCode() * Integer.MAX_VALUE) / (Integer.MAX_VALUE / (getColors().length) * 2);
@@ -315,7 +307,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * @return the colors array
      */
 
-    private String[] getColors() {
+    private static String[] getColors() {
         return colors;
     }
 
@@ -335,7 +327,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
      * But note that your choice of text color applies to the whole file.
      */
 
-    private void initializeColors() {
+    private static void initializeColors() {
         colors = new String[] { "AliceBlue", "AntiqueWhite", "Aqua", "Aquamarine", "Azure", "Beige", "Bisque",
                 // "Black",
                 "BlanchedAlmond",
