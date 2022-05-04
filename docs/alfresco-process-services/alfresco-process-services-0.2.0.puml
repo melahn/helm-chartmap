@@ -9,13 +9,13 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-process-services:0.2.0
 
 'There are 7 referenced Helm Charts
-artifact "alfresco-process-services:0.2.0\n====\n\talfresco-process-services\n====\n\t0.2.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: " as alfresco_process_services_0_2_0 #Gainsboro
-artifact "alfresco-infrastructure:4.1.1\n====\n\talfresco-infrastructure\n====\n\t4.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: " as alfresco_infrastructure_4_1_1 #Cornsilk
-artifact "postgresql:1.0.0\n====\n\tpostgresql\n====\n\t1.0.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tpostgresql\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_1_0_0 #LightSteelBlue
-artifact "alfresco-identity-service:1.1.0\n====\n\talfresco-identity-service\n====\n\t1.1.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
-artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: \n\t\tjackzampolin\n\t\tmgoodness\n\t\tchancez\n====\n\tKeywords: \n\t\tingress\n\t\tnginx" as nginx_ingress_0_14_0 #DarkSalmon
-artifact "activemq:1.1.1\n====\n\tactivemq\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tactivemq\n\t\tmessage broker" as activemq_1_1_1 #LightBlue
+artifact "alfresco-process-services:0.2.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: " as alfresco_process_services_0_2_0 #Gainsboro
+artifact "alfresco-infrastructure:4.1.1\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: " as alfresco_infrastructure_4_1_1 #Cornsilk
+artifact "postgresql:1.0.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tpostgresql\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_1_0_0 #LightSteelBlue
+artifact "alfresco-identity-service:1.1.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
+artifact "keycloak:4.3.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
+artifact "nginx-ingress:0.14.0\n====\n\tType: application\n====\n\tRepo: https://charts.helm.sh/stable\n====\n\tMaintainers: \n\t\tjackzampolin\n\t\tmgoodness\n\t\tchancez\n====\n\tKeywords: \n\t\tingress\n\t\tnginx" as nginx_ingress_0_14_0 #DarkSalmon
+artifact "activemq:1.1.1\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tactivemq\n\t\tmessage broker" as activemq_1_1_1 #LightBlue
 
 'There are 8 referenced Docker Images
 usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-process-workspace-app:1.3.4\n====\n1.3.4" as quay_io_alfresco_alfresco_process_workspace_app_1_3_4 #Azure
@@ -43,5 +43,5 @@ nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2022/05/04 15:18:56 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 19:05:00 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
