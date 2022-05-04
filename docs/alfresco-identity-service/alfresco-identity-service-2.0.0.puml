@@ -9,15 +9,15 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-identity-service:2.0.0
 
 'There are 2 referenced Helm Charts
-artifact "keycloak:6.0.0\n====\n\tkeycloak\n====\n\t6.0.0\n====\napplication\n====\n\thttps://codecentric.github.io/helm-charts\n====\n\tMaintainers: unguiculus, thomasdarimont\n====\n\tKeywords: sso\nidm\nopenid connect\nsaml\nkerberos\nldap" as keycloak_6_0_0 #LightBlue
-artifact "alfresco-identity-service:2.0.0\n====\n\talfresco-identity-service\n====\n\t2.0.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_2_0_0 #Chartreuse
+artifact "keycloak:6.0.0\n====\n\tkeycloak\n====\n\t6.0.0\n====\napplication\n====\n\thttps://codecentric.github.io/helm-charts\n====\n\tMaintainers: \n\t\tunguiculus\n\t\tthomasdarimont\n====\n\tKeywords: \n\t\tsso\n\t\tidm\n\t\topenid connect\n\t\tsaml\n\t\tkerberos\n\t\tldap" as keycloak_6_0_0 #LightBlue
+artifact "alfresco-identity-service:2.0.0\n====\n\talfresco-identity-service\n====\n\t2.0.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_2_0_0 #Chartreuse
 
 'There is one referenced Docker Image
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-identity-service\n====\n\t1.2" as alfresco_alfresco_identity_service_1_2 #BlanchedAlmond
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-identity-service\n====\n1.2" as alfresco_alfresco_identity_service_1_2 #BlanchedAlmond
 
 'Chart Dependencies
 alfresco_identity_service_2_0_0--[#green]-|>keycloak_6_0_0
 keycloak_6_0_0--[#orange]-|>alfresco_alfresco_identity_service_1_2
 
-center footer Generated on 2022/03/29 19:41:37 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 15:17:34 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

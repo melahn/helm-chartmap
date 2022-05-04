@@ -12,10 +12,10 @@ title Chart Map for nuxeo:3.0.3
 artifact "nuxeo:3.0.3\n====\n\tnuxeo\n====\n\t3.0.3\n====\napplication\n====\n\thttps://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_3 #LightSeaGreen
 
 'There is one referenced Docker Image
-usecase "Image\n====\n\tdocker.packages.nuxeo.com\n====\n\tnuxeo/nuxeo:latest\n====\n\tlatest" as docker_packages_nuxeo_com_nuxeo_nuxeo_latest #LightGray
+usecase "Image\n====\ndocker.packages.nuxeo.com\n====\nnuxeo/nuxeo:latest\n====\nlatest" as docker_packages_nuxeo_com_nuxeo_nuxeo_latest #LightGray
 
 'Chart Dependencies
 nuxeo_3_0_3--[#orange]-|>docker_packages_nuxeo_com_nuxeo_nuxeo_latest
 
-center footer Generated on 2022/03/29 19:39:26 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 15:15:22 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

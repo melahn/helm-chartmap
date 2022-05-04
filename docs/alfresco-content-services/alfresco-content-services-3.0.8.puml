@@ -9,48 +9,48 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-content-services:3.0.8
 
 'There are 10 referenced Helm Charts
-artifact "postgresql:0.9.3\n====\n\tpostgresql\n====\n\t0.9.3\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: databus23\n====\n\tKeywords: postgresql\npostgres\ndatabase\nsql" as postgresql_0_9_3 #LightSteelBlue
-artifact "alfresco-content-services:3.0.8\n====\n\talfresco-content-services\n====\n\t3.0.8\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: content\ncontent services\nalfresco\nalfresco content services" as alfresco_content_services_3_0_8 #Gainsboro
+artifact "postgresql:0.9.3\n====\n\tpostgresql\n====\n\t0.9.3\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: databus23\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql" as postgresql_0_9_3 #LightSteelBlue
+artifact "alfresco-content-services:3.0.8\n====\n\talfresco-content-services\n====\n\t3.0.8\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tcontent\n\t\tcontent services\n\t\talfresco\n\t\talfresco content services" as alfresco_content_services_3_0_8 #Gainsboro
 artifact "alfresco-infrastructure:4.1.1\n====\n\talfresco-infrastructure\n====\n\t4.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: " as alfresco_infrastructure_4_1_1 #Cornsilk
-artifact "alfresco-search:1.0.3\n====\n\talfresco-search\n====\n\t1.0.3\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: search\nsearch services\nalfresco search services\ninsight\ninsight engine\nalfresco insight engine" as alfresco_search_1_0_3 #GhostWhite
-artifact "alfresco-identity-service:1.1.0\n====\n\talfresco-identity-service\n====\n\t1.1.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: alfresco\nkeycloak\nidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
-artifact "alfresco-digital-workspace:2.2.1\n====\n\talfresco-digital-workspace\n====\n\t2.2.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: alfresco\ndigital workspace" as alfresco_digital_workspace_2_2_1 #DodgerBlue
-artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: jackzampolin, mgoodness, chancez\n====\n\tKeywords: ingress\nnginx" as nginx_ingress_0_14_0 #DarkSalmon
-artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: keycloak\naccess-management" as keycloak_4_3_0 #LightBlue
-artifact "alfresco-sync-service:3.0.2\n====\n\talfresco-sync-service\n====\n\t3.0.2\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco Apps Repo Team\n====\n\tKeywords: syncservice\nalfresco\napplication" as alfresco_sync_service_3_0_2 #CadetBlue
-artifact "activemq:1.1.1\n====\n\tactivemq\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: activemq\nmessage broker" as activemq_1_1_1 #LightBlue
+artifact "alfresco-search:1.0.3\n====\n\talfresco-search\n====\n\t1.0.3\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tsearch\n\t\tsearch services\n\t\talfresco search services\n\t\tinsight\n\t\tinsight engine\n\t\talfresco insight engine" as alfresco_search_1_0_3 #GhostWhite
+artifact "alfresco-identity-service:1.1.0\n====\n\talfresco-identity-service\n====\n\t1.1.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
+artifact "alfresco-digital-workspace:2.2.1\n====\n\talfresco-digital-workspace\n====\n\t2.2.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\talfresco\n\t\tdigital workspace" as alfresco_digital_workspace_2_2_1 #DodgerBlue
+artifact "keycloak:4.3.0\n====\n\tkeycloak\n====\n\t4.3.0\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
+artifact "nginx-ingress:0.14.0\n====\n\tnginx-ingress\n====\n\t0.14.0\n====\napplication\n====\n\thttps://charts.helm.sh/stable\n====\n\tMaintainers: \n\t\tjackzampolin\n\t\tmgoodness\n\t\tchancez\n====\n\tKeywords: \n\t\tingress\n\t\tnginx" as nginx_ingress_0_14_0 #DarkSalmon
+artifact "activemq:1.1.1\n====\n\tactivemq\n====\n\t1.1.1\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tactivemq\n\t\tmessage broker" as activemq_1_1_1 #LightBlue
+artifact "alfresco-sync-service:3.0.2\n====\n\talfresco-sync-service\n====\n\t3.0.2\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco Apps Repo Team\n====\n\tKeywords: \n\t\tsyncservice\n\t\talfresco\n\t\tapplication" as alfresco_sync_service_3_0_2 #CadetBlue
 
 'There are 18 referenced Docker Images
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-content-repository\n====\n\t6.2.0.2" as alfresco_alfresco_content_repository_6_2_0_2 #FloralWhite
-usecase "Image\n====\n\tDocker Hub\n====\n\tpostgres\n====\n\t11.4" as postgres_11_4 #Ivory
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-libreoffice\n====\n\t2.1.0" as alfresco_alfresco_libreoffice_2_1_0 #LightSkyBlue
-usecase "Image\n====\n\tquay.io\n====\n\talfresco/alfresco-digital-workspace:1.4.0\n====\n\t1.4.0" as quay_io_alfresco_alfresco_digital_workspace_1_4_0 #FloralWhite
-usecase "Image\n====\n\tDocker Hub\n====\n\tpostgres\n====\n\t10.1" as postgres_10_1 #Ivory
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-shared-file-store\n====\n\t0.5.3" as alfresco_alfresco_shared_file_store_0_5_3 #CadetBlue
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-transform-misc\n====\n\t2.1.0" as alfresco_alfresco_transform_misc_2_1_0 #LightSkyBlue
-usecase "Image\n====\n\tquay.io\n====\n\tkubernetes-ingress-controller/nginx-ingress-controller:0.12.0\n====\n\t0.12.0" as quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0 #LightSkyBlue
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-activemq\n====\n\t5.15.8-java-8-oracle-centos-7-87b15e37ce8b" as alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b #Khaki
-usecase "Image\n====\n\tquay.io\n====\n\talfresco/alfresco-transform-router:1.1.0\n====\n\t1.1.0" as quay_io_alfresco_alfresco_transform_router_1_1_0 #Aqua
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-share\n====\n\t6.2.0" as alfresco_alfresco_share_6_2_0 #LightSalmon
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-imagemagick\n====\n\t2.1.0" as alfresco_alfresco_imagemagick_2_1_0 #Aqua
-usecase "Image\n====\n\tDocker Hub\n====\n\tjboss/keycloak\n====\n\t4.8.3.Final" as jboss_keycloak_4_8_3_Final #LemonChiffon
-usecase "Image\n====\n\tquay.io\n====\n\talfresco/service-sync:3.3.1\n====\n\t3.3.1" as quay_io_alfresco_service_sync_3_3_1 #LightPink
-usecase "Image\n====\n\tDocker Hub\n====\n\tk8s.gcr.io/defaultbackend\n====\n\t1.3" as k8s_gcr_io_defaultbackend_1_3 #DarkSeaGreen
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-search-services\n====\n\t1.4.0" as alfresco_alfresco_search_services_1_4_0 #Coral
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-pdf-renderer\n====\n\t2.1.0" as alfresco_alfresco_pdf_renderer_2_1_0 #Cornsilk
-usecase "Image\n====\n\tDocker Hub\n====\n\talfresco/alfresco-tika\n====\n\t2.1.0" as alfresco_alfresco_tika_2_1_0 #DeepSkyBlue
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-content-repository\n====\n6.2.0.2" as alfresco_alfresco_content_repository_6_2_0_2 #FloralWhite
+usecase "Image\n====\nDocker Hub\n====\npostgres\n====\n11.4" as postgres_11_4 #Ivory
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-libreoffice\n====\n2.1.0" as alfresco_alfresco_libreoffice_2_1_0 #LightSkyBlue
+usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-digital-workspace:1.4.0\n====\n1.4.0" as quay_io_alfresco_alfresco_digital_workspace_1_4_0 #FloralWhite
+usecase "Image\n====\nDocker Hub\n====\npostgres\n====\n10.1" as postgres_10_1 #Ivory
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-shared-file-store\n====\n0.5.3" as alfresco_alfresco_shared_file_store_0_5_3 #CadetBlue
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-transform-misc\n====\n2.1.0" as alfresco_alfresco_transform_misc_2_1_0 #LightSkyBlue
+usecase "Image\n====\nquay.io\n====\nkubernetes-ingress-controller/nginx-ingress-controller:0.12.0\n====\n0.12.0" as quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0 #LightSkyBlue
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-activemq\n====\n5.15.8-java-8-oracle-centos-7-87b15e37ce8b" as alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b #Khaki
+usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-transform-router:1.1.0\n====\n1.1.0" as quay_io_alfresco_alfresco_transform_router_1_1_0 #Aqua
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-share\n====\n6.2.0" as alfresco_alfresco_share_6_2_0 #LightSalmon
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-imagemagick\n====\n2.1.0" as alfresco_alfresco_imagemagick_2_1_0 #Aqua
+usecase "Image\n====\nDocker Hub\n====\njboss/keycloak\n====\n4.8.3.Final" as jboss_keycloak_4_8_3_Final #LemonChiffon
+usecase "Image\n====\nquay.io\n====\nalfresco/service-sync:3.3.1\n====\n3.3.1" as quay_io_alfresco_service_sync_3_3_1 #LightPink
+usecase "Image\n====\nDocker Hub\n====\nk8s.gcr.io/defaultbackend\n====\n1.3" as k8s_gcr_io_defaultbackend_1_3 #DarkSeaGreen
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-search-services\n====\n1.4.0" as alfresco_alfresco_search_services_1_4_0 #Coral
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-pdf-renderer\n====\n2.1.0" as alfresco_alfresco_pdf_renderer_2_1_0 #Cornsilk
+usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-tika\n====\n2.1.0" as alfresco_alfresco_tika_2_1_0 #DeepSkyBlue
 
 'Chart Dependencies
+alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
+alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
+alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
+alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
+alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
 alfresco_content_services_3_0_8--[#green]-|>alfresco_search_1_0_3
+alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
 alfresco_content_services_3_0_8--[#green]-|>alfresco_sync_service_3_0_2
 alfresco_sync_service_3_0_2--[#green]-|>postgresql_0_9_3
 alfresco_content_services_3_0_8--[#green]-|>alfresco_digital_workspace_2_2_1
-alfresco_content_services_3_0_8--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
-alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
-alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
-alfresco_content_services_3_0_8--[#green]-|>postgresql_0_9_3
 postgresql_0_9_3--[#orange]-|>postgres_11_4
 postgresql_0_9_3--[#orange]-|>postgres_10_1
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_libreoffice_2_1_0
@@ -58,17 +58,17 @@ alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_transform_misc_2_
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_shared_file_store_0_5_3
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_pdf_renderer_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>quay_io_alfresco_alfresco_transform_router_1_1_0
-alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_tika_2_1_0
+alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_content_repository_6_2_0_2
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_imagemagick_2_1_0
 alfresco_content_services_3_0_8--[#orange]-|>alfresco_alfresco_share_6_2_0
 alfresco_search_1_0_3--[#orange]-|>alfresco_alfresco_search_services_1_4_0
 alfresco_digital_workspace_2_2_1--[#orange]-|>quay_io_alfresco_alfresco_digital_workspace_1_4_0
+keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
-keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
-alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
+alfresco_sync_service_3_0_2--[#orange]-|>quay_io_alfresco_service_sync_3_3_1
 
-center footer Generated on 2022/03/29 19:39:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 15:15:55 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
