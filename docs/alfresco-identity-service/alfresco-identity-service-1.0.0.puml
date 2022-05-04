@@ -9,8 +9,8 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-identity-service:1.0.0
 
 'There are 2 referenced Helm Charts
-artifact "keycloak:4.0.3\n====\n\tkeycloak\n====\n\t4.0.3\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_0_3 #LightBlue
-artifact "alfresco-identity-service:1.0.0\n====\n\talfresco-identity-service\n====\n\t1.0.0\n====\napplication\n====\n\thttps://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_0_0 #Chartreuse
+artifact "keycloak:4.0.3\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_0_3 #LightBlue
+artifact "alfresco-identity-service:1.0.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_0_0 #Chartreuse
 
 'There is one referenced Docker Image
 usecase "Image\n====\nDocker Hub\n====\njboss/keycloak\n====\n4.5.0.Final" as jboss_keycloak_4_5_0_Final #LemonChiffon
@@ -19,5 +19,5 @@ usecase "Image\n====\nDocker Hub\n====\njboss/keycloak\n====\n4.5.0.Final" as jb
 alfresco_identity_service_1_0_0--[#green]-|>keycloak_4_0_3
 keycloak_4_0_3--[#orange]-|>jboss_keycloak_4_5_0_Final
 
-center footer Generated on 2022/05/04 15:16:51 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 19:02:54 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

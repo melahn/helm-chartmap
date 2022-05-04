@@ -9,7 +9,7 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for nuxeo:3.0.3
 
 'There is one referenced Helm Chart
-artifact "nuxeo:3.0.3\n====\n\tnuxeo\n====\n\t3.0.3\n====\napplication\n====\n\thttps://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_3 #LightSeaGreen
+artifact "nuxeo:3.0.3\n====\n\tType: application\n====\n\tRepo: https://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_3 #LightSeaGreen
 
 'There is one referenced Docker Image
 usecase "Image\n====\ndocker.packages.nuxeo.com\n====\nnuxeo/nuxeo:latest\n====\nlatest" as docker_packages_nuxeo_com_nuxeo_nuxeo_latest #LightGray
@@ -17,5 +17,5 @@ usecase "Image\n====\ndocker.packages.nuxeo.com\n====\nnuxeo/nuxeo:latest\n====\
 'Chart Dependencies
 nuxeo_3_0_3--[#orange]-|>docker_packages_nuxeo_com_nuxeo_nuxeo_latest
 
-center footer Generated on 2022/05/04 15:15:22 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 19:01:25 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

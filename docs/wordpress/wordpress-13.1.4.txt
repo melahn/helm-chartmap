@@ -6,7 +6,7 @@ Chart: wordpress:13.1.4
 	apiVersion: v2
 	appVersion: 5.9.2
 	created: Not specified
-	dependencies: common:1.12.0, mariadb:10.4.2, memcached:6.0.7
+	dependencies: mariadb:10.4.2, common:1.12.0, memcached:6.0.7
 	description: WordPress is the world's most popular blogging and content management platform. Powerful yet simple, everyone from students to global corporations use it to build beautiful, functional websites.
 	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
@@ -71,13 +71,13 @@ Image: docker.io/bitnami/wordpress:5.9.2-debian-10-r9
 
 Chart Dependencies
 ------------------
-wordpress:13.1.4 depends on common:1.12.0
 wordpress:13.1.4 depends on mariadb:10.4.2
 mariadb:10.4.2 depends on common:1.12.0
+wordpress:13.1.4 depends on common:1.12.0
 wordpress:13.1.4 depends on memcached:6.0.7
 memcached:6.0.7 depends on common:1.12.0
 wordpress:13.1.4 uses docker.io/bitnami/wordpress:5.9.2-debian-10-r9
 mariadb:10.4.2 uses docker.io/bitnami/mariadb:10.5.15-debian-10-r30
 memcached:6.0.7 uses docker.io/bitnami/memcached:1.6.14-debian-10-r34
 
-Generated on 2022/05/04 15:19:47 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 19:05:51 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
