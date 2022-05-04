@@ -51,7 +51,7 @@ Chart: alfresco-identity-service:6.0.0
 	apiVersion: v2
 	appVersion: 1.7.0
 	created: Not specified
-	dependencies: keycloak:16.1.0, common:1.11.3
+	dependencies: common:1.11.3, keycloak:16.1.0
 	description: The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.
 	digest: Not specified
 	icon: Not specified
@@ -85,11 +85,11 @@ Image: docker.io/bitnami/postgresql:11.11.0-debian-10-r31
 
 Chart Dependencies
 ------------------
+alfresco-identity-service:6.0.0 depends on common:1.11.3
 alfresco-identity-service:6.0.0 depends on keycloak:16.1.0
 keycloak:16.1.0 depends on postgresql:10.3.13
 postgresql:10.3.13 depends on common:1.4.1
-alfresco-identity-service:6.0.0 depends on common:1.11.3
 keycloak:16.1.0 uses quay.io/alfresco/alfresco-identity-service:1.7.0
 postgresql:10.3.13 uses docker.io/bitnami/postgresql:11.11.0-debian-10-r31
 
-Generated on 2022/03/29 19:42:29 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 15:18:27 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

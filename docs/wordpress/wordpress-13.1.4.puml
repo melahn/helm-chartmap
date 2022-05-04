@@ -9,25 +9,25 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for wordpress:13.1.4
 
 'There are 4 referenced Helm Charts
-artifact "wordpress:13.1.4\n====\n\twordpress\n====\n\t13.1.4\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: application\nblog\ncms\nhttp\nphp\nweb\nwordpress" as wordpress_13_1_4 #GreenYellow
-artifact "mariadb:10.4.2\n====\n\tmariadb\n====\n\t10.4.2\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: mariadb\nmysql\ndatabase\nsql\nprometheus" as mariadb_10_4_2 #DarkTurquoise
-artifact "memcached:6.0.7\n====\n\tmemcached\n====\n\t6.0.7\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: memcached\ncache" as memcached_6_0_7 #DarkSeaGreen
-artifact "common:1.12.0\n====\n\tcommon\n====\n\t1.12.0\n====\nlibrary\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: common\nhelper\ntemplate\nfunction\nbitnami" as common_1_12_0 #DarkSeaGreen
+artifact "wordpress:13.1.4\n====\n\twordpress\n====\n\t13.1.4\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tapplication\n\t\tblog\n\t\tcms\n\t\thttp\n\t\tphp\n\t\tweb\n\t\twordpress" as wordpress_13_1_4 #GreenYellow
+artifact "mariadb:10.4.2\n====\n\tmariadb\n====\n\t10.4.2\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tmariadb\n\t\tmysql\n\t\tdatabase\n\t\tsql\n\t\tprometheus" as mariadb_10_4_2 #DarkTurquoise
+artifact "memcached:6.0.7\n====\n\tmemcached\n====\n\t6.0.7\n====\napplication\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tmemcached\n\t\tcache" as memcached_6_0_7 #DarkSeaGreen
+artifact "common:1.12.0\n====\n\tcommon\n====\n\t1.12.0\n====\nlibrary\n====\n\thttps://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_1_12_0 #DarkSeaGreen
 
 'There are 3 referenced Docker Images
-usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/mariadb:10.5.15-debian-10-r30\n====\n\t10.5.15-debian-10-r30" as docker_io_bitnami_mariadb_10_5_15_debian_10_r30 #DarkGoldenRod
-usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/memcached:1.6.14-debian-10-r34\n====\n\t1.6.14-debian-10-r34" as docker_io_bitnami_memcached_1_6_14_debian_10_r34 #CadetBlue
-usecase "Image\n====\n\tdocker.io\n====\n\tbitnami/wordpress:5.9.2-debian-10-r9\n====\n\t5.9.2-debian-10-r9" as docker_io_bitnami_wordpress_5_9_2_debian_10_r9 #Darkorange
+usecase "Image\n====\ndocker.io\n====\nbitnami/mariadb:10.5.15-debian-10-r30\n====\n10.5.15-debian-10-r30" as docker_io_bitnami_mariadb_10_5_15_debian_10_r30 #DarkGoldenRod
+usecase "Image\n====\ndocker.io\n====\nbitnami/memcached:1.6.14-debian-10-r34\n====\n1.6.14-debian-10-r34" as docker_io_bitnami_memcached_1_6_14_debian_10_r34 #CadetBlue
+usecase "Image\n====\ndocker.io\n====\nbitnami/wordpress:5.9.2-debian-10-r9\n====\n5.9.2-debian-10-r9" as docker_io_bitnami_wordpress_5_9_2_debian_10_r9 #Darkorange
 
 'Chart Dependencies
+wordpress_13_1_4--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#green]-|>mariadb_10_4_2
 mariadb_10_4_2--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#green]-|>memcached_6_0_7
 memcached_6_0_7--[#green]-|>common_1_12_0
-wordpress_13_1_4--[#green]-|>common_1_12_0
 wordpress_13_1_4--[#orange]-|>docker_io_bitnami_wordpress_5_9_2_debian_10_r9
 mariadb_10_4_2--[#orange]-|>docker_io_bitnami_mariadb_10_5_15_debian_10_r30
 memcached_6_0_7--[#orange]-|>docker_io_bitnami_memcached_1_6_14_debian_10_r34
 
-center footer Generated on 2022/03/29 19:43:55 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 15:19:57 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
