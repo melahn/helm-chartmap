@@ -1,0 +1,83 @@
+Chart Map for wordpress:13.3.1
+
+There are 4 referenced Helm Charts
+----------------------------------
+Chart: wordpress:13.3.1
+	apiVersion: v2
+	appVersion: 5.9.3
+	created: Not specified
+	dependencies: mariadb:10.5.1, memcached:6.0.15, common:1.13.0
+	description: WordPress is the world's most popular blogging and content management platform. Powerful yet simple, everyone from students to global corporations use it to build beautiful, functional websites.
+	digest: Not specified
+	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
+	keywords: application,blog,cms,http,php,web,wordpress
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: wordpress
+	sources: https://github.com/bitnami/bitnami-docker-wordpress,https://wordpress.org/
+	urls: Not specified
+	version: 13.3.1
+Chart: common:1.13.0
+	apiVersion: v2
+	appVersion: 1.13.0
+	created: 2022-03-24T20:21:21.283900785Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 360f82fc64d68a0c7a5ab2905b036fdb47168d4bc1e0d994478bceac7cfcbeb4
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.13.0.tgz
+	version: 1.13.0
+Chart: mariadb:10.5.1
+	apiVersion: v2
+	appVersion: 10.5.15
+	created: 2022-04-19T11:37:06.543876684Z
+	dependencies: common:1.13.0
+	description: MariaDB is an open source, community-developed SQL database server that is widely in use around the world due to its enterprise features, flexibility, and collaboration with leading tech firms.
+	digest: sha256:6daa7746f2057ca7f10000345646e2eaaafbcf0354bfb1ed62bef4c05858a9bb
+	icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
+	keywords: mariadb,mysql,database,sql,prometheus
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: mariadb
+	sources: https://github.com/bitnami/bitnami-docker-mariadb,https://github.com/prometheus/mysqld_exporter,https://mariadb.org
+	urls: https://charts.bitnami.com/bitnami/mariadb-10.5.1.tgz
+	version: 10.5.1
+Chart: memcached:6.0.15
+	apiVersion: v2
+	appVersion: 1.6.15
+	created: 2022-04-19T10:11:19.394036796Z
+	dependencies: common:1.13.0
+	description: Memcached is an high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
+	digest: sha256:d8e4f4fa6da71918c2f32c4126ace265211e0f79dbb3646a26f991af124b87dd
+	icon: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-220x234.png
+	keywords: memcached,cache
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: memcached
+	sources: https://github.com/bitnami/bitnami-docker-memcached,http://memcached.org/
+	urls: https://charts.bitnami.com/bitnami/memcached-6.0.15.tgz
+	version: 6.0.15
+
+There are 3 referenced Docker Images
+------------------------------------
+Image: docker.io/bitnami/memcached:1.6.15-debian-10-r19
+Image: docker.io/bitnami/mariadb:10.5.15-debian-10-r62
+Image: docker.io/bitnami/wordpress:5.9.3-debian-10-r16
+
+Chart Dependencies
+------------------
+wordpress:13.3.1 depends on mariadb:10.5.1
+mariadb:10.5.1 depends on common:1.13.0
+wordpress:13.3.1 depends on memcached:6.0.15
+memcached:6.0.15 depends on common:1.13.0
+wordpress:13.3.1 depends on common:1.13.0
+wordpress:13.3.1 uses docker.io/bitnami/wordpress:5.9.3-debian-10-r16
+mariadb:10.5.1 uses docker.io/bitnami/mariadb:10.5.15-debian-10-r62
+memcached:6.0.15 uses docker.io/bitnami/memcached:1.6.15-debian-10-r19
+
+Generated on 2022/05/04 20:58:49 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

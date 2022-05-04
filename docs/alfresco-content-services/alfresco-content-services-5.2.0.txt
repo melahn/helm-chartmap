@@ -1,0 +1,163 @@
+Chart Map for alfresco-content-services:5.2.0
+
+There are 8 referenced Helm Charts
+----------------------------------
+Chart: common:7.2.0
+	apiVersion: v1
+	appVersion: Not specified
+	created: Not specified
+	dependencies: None
+	description: A Helm chart for Activiti Cloud Common Templates
+	digest: Not specified
+	icon: https://raw.githubusercontent.com/Activiti/activiti.github.io/master/mstile-150x150.png
+	keywords: Not specified
+	maintainers: Not specified
+	name: common
+	sources: https://github.com/Activiti/activiti-cloud-common-chart
+	urls: Not specified
+	version: 7.2.0
+Chart: alfresco-insight-zeppelin:1.0.3
+	apiVersion: v1
+	appVersion: Not specified
+	created: 2020-07-08T12:03:13.303561171Z
+	dependencies: None
+	description: A Helm chart for deploying Alfresco Insight Zeppelin
+	digest: 5b77f751e7b74b89aaf10d7e5d1fb80cd75ce2ea5332e6e9a1af147222d56096
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: zeppelin,insight zeppelin,alfresco zeppelin,alfresco insight zeppelin
+	maintainers: Not specified
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-insight-zeppelin
+	sources: Not specified
+	urls: http://kubernetes-charts.alfresco.com/stable/alfresco-insight-zeppelin-1.0.3.tgz
+	version: 1.0.3
+Chart: alfresco-search:1.0.4
+	apiVersion: v2
+	appVersion: Not specified
+	created: Not specified
+	dependencies: alfresco-insight-zeppelin:1.0.3
+	description: A Helm chart for deploying Alfresco Search
+	digest: Not specified
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: search,search services,alfresco search services,insight,insight engine,alfresco insight engine
+	maintainers: Not specified
+	name: alfresco-search
+	sources: https://github.com/Alfresco/acs-deployment
+	urls: Not specified
+	version: 1.0.4
+Chart: postgresql:10.16.2
+	apiVersion: v2
+	appVersion: 11.14.0
+	created: 2022-01-20T17:10:14.706188476Z
+	dependencies: common:1.10.3
+	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+	digest: 6012be8e28cad57f87320c1b035b668c6d6d0325e384ce4732ec154e452dbca0
+	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+	keywords: postgresql,postgres,database,sql,replication,cluster
+	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
+	repo url: https://charts.bitnami.com/bitnami
+	name: postgresql
+	sources: https://github.com/bitnami/bitnami-docker-postgresql,https://www.postgresql.org/
+	urls: https://charts.bitnami.com/bitnami/postgresql-10.16.2.tgz
+	version: 10.16.2
+Chart: alfresco-content-services:5.2.0
+	apiVersion: v2
+	appVersion: Not specified
+	created: Not specified
+	dependencies: common:7.2.0, alfresco-search:1.0.4, activemq:2.1.0, alfresco-sync-service:3.0.9, postgresql:10.16.2
+	description: A Helm chart for deploying Alfresco Content Services
+	digest: Not specified
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: content,content services,alfresco,alfresco content services
+	maintainers: Not specified
+	repo url: https://kubernetes-charts.alfresco.com/stable
+	name: alfresco-content-services
+	sources: https://github.com/Alfresco/acs-deployment
+	urls: Not specified
+	version: 5.2.0
+Chart: activemq:2.1.0
+	apiVersion: v2
+	appVersion: 5.16.4
+	created: Not specified
+	dependencies: None
+	description: A Helm chart Providing Apache ActiveMQ.
+	digest: Not specified
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: activemq,message broker
+	maintainers: Not specified
+	name: activemq
+	sources: https://github.com/Alfresco/acs-deployment
+	urls: Not specified
+	version: 2.1.0
+Chart: alfresco-sync-service:3.0.9
+	apiVersion: v2
+	appVersion: Not specified
+	created: Not specified
+	dependencies: None
+	description: Alfresco Sync Service
+	digest: Not specified
+	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
+	keywords: syncservice,alfresco,application
+	maintainers: Not specified
+	name: alfresco-sync-service
+	sources: https://github.com/Alfresco/acs-deployment
+	urls: Not specified
+	version: 3.0.9
+Chart: common:1.10.3
+	apiVersion: v2
+	appVersion: 1.10.0
+	created: 2021-11-30T20:17:51.684597621Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: 5c5c415745755c80f39b5fc5fc54a846d81ef72fdd27662e0fa6061e3d342f7e
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami:containers@bitnami.com
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.10.3.tgz
+	version: 1.10.3
+
+There are 14 referenced Docker Images
+-------------------------------------
+Image: quay.io/alfresco/alfresco-share:7.2.0
+Image: alfresco/alfresco-pdf-renderer:2.5.7
+Image: quay.io/alfresco/alfresco-transform-router:1.5.2
+Image: alfresco/alfresco-tika:2.5.7
+Image: alfresco/alfresco-activemq:5.16.4-jre11-centos7
+Image: docker.io/bitnami/postgresql:13.3.0
+Image: quay.io/alfresco/alfresco-content-repository:7.2.0
+Image: alfresco/alfresco-imagemagick:2.5.7
+Image: alfresco/alfresco-libreoffice:2.5.7
+Image: quay.io/alfresco/alfresco-shared-file-store:0.16.1
+Image: quay.io/alfresco/insight-zeppelin:1.4.0
+Image: alfresco/alfresco-transform-misc:2.5.7
+Image: quay.io/alfresco/service-sync:3.6.0
+Image: quay.io/alfresco/search-services:2.0.3
+
+Chart Dependencies
+------------------
+alfresco-content-services:5.2.0 depends on common:7.2.0
+alfresco-content-services:5.2.0 depends on alfresco-search:1.0.4
+alfresco-search:1.0.4 depends on alfresco-insight-zeppelin:1.0.3
+alfresco-content-services:5.2.0 depends on activemq:2.1.0
+alfresco-content-services:5.2.0 depends on alfresco-sync-service:3.0.9
+alfresco-content-services:5.2.0 depends on postgresql:10.16.2
+postgresql:10.16.2 depends on common:1.10.3
+alfresco-insight-zeppelin:1.0.3 uses quay.io/alfresco/insight-zeppelin:1.4.0
+alfresco-search:1.0.4 uses quay.io/alfresco/search-services:2.0.3
+postgresql:10.16.2 uses docker.io/bitnami/postgresql:13.3.0
+alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-content-repository:7.2.0
+alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-share:7.2.0
+alfresco-content-services:5.2.0 uses alfresco/alfresco-imagemagick:2.5.7
+alfresco-content-services:5.2.0 uses alfresco/alfresco-tika:2.5.7
+alfresco-content-services:5.2.0 uses alfresco/alfresco-pdf-renderer:2.5.7
+alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-shared-file-store:0.16.1
+alfresco-content-services:5.2.0 uses alfresco/alfresco-libreoffice:2.5.7
+alfresco-content-services:5.2.0 uses alfresco/alfresco-transform-misc:2.5.7
+alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-transform-router:1.5.2
+activemq:2.1.0 uses alfresco/alfresco-activemq:5.16.4-jre11-centos7
+alfresco-sync-service:3.0.9 uses quay.io/alfresco/service-sync:3.6.0
+
+Generated on 2022/05/04 20:53:11 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

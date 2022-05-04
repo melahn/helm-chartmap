@@ -8,16 +8,20 @@ skinparam artifactArrowColor LightSlateGray
 
 title Chart Map for alfresco-identity-service:1.0.0
 
-'There are 2 referenced Helm Charts
+'There are 3 referenced Helm Charts
 artifact "keycloak:4.0.3\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_0_3 #LightBlue
 artifact "alfresco-identity-service:1.0.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_0_0 #Chartreuse
+artifact "postgresql:0.15.0\n====\n\tType: application\n====\n\tRepo: https://charts.helm.sh/stable\n====\n\tMaintainers: databus23\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql" as postgresql_0_15_0 #LightSteelBlue
 
-'There is one referenced Docker Image
+'There are 2 referenced Docker Images
+usecase "Image\n====\nDocker Hub\n====\npostgres\n====\n10.1" as postgres_10_1 #Ivory
 usecase "Image\n====\nDocker Hub\n====\njboss/keycloak\n====\n4.5.0.Final" as jboss_keycloak_4_5_0_Final #LemonChiffon
 
 'Chart Dependencies
 alfresco_identity_service_1_0_0--[#green]-|>keycloak_4_0_3
+keycloak_4_0_3--[#green]-|>postgresql_0_15_0
 keycloak_4_0_3--[#orange]-|>jboss_keycloak_4_5_0_Final
+postgresql_0_15_0--[#orange]-|>postgres_10_1
 
-center footer Generated on 2022/05/04 19:58:29 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 20:57:39 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

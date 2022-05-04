@@ -8,16 +8,20 @@ skinparam artifactArrowColor LightSlateGray
 
 title Chart Map for alfresco-identity-service:2.0.0
 
-'There are 2 referenced Helm Charts
+'There are 3 referenced Helm Charts
+artifact "postgresql:6.3.13\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: \n\t\tBitnami\n\t\tdesaintmartin\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_6_3_13 #LightSteelBlue
 artifact "keycloak:6.0.0\n====\n\tType: application\n====\n\tRepo: https://codecentric.github.io/helm-charts\n====\n\tMaintainers: \n\t\tunguiculus\n\t\tthomasdarimont\n====\n\tKeywords: \n\t\tsso\n\t\tidm\n\t\topenid connect\n\t\tsaml\n\t\tkerberos\n\t\tldap" as keycloak_6_0_0 #LightBlue
 artifact "alfresco-identity-service:2.0.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_2_0_0 #Chartreuse
 
-'There is one referenced Docker Image
+'There are 2 referenced Docker Images
+usecase "Image\n====\ndocker.io\n====\nbitnami/postgresql:11.5.0-debian-9-r60\n====\n11.5.0-debian-9-r60" as docker_io_bitnami_postgresql_11_5_0_debian_9_r60 #DarkSalmon
 usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-identity-service\n====\n1.2" as alfresco_alfresco_identity_service_1_2 #BlanchedAlmond
 
 'Chart Dependencies
 alfresco_identity_service_2_0_0--[#green]-|>keycloak_6_0_0
+keycloak_6_0_0--[#green]-|>postgresql_6_3_13
+postgresql_6_3_13--[#orange]-|>docker_io_bitnami_postgresql_11_5_0_debian_9_r60
 keycloak_6_0_0--[#orange]-|>alfresco_alfresco_identity_service_1_2
 
-center footer Generated on 2022/05/04 19:59:17 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 20:56:55 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

@@ -6,16 +6,16 @@ skinparam usecaseArrowColor LightSlateGray
 skinparam artifactBorderColor black
 skinparam artifactArrowColor LightSlateGray
 
-title Chart Map for nuxeo:3.0.3
+title Chart Map for nuxeo:3.0.9
 
 'There is one referenced Helm Chart
-artifact "nuxeo:3.0.3\n====\n\tType: application\n====\n\tRepo: https://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_3 #LightSeaGreen
+artifact "nuxeo:3.0.9\n====\n\tType: application\n====\n\tRepo: https://chartmuseum.platform.dev.nuxeo.com/\n====\n\tMaintainers: \n====\n\tKeywords: " as nuxeo_3_0_9 #LightSeaGreen
 
 'There is one referenced Docker Image
-usecase "Image\n====\ndocker.packages.nuxeo.com\n====\nnuxeo/nuxeo:latest\n====\nlatest" as docker_packages_nuxeo_com_nuxeo_nuxeo_latest #LightGray
+usecase "Image\n====\ndocker-private.packages.nuxeo.com\n====\nnuxeo/nuxeo:2021\n====\n2021" as docker_private_packages_nuxeo_com_nuxeo_nuxeo_2021 #LightSkyBlue
 
 'Chart Dependencies
-nuxeo_3_0_3--[#orange]-|>docker_packages_nuxeo_com_nuxeo_nuxeo_latest
+nuxeo_3_0_9--[#orange]-|>docker_private_packages_nuxeo_com_nuxeo_nuxeo_2021
 
-center footer Generated on 2022/05/04 19:56:51 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 20:52:16 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

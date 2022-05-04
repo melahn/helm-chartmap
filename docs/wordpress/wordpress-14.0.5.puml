@@ -1,0 +1,34 @@
+@startuml
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam usecaseBorderColor black
+skinparam usecaseArrowColor LightSlateGray
+skinparam artifactBorderColor black
+skinparam artifactArrowColor LightSlateGray
+
+title Chart Map for wordpress:14.0.5
+
+'There are 5 referenced Helm Charts
+artifact "common:1.13.1\n====\n\tType: library\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_1_13_1 #DarkSeaGreen
+artifact "wordpress:14.0.5\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tapplication\n\t\tblog\n\t\tcms\n\t\thttp\n\t\tphp\n\t\tweb\n\t\twordpress" as wordpress_14_0_5 #GreenYellow
+artifact "common:1.13.0\n====\n\tType: library\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_1_13_0 #DarkSeaGreen
+artifact "mariadb:11.0.2\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tmariadb\n\t\tmysql\n\t\tdatabase\n\t\tsql\n\t\tprometheus" as mariadb_11_0_2 #DarkTurquoise
+artifact "memcached:6.0.17\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tmemcached\n\t\tcache" as memcached_6_0_17 #DarkSeaGreen
+
+'There are 3 referenced Docker Images
+usecase "Image\n====\ndocker.io\n====\nbitnami/mariadb:10.6.7-debian-10-r70\n====\n10.6.7-debian-10-r70" as docker_io_bitnami_mariadb_10_6_7_debian_10_r70 #DarkGoldenRod
+usecase "Image\n====\ndocker.io\n====\nbitnami/wordpress:5.9.3-debian-10-r31\n====\n5.9.3-debian-10-r31" as docker_io_bitnami_wordpress_5_9_3_debian_10_r31 #Darkorange
+usecase "Image\n====\ndocker.io\n====\nbitnami/memcached:1.6.15-debian-10-r20\n====\n1.6.15-debian-10-r20" as docker_io_bitnami_memcached_1_6_15_debian_10_r20 #CadetBlue
+
+'Chart Dependencies
+wordpress_14_0_5--[#green]-|>common_1_13_1
+wordpress_14_0_5--[#green]-|>memcached_6_0_17
+memcached_6_0_17--[#green]-|>common_1_13_0
+wordpress_14_0_5--[#green]-|>mariadb_11_0_2
+mariadb_11_0_2--[#green]-|>common_1_13_1
+wordpress_14_0_5--[#orange]-|>docker_io_bitnami_wordpress_5_9_3_debian_10_r31
+mariadb_11_0_2--[#orange]-|>docker_io_bitnami_mariadb_10_6_7_debian_10_r70
+memcached_6_0_17--[#orange]-|>docker_io_bitnami_memcached_1_6_15_debian_10_r20
+
+center footer Generated on 2022/05/04 20:58:43 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+@enduml

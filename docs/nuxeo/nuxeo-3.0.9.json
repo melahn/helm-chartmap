@@ -6,9 +6,9 @@
     "type": "image",
     "version": "2021"
   }],
-  "name": "nuxeo:3.0.9",
+  "name": "nuxeo:3.0.8",
   "description": "A Helm chart for Kubernetes",
   "type": "chart",
   "shortName": "nuxeo",
-  "version": "3.0.9"
+  "version": "3.0.8"
 }

@@ -1,12 +1,27 @@
 Chart Map for alfresco-identity-service:2.0.0
 
-There are 2 referenced Helm Charts
+There are 3 referenced Helm Charts
 ----------------------------------
+Chart: postgresql:6.3.13
+	apiVersion: v1
+	appVersion: 11.5.0
+	created: 2019-10-16T15:34:56.938394762Z
+	dependencies: None
+	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+	digest: 69f6929adcf2f5fadf1943d6f48bdb5dca18396101ba3ec706e818c9126496aa
+	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
+	keywords: postgresql,postgres,database,sql,replication,cluster
+	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
+	repo url: https://charts.bitnami.com/bitnami
+	name: postgresql
+	sources: https://github.com/bitnami/bitnami-docker-postgresql
+	urls: https://charts.bitnami.com/bitnami/postgresql-6.3.13.tgz
+	version: 6.3.13
 Chart: keycloak:6.0.0
 	apiVersion: Not specified
 	appVersion: 7.0.0
 	created: 2019-10-17T18:39:10.656455999Z
-	dependencies: None
+	dependencies: postgresql:6.3.13
 	description: Open Source Identity and Access Management For Modern Applications and Services
 	digest: 3950a8b674629d2c164422db66fe59963a56a35c17f74d731a209cf761302b56
 	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
@@ -33,13 +48,16 @@ Chart: alfresco-identity-service:2.0.0
 	urls: Not specified
 	version: 2.0.0
 
-There is one referenced Docker Image
+There are 2 referenced Docker Images
 ------------------------------------
+Image: docker.io/bitnami/postgresql:11.5.0-debian-9-r60
 Image: alfresco/alfresco-identity-service:1.2
 
 Chart Dependencies
 ------------------
 alfresco-identity-service:2.0.0 depends on keycloak:6.0.0
+keycloak:6.0.0 depends on postgresql:6.3.13
+postgresql:6.3.13 uses docker.io/bitnami/postgresql:11.5.0-debian-9-r60
 keycloak:6.0.0 uses alfresco/alfresco-identity-service:1.2
 
-Generated on 2022/05/04 19:59:07 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 20:56:46 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

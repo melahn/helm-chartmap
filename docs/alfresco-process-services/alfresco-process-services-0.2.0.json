@@ -50,6 +50,64 @@
     {
       "children": [
         {
+          "maintainers": [{"name": "Alfresco"}],
+          "keywords": [
+            "alfresco",
+            "keycloak",
+            "identity-service"
+          ],
+          "children": [{
+            "maintainers": [{
+              "name": "Bitnami",
+              "email": "containers@bitnami.com"
+            }],
+            "keywords": [
+              "keycloak",
+              "access-management"
+            ],
+            "children": [
+              {
+                "repoHost": "Docker Hub",
+                "children": [],
+                "name": "jboss/keycloak",
+                "type": "image",
+                "version": "4.8.3.Final"
+              },
+              {
+                "maintainers": [{"name": "databus23"}],
+                "keywords": [
+                  "postgresql",
+                  "postgres",
+                  "database",
+                  "sql"
+                ],
+                "children": [{
+                  "repoHost": "Docker Hub",
+                  "children": [],
+                  "name": "postgres",
+                  "type": "image",
+                  "version": "10.1"
+                }],
+                "name": "postgresql:0.15.0",
+                "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+                "type": "chart",
+                "shortName": "postgresql",
+                "version": "0.15.0"
+              }
+            ],
+            "name": "keycloak:4.3.0",
+            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+            "type": "chart",
+            "shortName": "keycloak",
+            "version": "4.3.0"
+          }],
+          "name": "alfresco-identity-service:1.1.0",
+          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
+          "type": "chart",
+          "shortName": "alfresco-identity-service",
+          "version": "1.1.0"
+        },
+        {
           "keywords": [
             "activemq",
             "message broker"
@@ -107,41 +165,6 @@
           "type": "chart",
           "shortName": "nginx-ingress",
           "version": "0.14.0"
-        },
-        {
-          "maintainers": [{"name": "Alfresco"}],
-          "keywords": [
-            "alfresco",
-            "keycloak",
-            "identity-service"
-          ],
-          "children": [{
-            "maintainers": [{
-              "name": "Bitnami",
-              "email": "containers@bitnami.com"
-            }],
-            "keywords": [
-              "keycloak",
-              "access-management"
-            ],
-            "children": [{
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "jboss/keycloak",
-              "type": "image",
-              "version": "4.8.3.Final"
-            }],
-            "name": "keycloak:4.3.0",
-            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
-            "type": "chart",
-            "shortName": "keycloak",
-            "version": "4.3.0"
-          }],
-          "name": "alfresco-identity-service:1.1.0",
-          "description": "The Alfresco Identity Service will become the central component responsible for identity-related capabilities needed by other Alfresco software, such as managing users, groups, roles, profiles, and authentication. Currently it deals just with authentication.",
-          "type": "chart",
-          "shortName": "alfresco-identity-service",
-          "version": "1.1.0"
         }
       ],
       "name": "alfresco-infrastructure:4.1.1",

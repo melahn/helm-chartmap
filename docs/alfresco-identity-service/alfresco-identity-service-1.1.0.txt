@@ -1,7 +1,22 @@
 Chart Map for alfresco-identity-service:1.1.0
 
-There are 2 referenced Helm Charts
+There are 3 referenced Helm Charts
 ----------------------------------
+Chart: postgresql:0.15.0
+	apiVersion: v1
+	appVersion: 9.6.2
+	created: 2020-10-15T15:46:22.333977-04:00
+	dependencies: None
+	description: Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+	digest: 6083155dd4d79178afe9b0413e70747ee22c514b56797d478d1976d995634f6e
+	icon: https://www.postgresql.org/media/img/about/press/elephant.png
+	keywords: postgresql,postgres,database,sql
+	maintainers: databus23
+	repo url: https://charts.helm.sh/stable
+	name: postgresql
+	sources: https://github.com/kubernetes/charts,https://github.com/docker-library/postgres
+	urls: https://charts.helm.sh/stable/packages/postgresql-0.15.0.tgz
+	version: 0.15.0
 Chart: alfresco-identity-service:1.1.0
 	apiVersion: Not specified
 	appVersion: Not specified
@@ -21,7 +36,7 @@ Chart: keycloak:4.3.0
 	apiVersion: v2
 	appVersion: 14.0.0
 	created: 2021-08-19T11:05:43.02444256Z
-	dependencies: None
+	dependencies: postgresql:0.15.0
 	description: Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.
 	digest: 8967dfa5a2cd1381d1b48a1daa0a2d89de8a4fb17221f0ed11764bc3087e8e4e
 	icon: https://bitnami.com/assets/stacks/keycloak/img/keycloak-stack-220x234.png
@@ -33,13 +48,16 @@ Chart: keycloak:4.3.0
 	urls: https://charts.bitnami.com/bitnami/keycloak-4.3.0.tgz
 	version: 4.3.0
 
-There is one referenced Docker Image
+There are 2 referenced Docker Images
 ------------------------------------
+Image: postgres:10.1
 Image: jboss/keycloak:4.8.3.Final
 
 Chart Dependencies
 ------------------
 alfresco-identity-service:1.1.0 depends on keycloak:4.3.0
+keycloak:4.3.0 depends on postgresql:0.15.0
+postgresql:0.15.0 uses postgres:10.1
 keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 
-Generated on 2022/05/04 19:58:35 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 20:57:15 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
