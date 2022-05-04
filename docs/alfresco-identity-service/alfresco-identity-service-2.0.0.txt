@@ -60,4 +60,4 @@ keycloak:6.0.0 depends on postgresql:6.3.13
 postgresql:6.3.13 uses docker.io/bitnami/postgresql:11.5.0-debian-9-r60
 keycloak:6.0.0 uses alfresco/alfresco-identity-service:1.2
 
-Generated on 2022/05/04 20:56:46 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 21:59:56 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

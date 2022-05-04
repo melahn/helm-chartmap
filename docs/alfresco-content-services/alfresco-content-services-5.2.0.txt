@@ -160,4 +160,4 @@ alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-transform-router:
 activemq:2.1.0 uses alfresco/alfresco-activemq:5.16.4-jre11-centos7
 alfresco-sync-service:3.0.9 uses quay.io/alfresco/service-sync:3.6.0
 
-Generated on 2022/05/04 20:53:11 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/04 21:56:26 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
