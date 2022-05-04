@@ -19,5 +19,5 @@ usecase "Image\n====\nDocker Hub\n====\njboss/keycloak\n====\n4.5.0.Final" as jb
 alfresco_identity_service_1_0_0--[#green]-|>keycloak_4_0_3
 keycloak_4_0_3--[#orange]-|>jboss_keycloak_4_5_0_Final
 
-center footer Generated on 2022/05/04 19:02:54 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/04 19:58:29 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
