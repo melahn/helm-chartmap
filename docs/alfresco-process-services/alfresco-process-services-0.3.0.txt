@@ -48,4 +48,4 @@ alfresco-process-services:0.3.0 uses quay.io/alfresco/alfresco-process-workspace
 alfresco-process-services:0.3.0 uses quay.io/alfresco/alfresco-process-services:1.11.0
 postgresql:8.6.4 uses docker.io/bitnami/postgresql:11.7.0-debian-10-r26
 
-Generated on 2022/05/04 22:01:12 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/05 00:16:11 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
