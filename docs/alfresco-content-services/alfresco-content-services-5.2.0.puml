@@ -57,5 +57,5 @@ alfresco_content_services_5_2_0--[#orange]-|>quay_io_alfresco_alfresco_transform
 activemq_2_1_0--[#orange]-|>alfresco_alfresco_activemq_5_16_4_jre11_centos7
 alfresco_sync_service_3_0_9--[#orange]-|>quay_io_alfresco_service_sync_3_6_0
 
-center footer Generated on 2022/05/05 12:07:39 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/05 15:08:02 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
