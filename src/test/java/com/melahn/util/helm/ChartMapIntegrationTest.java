@@ -24,25 +24,25 @@ import org.junit.jupiter.api.Test;
  */
 class ChartMapIntegrationTest {
 
-    private List<String> args = null;
+    List<String> args = null;
 
-    private static String CLASS_NAME = "com.melahn.util.helm.ChartMap";
-    private static final String DIVIDER = "-------------------------------------";
-    private static final Path JACOCO_AGENT_PATH = Paths.get("", "lib/org.jacoco.agent-0.8.8-runtime").toAbsolutePath();
-    private static final String JACOCO_AGENT_STRING = JACOCO_AGENT_PATH.toString()
+    static String CLASS_NAME = "com.melahn.util.helm.ChartMap";
+    static final String DIVIDER = "-------------------------------------";
+    static final Path JACOCO_AGENT_PATH = Paths.get("", "lib/org.jacoco.agent-0.8.8-runtime").toAbsolutePath();
+    static final String JACOCO_AGENT_STRING = JACOCO_AGENT_PATH.toString()
             .concat(".jar=destfile=../jacoco.exec,append=true");
-    private static final ChartMapTestUtil UTILITY = new ChartMapTestUtil();
-    private static final String TARGET_TEST_DIR_NAME = "target/integration-test";
-    private static final Path TARGET_TEST_PATH = Paths.get(TARGET_TEST_DIR_NAME);
-    private static final String TEST_ENV_FILE_NAME = "../../resource/example/example-env-spec.yaml";
-    private static final String TEST_FAKE_CHART_FILE_NAME = "src/test/resource/test-fakechart.tgz";
+    static final ChartMapTestUtil UTILITY = new ChartMapTestUtil();
+    static final String TARGET_TEST_DIR_NAME = "target/integration-test";
+    static final Path TARGET_TEST_PATH = Paths.get(TARGET_TEST_DIR_NAME);
+    static final String TEST_ENV_FILE_NAME = "../../resource/example/example-env-spec.yaml";
+    static final String TEST_FAKE_CHART_FILE_NAME = "src/test/resource/test-fakechart.tgz";
     // use TEST_INPUT_FILE_NAME_1 for test cases where you must use the refresh flag since it contains subcharts that are not in any helm repo
-    private static final String TEST_INPUT_FILE_NAME_1 = "../../src/test/resource/test-chart-file-1.tgz";
+    static final String TEST_INPUT_FILE_NAME_1 = "../../src/test/resource/test-chart-file-1.tgz";
     // use TEST_INPUT_FILE_NAME_2 for test cases where you must not use the refresh flag since it contains old helm chart repo names
-    private static final String TEST_INPUT_FILE_NAME_2 = "../../src/test/resource/test-chart-file-2.tgz";
-    private static final Path LOG_FILE_PATH = Paths.get(TARGET_TEST_DIR_NAME, "sub-process-out.txt");
-    private static final String OUTPUT_FILE_NAME = "testChartFile.puml";
-    private static final Path OUTPUT_FILE_PATH = Paths.get(TARGET_TEST_DIR_NAME, "testChartFile.puml");
+    static final String TEST_INPUT_FILE_NAME_2 = "../../src/test/resource/test-chart-file-2.tgz";
+    static final Path LOG_FILE_PATH = Paths.get(TARGET_TEST_DIR_NAME, "sub-process-out.txt");
+    static final String OUTPUT_FILE_NAME = "testChartFile.puml";
+    static final Path OUTPUT_FILE_PATH = Paths.get(TARGET_TEST_DIR_NAME, "testChartFile.puml");
 
     /**
      * Cleans the target test directory and creates one anew.
