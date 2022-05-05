@@ -76,4 +76,4 @@ postgresql:10.3.13 depends on common:1.4.1
 postgresql:10.3.13 uses docker.io/bitnami/postgresql:11.11.0-debian-10-r31
 keycloak:15.0.0 uses quay.io/alfresco/alfresco-identity-service:1.6.0
 
-Generated on 2022/05/05 00:13:50 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/05 12:08:38 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
