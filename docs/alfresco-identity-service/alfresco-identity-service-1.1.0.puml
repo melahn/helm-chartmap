@@ -23,5 +23,5 @@ keycloak_4_3_0--[#green]-|>postgresql_0_15_0
 postgresql_0_15_0--[#orange]-|>postgres_10_1
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2022/05/05 19:24:45 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/05 20:23:04 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
