@@ -2,7 +2,7 @@
 #
 # It uses relative directories based on the source directory containing the script file so it should
 # be executed in that directory or the relative directories should be modified to your preference
-jarfile=../../target/helm-chartmap-1.1.1-SNAPSHOT.jar
+jarfile=../../target/helm-chartmap-1.1.1.jar
 docdir=../../docs
 envfile=../../resource/example/example-env-spec.yaml
 
@@ -12,12 +12,12 @@ helm repo update
 # Nuxeo
 chart=nuxeo
 outdir=$docdir/$chart
-java -jar $jarfile -c "$chart:3.0.8" -o $outdir/"$chart-3.0.9.txt"  
-java -jar $jarfile -c "$chart:3.0.8" -o $outdir/"$chart-3.0.9.json" 
-java -jar $jarfile -c "$chart:3.0.8" -o $outdir/"$chart-3.0.9.puml" -g
-java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.3.txt"  
-java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.3.json" 
-java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.3.puml" -g
+java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.9.txt"  
+java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.9.json" 
+java -jar $jarfile -c "$chart:3.0.9" -o $outdir/"$chart-3.0.9.puml" -g
+java -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.txt"  
+java -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.json" 
+java -jar $jarfile -c "$chart:3.0.3" -o $outdir/"$chart-3.0.3.puml" -g
 # Alfresco Content Services
 chart=alfresco-content-services
 outdir=$docdir/$chart

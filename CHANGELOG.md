@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2022-05-05
+
 - Updated pom dependencies to most recent versions
 - Better wording in README.md
 - More test cases to keep coverage at 100%
@@ -21,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generate a chart map using the refresh option if the non-refresh attempt fails
 - Relax version parsing to allow non-SemVer names
 - Use 'helm dep update' recursively when -r parameter used
-- Handle case where there is a chart referenced in dependencies that only exists as a sub-chart
 - Update test chart to eliminate references to outdated helm chart repos
 - Remove reference to prebuilt jar
 - Bad link in the README.md pointing to more examples of the Java constructor
@@ -66,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial version
 
-[Unreleased]: https://github.com/melahn/helm-chartmap/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/melahn/helm-chartmap/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/melahn/helm-chartmap/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/melahn/helm-chartmap/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/melahn/helm-chartmap/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/melahn/helm-chartmap/compare/v1.0.0...v1.0.1
