@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Improvements in README.md
+- Updated pom dependencies to most recent versions
+- Better wording in README.md
 - More test cases to keep coverage at 100%
 - Tidied up the index files of examples
 - Updated example charts to use more recent chart versions

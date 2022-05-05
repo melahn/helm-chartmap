@@ -28,7 +28,7 @@ class ChartMapIntegrationTest {
 
     private static String CLASS_NAME = "com.melahn.util.helm.ChartMap";
     private static final String DIVIDER = "-------------------------------------";
-    private static final Path JACOCO_AGENT_PATH = Paths.get("", "lib/org.jacoco.agent-0.8.7-runtime").toAbsolutePath();
+    private static final Path JACOCO_AGENT_PATH = Paths.get("", "lib/org.jacoco.agent-0.8.8-runtime").toAbsolutePath();
     private static final String JACOCO_AGENT_STRING = JACOCO_AGENT_PATH.toString()
             .concat(".jar=destfile=../jacoco.exec,append=true");
     private static final ChartMapTestUtil UTILITY = new ChartMapTestUtil();
