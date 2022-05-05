@@ -20,14 +20,14 @@ usecase "Image\n====\ndocker.io\n====\nbitnami/mariadb:10.5.15-debian-10-r62\n==
 usecase "Image\n====\ndocker.io\n====\nbitnami/wordpress:5.9.3-debian-10-r16\n====\n5.9.3-debian-10-r16" as docker_io_bitnami_wordpress_5_9_3_debian_10_r16 #Darkorange
 
 'Chart Dependencies
-wordpress_13_3_1--[#green]-|>mariadb_10_5_1
-mariadb_10_5_1--[#green]-|>common_1_13_0
+wordpress_13_3_1--[#green]-|>common_1_13_0
 wordpress_13_3_1--[#green]-|>memcached_6_0_15
 memcached_6_0_15--[#green]-|>common_1_13_0
-wordpress_13_3_1--[#green]-|>common_1_13_0
+wordpress_13_3_1--[#green]-|>mariadb_10_5_1
+mariadb_10_5_1--[#green]-|>common_1_13_0
 wordpress_13_3_1--[#orange]-|>docker_io_bitnami_wordpress_5_9_3_debian_10_r16
 mariadb_10_5_1--[#orange]-|>docker_io_bitnami_mariadb_10_5_15_debian_10_r62
 memcached_6_0_15--[#orange]-|>docker_io_bitnami_memcached_1_6_15_debian_10_r19
 
-center footer Generated on 2022/05/05 00:17:18 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/05 12:11:35 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

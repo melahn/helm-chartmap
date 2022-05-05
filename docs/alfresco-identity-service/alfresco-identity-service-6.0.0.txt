@@ -92,4 +92,4 @@ alfresco-identity-service:6.0.0 depends on common:1.11.3
 keycloak:16.1.0 uses quay.io/alfresco/alfresco-identity-service:1.7.0
 postgresql:10.3.13 uses docker.io/bitnami/postgresql:11.11.0-debian-10-r31
 
-Generated on 2022/05/05 00:13:31 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/05 12:08:22 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
