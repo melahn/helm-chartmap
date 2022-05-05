@@ -50,22 +50,45 @@
     {
       "children": [
         {
-          "keywords": [
-            "activemq",
-            "message broker"
+          "maintainers": [
+            {
+              "name": "jackzampolin",
+              "email": "jack.zampolin@gmail.com"
+            },
+            {
+              "name": "mgoodness",
+              "email": "mgoodness@gmail.com"
+            },
+            {
+              "name": "chancez",
+              "email": "chance.zibolski@coreos.com"
+            }
           ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-activemq",
-            "type": "image",
-            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
-          }],
-          "name": "activemq:1.1.1",
-          "description": "A Helm chart Providing Apache ActiveMQ.",
+          "keywords": [
+            "ingress",
+            "nginx"
+          ],
+          "children": [
+            {
+              "repoHost": "Docker Hub",
+              "children": [],
+              "name": "k8s.gcr.io/defaultbackend",
+              "type": "image",
+              "version": "1.3"
+            },
+            {
+              "repoHost": "quay.io",
+              "children": [],
+              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
+              "type": "image",
+              "version": "0.12.0"
+            }
+          ],
+          "name": "nginx-ingress:0.14.0",
+          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
           "type": "chart",
-          "shortName": "activemq",
-          "version": "1.1.1"
+          "shortName": "nginx-ingress",
+          "version": "0.14.0"
         },
         {
           "maintainers": [{"name": "Alfresco"}],
@@ -126,45 +149,22 @@
           "version": "1.1.0"
         },
         {
-          "maintainers": [
-            {
-              "name": "jackzampolin",
-              "email": "jack.zampolin@gmail.com"
-            },
-            {
-              "name": "mgoodness",
-              "email": "mgoodness@gmail.com"
-            },
-            {
-              "name": "chancez",
-              "email": "chance.zibolski@coreos.com"
-            }
-          ],
           "keywords": [
-            "ingress",
-            "nginx"
+            "activemq",
+            "message broker"
           ],
-          "children": [
-            {
-              "repoHost": "Docker Hub",
-              "children": [],
-              "name": "k8s.gcr.io/defaultbackend",
-              "type": "image",
-              "version": "1.3"
-            },
-            {
-              "repoHost": "quay.io",
-              "children": [],
-              "name": "kubernetes-ingress-controller/nginx-ingress-controller:0.12.0",
-              "type": "image",
-              "version": "0.12.0"
-            }
-          ],
-          "name": "nginx-ingress:0.14.0",
-          "description": "An nginx Ingress controller that uses ConfigMap to store the nginx configuration.",
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-activemq",
+            "type": "image",
+            "version": "5.15.8-java-8-oracle-centos-7-87b15e37ce8b"
+          }],
+          "name": "activemq:1.1.1",
+          "description": "A Helm chart Providing Apache ActiveMQ.",
           "type": "chart",
-          "shortName": "nginx-ingress",
-          "version": "0.14.0"
+          "shortName": "activemq",
+          "version": "1.1.1"
         }
       ],
       "name": "alfresco-infrastructure:4.1.1",
