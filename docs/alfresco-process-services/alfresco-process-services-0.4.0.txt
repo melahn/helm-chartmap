@@ -6,7 +6,7 @@ Chart: alfresco-process-services:0.4.0
 	apiVersion: v2
 	appVersion: 2.3.0
 	created: Not specified
-	dependencies: common:1.12.0, postgresql:8.9.6
+	dependencies: postgresql:8.9.6, common:1.12.0
 	description: A Helm chart for Alfresco Process Services
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -57,11 +57,11 @@ Image: quay.io/alfresco/alfresco-process-services:2.3.0
 
 Chart Dependencies
 ------------------
-alfresco-process-services:0.4.0 depends on common:1.12.0
 alfresco-process-services:0.4.0 depends on postgresql:8.9.6
+alfresco-process-services:0.4.0 depends on common:1.12.0
 alfresco-process-services:0.4.0 uses quay.io/alfresco/alfresco-process-services-admin:2.3.0
 alfresco-process-services:0.4.0 uses quay.io/alfresco/alfresco-process-workspace-app:1.3.4
 alfresco-process-services:0.4.0 uses quay.io/alfresco/alfresco-process-services:2.3.0
 postgresql:8.9.6 uses docker.io/bitnami/postgresql:11.6.0
 
-Generated on 2022/05/05 19:25:09 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/05 20:23:27 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

@@ -1,8 +1,8 @@
-Chart Map for nuxeo:3.0.9
+Chart Map for nuxeo:3.0.3
 
 There is one referenced Helm Chart
 ----------------------------------
-Chart: nuxeo:3.0.9
+Chart: nuxeo:3.0.3
 	apiVersion: v1
 	appVersion: Not specified
 	created: Not specified
@@ -16,14 +16,14 @@ Chart: nuxeo:3.0.9
 	name: nuxeo
 	sources: Not specified
 	urls: Not specified
-	version: 3.0.9
+	version: 3.0.3
 
 There is one referenced Docker Image
 ------------------------------------
-Image: docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021
+Image: docker.packages.nuxeo.com/nuxeo/nuxeo:latest
 
 Chart Dependencies
 ------------------
-nuxeo:3.0.9 uses docker-private.packages.nuxeo.com/nuxeo/nuxeo:2021
+nuxeo:3.0.3 uses docker.packages.nuxeo.com/nuxeo/nuxeo:latest
 
-Generated on 2022/05/05 19:18:34 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/05 20:17:07 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
