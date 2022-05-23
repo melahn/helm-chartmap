@@ -1067,6 +1067,7 @@ public class ChartMap {
                 .concat(Integer.toString(exitValue))
                 .concat(".  Possibly you cannot access one of your remote charts repos.")));
             } else {
+                extractEmbeddedCharts(dirName);
                 logger.log(logLevelVerbose, "Updated Helm dependencies for {}", chartName);
             }
         }
