@@ -1256,7 +1256,7 @@ class ChartMapTest {
         ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
         ChartMap scm1 = spy(cm1);
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
-        assertThrows(ChartMapException.class, () -> scm1.updateLocalRepo("foo", "bar"));
+        assertThrows(ChartMapException.class, () -> scm1.updateLocalRepo("foo"));
         System.out.println("IOException -> ChartMapException thrown as expected");
         // Cause a bad exit value from the process
         ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
@@ -1265,7 +1265,7 @@ class ChartMapTest {
         Process sp2 = spy(p2);
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
         doReturn(1).when(sp2).exitValue();
-        assertThrows(ChartMapException.class, () -> scm2.updateLocalRepo("foo", "bar"));
+        assertThrows(ChartMapException.class, () -> scm2.updateLocalRepo("foo"));
         System.out.println("ChartMapException thrown as expected");
         // Simulate an InterruptedException -> ChartMapException on waitFor()
         // Be careful to put InterruptedException case last in the test case since the
@@ -1277,7 +1277,7 @@ class ChartMapTest {
         Process sp3 = spy(p3);
         doReturn(sp3).when(scm3).getProcess(any(), any(File.class));
         doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo", "bar"));
+        assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo"));
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }

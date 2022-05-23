@@ -1037,18 +1037,17 @@ public class ChartMap {
      * Updates the local chart cache using the Helm client. This is only done if the
      * user has specified the refresh parameter on the command line or method call.
      *
-     * @param dirName The name of the directory containing the chart
-     * @param chartName The name of the chart (just fior logging)
+     * @param d The name of the directory containing the chart
      * @throws ChartMapException if an error occurs updating the local repo
      */
-    protected void updateLocalRepo(String dirName, String chartName) throws ChartMapException {
-        logger.log(logLevelVerbose, "Updating Helm dependencies for {} in directory {}", chartName, dirName);
+    protected void updateLocalRepo(String d) throws ChartMapException {
+        logger.log(logLevelVerbose, "Updating Helm dependencies in directory {}", d);
         // if the user wants us to update the Helm dependencies, do so
         if (this.isRefreshLocalRepo()) {
             String[] c = {"helm", "dep", "update"};
             int exitValue = -1;
             try {
-                Process p = getProcess(c, new File(dirName));
+                Process p = getProcess(c, new File(d));
                 p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
                 exitValue = p.exitValue();
             } catch (IOException e) {
@@ -1059,16 +1058,14 @@ public class ChartMap {
                         "InterruptedException while executing helm dep update");
             }
             if (exitValue != 0) {
-                throw new ChartMapException("Exception updating chart repo in "
-                .concat(dirName)
-                .concat(" for chart ")
-                .concat(chartName)
+                throw new ChartMapException("Exception updating chart repo in directory "
+                .concat(d)
                 .concat(".  Exit code: "
                 .concat(Integer.toString(exitValue))
                 .concat(".  Possibly you cannot access one of your remote charts repos.")));
             } else {
-                extractEmbeddedCharts(dirName);
-                logger.log(logLevelVerbose, "Updated Helm dependencies for {}", chartName);
+                extractEmbeddedCharts(d);
+                logger.log(logLevelVerbose, "Updated Helm dependencies in directory {}", d);
             }
         }
     }
@@ -1199,14 +1196,14 @@ public class ChartMap {
             String[] directories = currentDirectory.list((c, n) -> new File(c, n).isDirectory());
             if (directories != null) {
                 for (String directory : directories) {
+                    // helm dep update is not recursive (see
+                    // https://github.com/helm/helm/issues/2247) so run the command at each level
+                    //
+                    // Note: the updateLocalRepo function does check for the -r flag
+                    updateLocalRepo(chartDirName.concat(File.separator).concat(directory));
                     if (h != null) {
                         parentHelmChart = charts.get(h.getName(), h.getVersion());
                         chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
-                        // helm dep update is not recursive (see
-                        // https://github.com/helm/helm/issues/2247) so run the command at each level
-                        //
-                        // Note: the updateLocalRepo function does check for the -r flag
-                        updateLocalRepo(chartDirName.concat(File.separator).concat(directory), h.getNameFull());
                     }
                     File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
                     if (chartFile.exists()) {
