@@ -1352,41 +1352,22 @@ class ChartMapTest {
         Files.createFile(f1);
         cm1.collectDependencies(f1.toString(), h);
         assertEquals(i1, cm1.getChartsReferenced().size());
-        // Test the chart file does not exist case
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, true,
-                false);
-        cm2.print();
-        int i2 = cm2.getChartsReferenced().size();
         Path d2p = Paths.get(TARGET_TEST, "collectDependenciesTestDir1");
         Path d2c = Paths.get(d2p.toString(), "collectDependenciesTestDir2");
         Files.deleteIfExists(d2c);
         Files.deleteIfExists(d2p);
         Files.createDirectory(d2p);
         Files.createDirectory(d2c);
-        cm2.collectDependencies(d2p.toString(), null);
-        assertEquals(i2, cm2.getChartsReferenced().size());
-        // Test an empty Chart.yaml file tp cause an IO Exception -> ChartMapException
         Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
-        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm3 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false,
-                    true, false);
-            cm3.print();
-            Files.createFile(p3);
-            System.setOut(new PrintStream(o));
-            assertThrows(ChartMapException.class, () -> cm3.collectDependencies(d2p.toString(), null));
-            assertTrue(ChartMapTestUtil.streamContains(o, "IOException getting Dependencies"));
-            System.setOut(new PrintStream(INITIAL_OUT));
-            System.out.println("ChartMapException thrown as expected");
-        }
         // Test the Chart.yaml file references a chart that does not exist
-        ChartMap cm4 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, true,
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, true,
                 false);
-        cm4.print();
+        cm2.print();
         String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat("foo").concat("\n    version: ")
                 .concat("1.1.1").concat("\n".concat("    urls:\n    - https://foo\n"));
         byte[] b = s.getBytes();
         Files.write(p3, b);
-        assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
+        assertThrows(ChartMapException.class, () -> cm2.collectDependencies(d2p.toString(), null));
         System.out.println("ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1917,7 +1898,7 @@ class ChartMapTest {
         }
         h.setDeploymentTemplates(templates);
         cm1.printMap();
-        assertTrue(ChartMapTestUtil.fileContains(OUTPUT_PUML_PATH_NRNV, "Unknown Repo URL"));
+        assertTrue(ChartMapTestUtil.fileContains(OUTPUT_PUML_PATH_NRNV, PlantUmlChartMapPrinter.NO_REPO_URL_MESSAGE));
         assertTrue(ChartMapTestUtil.fileContains(OUTPUT_PUML_PATH_NRNV, "alfresco_alfresco_imagemagickX2_5_7"));
         System.out.println("Tested bad values for repo and images tested for PlantUML format");
         // Test odd combinations of maintainer and keywords

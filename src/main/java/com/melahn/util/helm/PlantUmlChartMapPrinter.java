@@ -10,6 +10,7 @@ import com.melahn.util.helm.model.HelmMaintainer;
  */
 public class PlantUmlChartMapPrinter extends ChartMapPrinter {
 
+    public static final String NO_REPO_URL_MESSAGE = "N/A - Explicit Dependency";
     private static String[] colors;
     private static final String SEPARATOR = "\\n====\\n";
 
@@ -143,7 +144,7 @@ public class PlantUmlChartMapPrinter extends ChartMapPrinter {
         StringBuilder sb = new StringBuilder(getSeparator());
         sb.append("\\tType: ").append(getChartType(chart));
         sb.append(getSeparator());
-        sb.append("\\tRepo: ").append(chart.getRepoUrl()==null? "N/A - Explicit Dependency":chart.getRepoUrl());
+        sb.append("\\tRepo: ").append(chart.getRepoUrl()==null? NO_REPO_URL_MESSAGE:chart.getRepoUrl());
         sb.append(getSeparator());
         sb.append("\\t").append(getMaintainers(chart.getMaintainers()));
         sb.append(getSeparator());
