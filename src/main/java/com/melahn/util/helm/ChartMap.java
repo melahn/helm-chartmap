@@ -1206,23 +1206,25 @@ public class ChartMap {
                         chartsReferenced.put(parentHelmChart.getName(), parentHelmChart.getVersion(), parentHelmChart);
                     }
                     File chartFile = new File(chartDirName + File.separator + directory + File.separator + CHART_YAML);
-                    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);
-                    HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
-                            currentHelmChartFromDisk.getVersion());
-                    if (currentHelmChart == null) {
-                        // If the chart was not found in the charts map, which can happen if this is a
-                        // subchart not pulled from any repo) then put it there.
+                    if (chartFile.exists()) {
+                        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        HelmChart currentHelmChartFromDisk = mapper.readValue(chartFile, HelmChart.class);
+                        HelmChart currentHelmChart = charts.get(currentHelmChartFromDisk.getName(),
+                                currentHelmChartFromDisk.getVersion());
+                        if (currentHelmChart == null) {
+                            // If the chart was not found in the charts map, which can happen if this is a
+                            // subchart not pulled from any repo) then put it there.
 
-                        // Note: this can also happen if the user's repo cache is stale and needs to be
-                        // updated with a helm repo update but there is no obvious way to know that is
-                        // the case. But I can least log the fact.
-                        logger.log(logLevelVerbose, "Chart {} was not found in the local helm repo.",
-                                currentHelmChartFromDisk.getNameFull());
-                        charts.put(currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion(),
-                                currentHelmChartFromDisk);
-                        currentHelmChart = currentHelmChartFromDisk;
+                            // Note: this can also happen if the user's repo cache is stale and needs to be
+                            // updated with a helm repo update but there is no obvious way to know that is
+                            // the case. But I can least log the fact.
+                            logger.log(logLevelVerbose, "Chart {} was not found in the local helm repo.",
+                                    currentHelmChartFromDisk.getNameFull());
+                            charts.put(currentHelmChartFromDisk.getName(), currentHelmChartFromDisk.getVersion(),
+                                    currentHelmChartFromDisk);
+                            currentHelmChart = currentHelmChartFromDisk;
+                        }
                         handleHelmChartCondition(checkForCondition(chartDirName, currentHelmChart, parentHelmChart),
                                 chartDirName, directory, currentHelmChart, parentHelmChart);
                     }

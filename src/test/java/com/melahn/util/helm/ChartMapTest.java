@@ -1340,7 +1340,7 @@ class ChartMapTest {
     @Test
     void collectDependenciesTest() throws ChartMapException, IOException {
         // Test the currentDirectory.list returns null case
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, true,
+        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         HelmChart h = new HelmChart();
         h.setName("foo");
@@ -1352,23 +1352,40 @@ class ChartMapTest {
         Files.createFile(f1);
         cm1.collectDependencies(f1.toString(), h);
         assertEquals(i1, cm1.getChartsReferenced().size());
-        Path d2p = Paths.get(TARGET_TEST, "collectDependenciesTestDir1");
-        Path d2c = Paths.get(d2p.toString(), "collectDependenciesTestDir2");
+        System.out.println("Tested collectDependencies when currentDirectory.list returns null");
+        // Test no Chart.yaml file found 
+        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+                false);
+        Path d2p = Paths.get(TARGET_TEST, "collectDependenciesTestParent");
+        Path d2c = Paths.get(d2p.toString(), "collectDependenciesTestChild");
         Files.deleteIfExists(d2c);
         Files.deleteIfExists(d2p);
         Files.createDirectory(d2p);
         Files.createDirectory(d2c);
-        Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
-        // Test the Chart.yaml file references a chart that does not exist
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, true,
-                false);
         cm2.print();
+        i1 = cm2.getChartsReferenced().size();
+        cm2.collectDependencies(d2p.toString(), null);
+        assertEquals(i1, cm2.getChartsReferenced().size());
+        System.out.println("Tested collectDependencies when Chart.yaml does not exist");
+        // Test the Chart.yaml file references a chart that does not exist
+        Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
+        ChartMap cm3 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+                false);
+        cm3.print();
         String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat("foo").concat("\n    version: ")
                 .concat("1.1.1").concat("\n".concat("    urls:\n    - https://foo\n"));
         byte[] b = s.getBytes();
         Files.write(p3, b);
-        assertThrows(ChartMapException.class, () -> cm2.collectDependencies(d2p.toString(), null));
-        System.out.println("ChartMapException thrown as expected");
+        assertThrows(ChartMapException.class, () -> cm3.collectDependencies(d2p.toString(), null));
+        System.out.println("ChartMapException thrown as expected in collectDependencies");
+        // Test the IOException is thrown
+        ChartMap cm4 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+                false);
+        cm4.print();
+        Files.delete(p3);
+        Files.createFile(p3);
+        assertThrows(ChartMapException.class, () -> cm4.collectDependencies(d2p.toString(), null));
+        System.out.println("IOException thrown as expected in collectDependencies when empty Chart.yaml file");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
