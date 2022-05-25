@@ -9,14 +9,14 @@
     {
       "repoHost": "quay.io",
       "children": [],
-      "name": "alfresco/alfresco-content-repository:7.2.0",
+      "name": "alfresco/alfresco-share:7.2.0",
       "type": "image",
       "version": "7.2.0"
     },
     {
       "repoHost": "quay.io",
       "children": [],
-      "name": "alfresco/alfresco-share:7.2.0",
+      "name": "alfresco/alfresco-content-repository:7.2.0",
       "type": "image",
       "version": "7.2.0"
     },
@@ -56,18 +56,18 @@
       "version": "0.16.1"
     },
     {
-      "repoHost": "quay.io",
-      "children": [],
-      "name": "alfresco/alfresco-transform-router:1.5.2",
-      "type": "image",
-      "version": "1.5.2"
-    },
-    {
       "repoHost": "Docker Hub",
       "children": [],
       "name": "alfresco/alfresco-transform-misc",
       "type": "image",
       "version": "2.5.7"
+    },
+    {
+      "repoHost": "quay.io",
+      "children": [],
+      "name": "alfresco/alfresco-transform-router:1.5.2",
+      "type": "image",
+      "version": "1.5.2"
     },
     {
       "keywords": [
@@ -93,18 +93,58 @@
             "alfresco zeppelin",
             "alfresco insight zeppelin"
           ],
-          "children": [{
-            "repoHost": "quay.io",
-            "children": [],
-            "name": "alfresco/insight-zeppelin:1.4.0",
-            "type": "image",
-            "version": "1.4.0"
-          }],
+          "children": [
+            {
+              "repoHost": "quay.io",
+              "children": [],
+              "name": "alfresco/insight-zeppelin:1.4.0",
+              "type": "image",
+              "version": "1.4.0"
+            },
+            {
+              "maintainers": [{
+                "name": "Bitnami",
+                "email": "containers@bitnami.com"
+              }],
+              "keywords": [
+                "common",
+                "helper",
+                "template",
+                "function",
+                "bitnami"
+              ],
+              "children": [],
+              "name": "common:1.14.1",
+              "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+              "type": "chart",
+              "shortName": "common",
+              "version": "1.14.1"
+            }
+          ],
           "name": "alfresco-insight-zeppelin:1.0.3",
           "description": "A Helm chart for deploying Alfresco Insight Zeppelin",
           "type": "chart",
           "shortName": "alfresco-insight-zeppelin",
           "version": "1.0.3"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.14.1",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.14.1"
         }
       ],
       "name": "alfresco-search:1.0.4",
@@ -112,25 +152,6 @@
       "type": "chart",
       "shortName": "alfresco-search",
       "version": "1.0.4"
-    },
-    {
-      "keywords": [
-        "syncservice",
-        "alfresco",
-        "application"
-      ],
-      "children": [{
-        "repoHost": "quay.io",
-        "children": [],
-        "name": "alfresco/service-sync:3.6.0",
-        "type": "image",
-        "version": "3.6.0"
-      }],
-      "name": "alfresco-sync-service:3.0.9",
-      "description": "Alfresco Sync Service",
-      "type": "chart",
-      "shortName": "alfresco-sync-service",
-      "version": "3.0.9"
     },
     {
       "keywords": [
@@ -149,14 +170,6 @@
       "type": "chart",
       "shortName": "activemq",
       "version": "2.1.0"
-    },
-    {
-      "children": [],
-      "name": "common:7.2.0",
-      "description": "A Helm chart for Activiti Cloud Common Templates",
-      "type": "chart",
-      "shortName": "common",
-      "version": "7.2.0"
     },
     {
       "maintainers": [
@@ -210,6 +223,54 @@
       "type": "chart",
       "shortName": "postgresql",
       "version": "10.16.2"
+    },
+    {
+      "keywords": [
+        "syncservice",
+        "alfresco",
+        "application"
+      ],
+      "children": [
+        {
+          "repoHost": "quay.io",
+          "children": [],
+          "name": "alfresco/service-sync:3.6.0",
+          "type": "image",
+          "version": "3.6.0"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.14.1",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.14.1"
+        }
+      ],
+      "name": "alfresco-sync-service:3.0.9",
+      "description": "Alfresco Sync Service",
+      "type": "chart",
+      "shortName": "alfresco-sync-service",
+      "version": "3.0.9"
+    },
+    {
+      "children": [],
+      "name": "common:7.2.0",
+      "description": "A Helm chart for Activiti Cloud Common Templates",
+      "type": "chart",
+      "shortName": "common",
+      "version": "7.2.0"
     }
   ],
   "name": "alfresco-content-services:5.2.0",
