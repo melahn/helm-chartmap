@@ -14,8 +14,8 @@ artifact "postgresql:0.15.0\n====\n\tType: application\n====\n\tRepo: https://ch
 artifact "alfresco-infrastructure:4.1.1\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: " as alfresco_infrastructure_4_1_1 #Cornsilk
 artifact "postgresql:1.0.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tpostgresql\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_1_0_0 #LightSteelBlue
 artifact "alfresco-identity-service:1.1.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
-artifact "keycloak:4.3.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
 artifact "nginx-ingress:0.14.0\n====\n\tType: application\n====\n\tRepo: https://charts.helm.sh/stable\n====\n\tMaintainers: \n\t\tjackzampolin\n\t\tmgoodness\n\t\tchancez\n====\n\tKeywords: \n\t\tingress\n\t\tnginx" as nginx_ingress_0_14_0 #DarkSalmon
+artifact "keycloak:4.3.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
 artifact "activemq:1.1.1\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: \n====\n\tKeywords: \n\t\tactivemq\n\t\tmessage broker" as activemq_1_1_1 #LightBlue
 
 'There are 9 referenced Docker Images
@@ -30,22 +30,22 @@ usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-process-services:1.10.0\n
 usecase "Image\n====\nDocker Hub\n====\nalfresco/alfresco-activemq\n====\n5.15.8-java-8-oracle-centos-7-87b15e37ce8b" as alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b #Khaki
 
 'Chart Dependencies
+alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
 alfresco_process_services_0_2_0--[#green]-|>alfresco_infrastructure_4_1_1
-alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
 alfresco_infrastructure_4_1_1--[#green]-|>alfresco_identity_service_1_1_0
 alfresco_identity_service_1_1_0--[#green]-|>keycloak_4_3_0
 keycloak_4_3_0--[#green]-|>postgresql_0_15_0
 alfresco_infrastructure_4_1_1--[#green]-|>activemq_1_1_1
-alfresco_process_services_0_2_0--[#green]-|>postgresql_1_0_0
+alfresco_infrastructure_4_1_1--[#green]-|>nginx_ingress_0_14_0
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_admin_1_10_0
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_1_10_0
 alfresco_process_services_0_2_0--[#orange]-|>quay_io_alfresco_alfresco_process_workspace_app_1_3_4
 postgresql_0_15_0--[#orange]-|>postgres_10_1
 postgresql_1_0_0--[#orange]-|>postgres_9_4_6
-keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 nginx_ingress_0_14_0--[#orange]-|>k8s_gcr_io_defaultbackend_1_3
 nginx_ingress_0_14_0--[#orange]-|>quay_io_kubernetes_ingress_controller_nginx_ingress_controller_0_12_0
+keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 activemq_1_1_1--[#orange]-|>alfresco_alfresco_activemq_5_15_8_java_8_oracle_centos_7_87b15e37ce8b
 
-center footer Generated on 2022/05/25 12:02:21 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/27 21:40:34 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

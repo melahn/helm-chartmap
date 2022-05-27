@@ -42,18 +42,18 @@
       "version": "2.5.7"
     },
     {
-      "repoHost": "Docker Hub",
-      "children": [],
-      "name": "alfresco/alfresco-libreoffice",
-      "type": "image",
-      "version": "2.5.7"
-    },
-    {
       "repoHost": "quay.io",
       "children": [],
       "name": "alfresco/alfresco-shared-file-store:0.16.1",
       "type": "image",
       "version": "0.16.1"
+    },
+    {
+      "repoHost": "Docker Hub",
+      "children": [],
+      "name": "alfresco/alfresco-libreoffice",
+      "type": "image",
+      "version": "2.5.7"
     },
     {
       "repoHost": "Docker Hub",
@@ -68,6 +68,117 @@
       "name": "alfresco/alfresco-transform-router:1.5.2",
       "type": "image",
       "version": "1.5.2"
+    },
+    {
+      "keywords": [
+        "syncservice",
+        "alfresco",
+        "application"
+      ],
+      "children": [
+        {
+          "repoHost": "quay.io",
+          "children": [],
+          "name": "alfresco/service-sync:3.6.0",
+          "type": "image",
+          "version": "3.6.0"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.14.1",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.14.1"
+        }
+      ],
+      "name": "alfresco-sync-service:3.0.9",
+      "description": "Alfresco Sync Service",
+      "type": "chart",
+      "shortName": "alfresco-sync-service",
+      "version": "3.0.9"
+    },
+    {
+      "maintainers": [
+        {
+          "name": "Bitnami",
+          "email": "containers@bitnami.com"
+        },
+        {
+          "name": "desaintmartin",
+          "email": "cedric@desaintmartin.fr"
+        }
+      ],
+      "keywords": [
+        "postgresql",
+        "postgres",
+        "database",
+        "sql",
+        "replication",
+        "cluster"
+      ],
+      "children": [
+        {
+          "repoHost": "docker.io",
+          "children": [],
+          "name": "bitnami/postgresql:13.3.0",
+          "type": "image",
+          "version": "13.3.0"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.10.3",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.10.3"
+        }
+      ],
+      "name": "postgresql:10.16.2",
+      "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "type": "chart",
+      "shortName": "postgresql",
+      "version": "10.16.2"
+    },
+    {
+      "keywords": [
+        "activemq",
+        "message broker"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "alfresco/alfresco-activemq",
+        "type": "image",
+        "version": "5.16.4-jre11-centos7"
+      }],
+      "name": "activemq:2.1.0",
+      "description": "A Helm chart Providing Apache ActiveMQ.",
+      "type": "chart",
+      "shortName": "activemq",
+      "version": "2.1.0"
     },
     {
       "keywords": [
@@ -152,117 +263,6 @@
       "type": "chart",
       "shortName": "alfresco-search",
       "version": "1.0.4"
-    },
-    {
-      "keywords": [
-        "activemq",
-        "message broker"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "alfresco/alfresco-activemq",
-        "type": "image",
-        "version": "5.16.4-jre11-centos7"
-      }],
-      "name": "activemq:2.1.0",
-      "description": "A Helm chart Providing Apache ActiveMQ.",
-      "type": "chart",
-      "shortName": "activemq",
-      "version": "2.1.0"
-    },
-    {
-      "maintainers": [
-        {
-          "name": "Bitnami",
-          "email": "containers@bitnami.com"
-        },
-        {
-          "name": "desaintmartin",
-          "email": "cedric@desaintmartin.fr"
-        }
-      ],
-      "keywords": [
-        "postgresql",
-        "postgres",
-        "database",
-        "sql",
-        "replication",
-        "cluster"
-      ],
-      "children": [
-        {
-          "repoHost": "docker.io",
-          "children": [],
-          "name": "bitnami/postgresql:13.3.0",
-          "type": "image",
-          "version": "13.3.0"
-        },
-        {
-          "maintainers": [{
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          }],
-          "keywords": [
-            "common",
-            "helper",
-            "template",
-            "function",
-            "bitnami"
-          ],
-          "children": [],
-          "name": "common:1.10.3",
-          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
-          "type": "chart",
-          "shortName": "common",
-          "version": "1.10.3"
-        }
-      ],
-      "name": "postgresql:10.16.2",
-      "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-      "type": "chart",
-      "shortName": "postgresql",
-      "version": "10.16.2"
-    },
-    {
-      "keywords": [
-        "syncservice",
-        "alfresco",
-        "application"
-      ],
-      "children": [
-        {
-          "repoHost": "quay.io",
-          "children": [],
-          "name": "alfresco/service-sync:3.6.0",
-          "type": "image",
-          "version": "3.6.0"
-        },
-        {
-          "maintainers": [{
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          }],
-          "keywords": [
-            "common",
-            "helper",
-            "template",
-            "function",
-            "bitnami"
-          ],
-          "children": [],
-          "name": "common:1.14.1",
-          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
-          "type": "chart",
-          "shortName": "common",
-          "version": "1.14.1"
-        }
-      ],
-      "name": "alfresco-sync-service:3.0.9",
-      "description": "Alfresco Sync Service",
-      "type": "chart",
-      "shortName": "alfresco-sync-service",
-      "version": "3.0.9"
     },
     {
       "children": [],
