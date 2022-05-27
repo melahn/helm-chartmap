@@ -2,7 +2,7 @@
 #
 # It uses relative directories based on the source directory containing the script file so it should
 # be executed in that directory or the relative directories should be modified to your preference
-jarfile=../../target/helm-chartmap-1.1.1.jar
+jarfile=../../target/helm-chartmap-1.1.2.jar
 docdir=../../docs
 envfile=../../resource/example/example-env-spec.yaml
 
@@ -72,9 +72,9 @@ java -jar $jarfile -c "$chart:0.2.0" -o "$outdir/$chart-0.2.0.puml" -e $envfile 
 # Wordpress
 chart=wordpress
 outdir=$docdir/$chart
-java -jar $jarfile -c "$chart:14.0.5"  -o "$outdir/$chart-14.0.5.txt"   
-java -jar $jarfile -c "$chart:14.0.5"  -o "$outdir/$chart-14.0.5.json"  
-java -jar $jarfile -c "$chart:14.0.5"  -o "$outdir/$chart-14.0.5.puml"  -g
+java -jar $jarfile -c "$chart:14.2.5"  -o "$outdir/$chart-14.2.5.txt"   
+java -jar $jarfile -c "$chart:14.2.5"  -o "$outdir/$chart-14.2.5.json"  
+java -jar $jarfile -c "$chart:14.2.5"  -o "$outdir/$chart-14.2.5.puml"  -g
 java -jar $jarfile -c "$chart:13.3.1"  -o "$outdir/$chart-13.3.1.txt"   
 java -jar $jarfile -c "$chart:13.3.1"  -o "$outdir/$chart-13.3.1.json"  
 java -jar $jarfile -c "$chart:13.3.1"  -o "$outdir/$chart-13.3.1.puml"  -g

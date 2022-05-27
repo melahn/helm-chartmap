@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2022-05-28
+
+- Updated pom dependencies to most recent versions
+- APPR host name is now included in the chart map
+- Helm charts which are dynamic dependencies of the root chart are now discovered
+- Explicit chart dependencies are better labeled
+- Changed visibility of some getters only intended for use in test cases
+- Updated wordpress version in examples
+- Increased test process wait time
+  
 ## [1.1.1] - 2022-05-05
 
 - Updated pom dependencies to most recent versions
@@ -67,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial version
 
-[Unreleased]: https://github.com/melahn/helm-chartmap/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/melahn/helm-chartmap/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/melahn/helm-chartmap/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/melahn/helm-chartmap/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/melahn/helm-chartmap/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/melahn/helm-chartmap/compare/v1.0.1...v1.0.2

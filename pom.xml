@@ -4,7 +4,7 @@
 
   <groupId>com.melahn</groupId>
   <artifactId>helm-chartmap</artifactId>
-  <version>1.1.2-SNAPSHOT</version>
+  <version>1.1.2</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -57,12 +57,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2.2</version>
+      <version>2.13.3</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>2.13.2</version>
+      <version>2.13.3</version>
     </dependency>
     <dependency>
       <groupId>com.melahn</groupId>
@@ -112,7 +112,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.8.2</version>
+      <version>5.9.0-M1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
