@@ -1670,16 +1670,18 @@ class ChartMapTest {
     }
 
     @Test
-    void APPRTest() throws ChartMapException { // test normal path
+    void APPRTest() throws ChartMapException, IOException{ // test normal path
         ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         cm1.print();
         assertTrue(Files.exists(OUTPUT_APPR_PUML_PATH));
-        // test null appr spec
+        assertEquals("quay.io/melahn",cm1.getApprRepoHostName());
+        System.out.println("Normal APPR test variation succeeded");
+        // Test null appr spec
         assertTrue(Files.exists(OUTPUT_APPR_PNG_PATH));
         assertThrows(ChartMapException.class,
                 () -> createTestMap(ChartOption.APPRSPEC, null, OUTPUT_APPR_PUML_PATH, true, false, false));
         System.out.println("ChartMapException thrown as expected with a null appr spec");
-        // test various malformed appr specs
+        // Test various malformed appr specs
         assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat",
                 OUTPUT_APPR_PUML_PATH, true, false, false));
         System.out.println("ChartMapException thrown as expected with a bad appr spec");
@@ -1690,6 +1692,17 @@ class ChartMapTest {
                 true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
         System.out.println("ChartMapException thrown as expected");
+        // Test the case where the repoUrl is guaranteed to be null 
+        try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(o));
+            ChartMap cm3 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, true);
+            cm3.setApprRepoHostName(null);
+            cm3.print();
+            assertTrue(
+                    ChartMapTestUtil.streamContains(o, "repoUrl set to null"));
+            System.setOut(INITIAL_OUT);
+            System.out.println("repoUrl was null as expected");
+        }
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

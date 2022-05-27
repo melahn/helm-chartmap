@@ -61,7 +61,8 @@ import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 public class ChartMap {
-    private String apprSpec;
+    private String apprSpec = null;
+    private String apprRepoHostName = null;
     private HelmChart chart;
     private String chartFilename = null;
     private ChartKeyMap charts = new ChartKeyMap();
@@ -456,7 +457,11 @@ public class ChartMap {
         String[] apprSpecParts = a.split("@");
         setChartName(apprSpecParts[0].substring(apprSpecParts[0].lastIndexOf('/') + 1, apprSpecParts[0].length()));
         setChartVersion(apprSpecParts[1]);
-        apprSpec = a;
+        apprSpecParts = a.split("/");
+        // Remember the server of the appr repo so it can be used to set repoUrl in the chart later
+        // since there is no other way to find it. This chart will never appear in the helm charts cache.
+        setApprRepoHostName(apprSpecParts[0].concat("/").concat(apprSpecParts[1]));
+        setApprSpec(a);
     }
 
     /**
@@ -531,7 +536,7 @@ public class ChartMap {
      * 
      * @return an ObjectMapper
      */
-    public ObjectMapper getObjectMapper() {
+    protected ObjectMapper getObjectMapper() {
         return new ObjectMapper(new YAMLFactory());
     }
 
@@ -585,7 +590,7 @@ public class ChartMap {
      * @return a Process
      * @throws IOException if an error occurs getting the process
      */
-    public Process getProcess(String[] c, File d) throws IOException {
+    protected Process getProcess(String[] c, File d) throws IOException {
         return d!=null?Runtime.getRuntime().exec(c, null, d):Runtime.getRuntime().exec(c, null);
     }
 
@@ -599,7 +604,7 @@ public class ChartMap {
      * @return a ProcessBuilder
      * @throws IOException if an error occurs getting the process
      */
-    public ProcessBuilder getProcessBuilder(String c, String a) throws IOException {
+    protected ProcessBuilder getProcessBuilder(String c, String a) throws IOException {
         return new ProcessBuilder(c, a);
     }
 
@@ -966,7 +971,7 @@ public class ChartMap {
      * @throws ChartMapException if an exception occurs extracting the embedded
      *                           archives
      */
-    public void extractEmbeddedCharts(String d) throws ChartMapException {
+    protected void extractEmbeddedCharts(String d) throws ChartMapException {
         final int MAXDEPTH = 5;
         try (Stream<Path> walk = Files.walk(Paths.get(d), MAXDEPTH)) {
             walk.filter(Files::isRegularFile).filter(p -> p.getFileName().toString().endsWith(".tgz"))
@@ -1092,6 +1097,13 @@ public class ChartMap {
             if (foundChart != null) {
                 h.setRepoUrl(foundChart.getRepoUrl());
             }
+            // The other possibility is that the main chart was pulled from an APPR spec in which
+            // case we can expect the name of the repo to be found in the apprRepoHostName variable having
+            // been previous;y put there in the parsing of the APPR spec.
+            else if (apprRepoHostName != null) {
+                h.setRepoUrl(apprRepoHostName);
+            }
+            logger.log(logLevelVerbose, "repoUrl set to {}", h.getRepoUrl());
             // Don't forget the values
             collectValues(chartDirName, h);
             charts.put(h.getName(), h.getVersion(), h);
@@ -2098,6 +2110,18 @@ public class ChartMap {
 
     public String getApprSpec() {
         return apprSpec;
+    }
+
+    public void setApprSpec(String a) {
+        apprSpec = a;
+    }
+    
+    public String getApprRepoHostName() {
+        return apprRepoHostName;
+    }
+
+    public void setApprRepoHostName(String r) {
+        apprRepoHostName = r;
     }
 
     public HelmChart getChart() {

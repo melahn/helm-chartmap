@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 
 public class ChartMapTestUtil {
 
+    private static final int WAIT_TIME = 600;
+    
     /**
      * Answers true if the log contains a particular entry.
      * 
@@ -124,7 +126,7 @@ public class ChartMapTestUtil {
         pb.redirectErrorStream(true);
         pb.redirectOutput(Redirect.appendTo(l.toFile()));
         Process process = pb.start();
-        final int waitTime = 120;
+        final int waitTime = WAIT_TIME;
         process.waitFor(waitTime, TimeUnit.SECONDS);
         return process.exitValue();
     }
