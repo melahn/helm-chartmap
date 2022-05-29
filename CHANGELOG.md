@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.2] - 2022-05-28
+## [1.1.2] - 2022-05-30
 
 - Updated pom dependencies to most recent versions
 - APPR host name is now included in the chart map
