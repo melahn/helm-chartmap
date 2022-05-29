@@ -26,18 +26,42 @@
         "email": "containers@bitnami.com"
       }],
       "keywords": [
-        "common",
-        "helper",
-        "template",
-        "function",
-        "bitnami"
+        "memcached",
+        "cache"
       ],
-      "children": [],
-      "name": "common:1.13.0",
-      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "children": [
+        {
+          "repoHost": "docker.io",
+          "children": [],
+          "name": "bitnami/memcached:1.6.15-debian-10-r19",
+          "type": "image",
+          "version": "1.6.15-debian-10-r19"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.13.0",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.13.0"
+        }
+      ],
+      "name": "memcached:6.0.15",
+      "description": "Memcached is an high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.",
       "type": "chart",
-      "shortName": "common",
-      "version": "1.13.0"
+      "shortName": "memcached",
+      "version": "6.0.15"
     },
     {
       "maintainers": [{
@@ -91,42 +115,18 @@
         "email": "containers@bitnami.com"
       }],
       "keywords": [
-        "memcached",
-        "cache"
+        "common",
+        "helper",
+        "template",
+        "function",
+        "bitnami"
       ],
-      "children": [
-        {
-          "repoHost": "docker.io",
-          "children": [],
-          "name": "bitnami/memcached:1.6.15-debian-10-r19",
-          "type": "image",
-          "version": "1.6.15-debian-10-r19"
-        },
-        {
-          "maintainers": [{
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          }],
-          "keywords": [
-            "common",
-            "helper",
-            "template",
-            "function",
-            "bitnami"
-          ],
-          "children": [],
-          "name": "common:1.13.0",
-          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
-          "type": "chart",
-          "shortName": "common",
-          "version": "1.13.0"
-        }
-      ],
-      "name": "memcached:6.0.15",
-      "description": "Memcached is an high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.",
+      "children": [],
+      "name": "common:1.13.0",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
       "type": "chart",
-      "shortName": "memcached",
-      "version": "6.0.15"
+      "shortName": "common",
+      "version": "1.13.0"
     }
   ],
   "name": "wordpress:13.3.1",

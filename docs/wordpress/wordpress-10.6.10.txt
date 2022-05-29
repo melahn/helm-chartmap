@@ -76,4 +76,4 @@ mariadb:9.3.4 depends on common:1.4.0
 mariadb:9.3.4 uses docker.io/bitnami/mariadb:10.5.9-debian-10-r0
 wordpress:10.6.10 uses docker.io/bitnami/wordpress:5.6.2-debian-10-r8
 
-Generated on 2022/05/27 21:41:11 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/05/29 21:12:04 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
