@@ -17,5 +17,5 @@ usecase "Image\n====\ndocker-private.packages.nuxeo.com\n====\nnuxeo/nuxeo:2021\
 'Chart Dependencies
 nuxeo_3_0_9--[#orange]-|>docker_private_packages_nuxeo_com_nuxeo_nuxeo_2021
 
-center footer Generated on 2022/05/27 21:33:15 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/29 21:04:09 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

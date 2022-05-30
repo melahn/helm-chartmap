@@ -20,12 +20,12 @@ usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-identity-service:1.7.0\n=
 usecase "Image\n====\ndocker.io\n====\nbitnami/postgresql:11.11.0-debian-10-r31\n====\n11.11.0-debian-10-r31" as docker_io_bitnami_postgresql_11_11_0_debian_10_r31 #DarkSalmon
 
 'Chart Dependencies
+alfresco_identity_service_6_0_0--[#green]-|>common_1_11_3
 alfresco_identity_service_6_0_0--[#green]-|>keycloak_16_1_0
 keycloak_16_1_0--[#green]-|>postgresql_10_3_13
 postgresql_10_3_13--[#green]-|>common_1_4_1
-alfresco_identity_service_6_0_0--[#green]-|>common_1_11_3
 keycloak_16_1_0--[#orange]-|>quay_io_alfresco_alfresco_identity_service_1_7_0
 postgresql_10_3_13--[#orange]-|>docker_io_bitnami_postgresql_11_11_0_debian_10_r31
 
-center footer Generated on 2022/05/27 21:37:59 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/05/29 21:08:53 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
