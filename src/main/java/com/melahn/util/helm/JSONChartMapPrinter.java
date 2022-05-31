@@ -1,13 +1,15 @@
 package com.melahn.util.helm;
 
-import com.melahn.util.helm.model.HelmChart;
-import com.melahn.util.helm.model.HelmDeploymentContainer;
-import org.json.*;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+
+import com.melahn.util.helm.model.HelmChart;
+import com.melahn.util.helm.model.HelmDeploymentContainer;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * A class that generates a JSON file describing a Kubernetes
@@ -22,7 +24,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * @param   chartMap        the instance of chartMap using this printer
      * @param   outputFilename  the name of the PlantUML file to be created.
      * @param   charts          a multi-key map of all the Helm Charts that
-     *                          might be referenced.  The map is keyed by
+     *                          might be referenced. The map is keyed by
      *                          Chart Name and Chart Version.
      * @param   chart           a Helm Chart to be printed in PlantUML format
      * @throws ChartMapException when an error occurs printing the chart map
@@ -108,7 +110,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
      * Adds the dependent containers to an array.
      *
      * Checks if the parent of the helm chart was the same
-     * parent that caused the dependent chart to be added.  This
+     * parent that caused the dependent chart to be added. This
      * check is necessary because there are cases where a chart
      * is common between two charts in a dependency tree but in each
      * usage the image that is used may be different (because of
@@ -132,7 +134,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
             }
             // If the parent chart matches the parent that was found
             // when the image was collected, then add it to the returned
-            // containers so it can be printed with this chart.  Otherwise
+            // containers so it can be printed with this chart. Otherwise
             // ignore because it will be printed elsewhere in the tree.
             if (ignf.equals(pgnf)) {
                 addContainer(c.getImage(), a);
@@ -198,7 +200,7 @@ public class JSONChartMapPrinter extends ChartMapPrinter {
     }
 
     /**
-     * Writes a section header.  Not relevant for JSON
+     * Writes a section header. Not relevant for JSON
      *
      * @param   header the header to be written
      * @throws  ChartMapException  when an error occurs printing the section header 

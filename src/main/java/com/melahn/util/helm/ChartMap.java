@@ -681,7 +681,7 @@ public class ChartMap {
     }
 
     /**
-     * Extracts the relevant helm path from the string.  Note that
+     * Extracts the relevant helm path from the string. Note that
      * the values returned in a line returned by the helm env command 
      * are enclosed in double quotes so these double quotes
      * must be stripped out so as not to cause problems later 
@@ -708,7 +708,7 @@ public class ChartMap {
 
      /**
      * Gets the environment variable. Using my own function for this allows testing
-     * of different environment variable values using mocks and spies.  
+     * of different environment variable values using mocks and spies.
      * 
      * @param e The name of the variable to fetch
      * @return The value of the variable or null
@@ -1025,10 +1025,10 @@ public class ChartMap {
     }
 
     /**
-     * Gets an HTTP response.  The main purpose of extracting this to a method is to allow
+     * Gets an HTTP response. The main purpose of extracting this to a method is to allow
      * test cases for different kinds of responses and exceptions.
      * 
-     * @param c Http client.  It is the caller's responsibility to close it.
+     * @param c Http client. It is the caller's responsibility to close it.
      * @param u the URL to get
      * @return the HttpResponse
      * @throws IOException if an error occured executing the HTTP request
@@ -1065,9 +1065,9 @@ public class ChartMap {
             if (exitValue != 0) {
                 throw new ChartMapException("Exception updating chart repo in directory "
                 .concat(d)
-                .concat(".  Exit code: "
+                .concat(". Exit code: "
                 .concat(Integer.toString(exitValue))
-                .concat(".  Possibly you cannot access one of your remote charts repos.")));
+                .concat(". Possibly you cannot access one of your remote charts repos.")));
             } else {
                 extractEmbeddedCharts(d);
                 logger.log(logLevelVerbose, "Updated Helm dependencies in directory {}", d);

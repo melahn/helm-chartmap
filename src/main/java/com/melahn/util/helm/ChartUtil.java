@@ -77,7 +77,7 @@ public final class ChartUtil {
 
     /**
      * Used to derive the current OS using the os.name
-     * system property.  I use this instead of SystemUtils
+     * system property. I use this instead of SystemUtils
      * because I want to be able to set the OS name dynamically
      * using a system property to allow for or more complete 
      * test coverage.

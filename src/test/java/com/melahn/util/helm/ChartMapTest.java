@@ -118,7 +118,7 @@ class ChartMapTest {
          * might be handy to have around to diagnose issues in test failures. They are
          * deleted anyway when the test is next run.
          */
-        System.out.println("Test complete.  Any generated file can be found in "
+        System.out.println("Test complete. Any generated file can be found in "
                 .concat(Paths.get(TARGET_TEST_DIR).toAbsolutePath().toString()));
         System.out.println(DIVIDER.concat(" UNIT TESTS END ").concat(DIVIDER));
     }
@@ -987,7 +987,7 @@ class ChartMapTest {
         byte[] b = s.getBytes();
         Files.write(p, b);
         // Create a test ChartMap and validate I can load the chart from my fabricated
-        // cache.  Note that it will compesate for a missing url in the local helm chart.
+        // cache. Note that it will compesate for a missing url in the local helm chart.
         ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm1.loadChartsFromCache(r, f);
