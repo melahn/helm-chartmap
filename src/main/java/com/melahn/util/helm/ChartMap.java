@@ -576,7 +576,7 @@ public class ChartMap {
                     String.format("Exception trying to discover Helm Version: %s ", e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
+            throw new ChartMapException(String.format("InterruptedException checking helm version: %s", e.getMessage()));
         }
     }
 
@@ -613,7 +613,7 @@ public class ChartMap {
      * 
      * @throws ChartMapException if any of the helm information cannot be set
      */
-    void setHelmEnvironment() throws ChartMapException {
+    protected void setHelmEnvironment() throws ChartMapException {
         helmCommand = getHelmCommand();
         checkHelmVersion();
         getHelmClientInformation();
