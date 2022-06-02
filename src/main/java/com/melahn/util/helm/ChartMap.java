@@ -28,21 +28,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.melahn.util.extract.ArchiveExtract;
-import com.melahn.util.helm.model.EnvironmentSpecification;
-import com.melahn.util.helm.model.HelmChart;
-import com.melahn.util.helm.model.HelmChartLocalCache;
-import com.melahn.util.helm.model.HelmChartRepoLocal;
-import com.melahn.util.helm.model.HelmChartReposLocal;
-import com.melahn.util.helm.model.HelmDeploymentContainer;
-import com.melahn.util.helm.model.HelmDeploymentTemplate;
-import com.melahn.util.helm.model.HelmRequirement;
-import com.melahn.util.helm.model.HelmRequirements;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -59,6 +44,21 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.melahn.util.extract.ArchiveExtract;
+import com.melahn.util.helm.model.EnvironmentSpecification;
+import com.melahn.util.helm.model.HelmChart;
+import com.melahn.util.helm.model.HelmChartLocalCache;
+import com.melahn.util.helm.model.HelmChartRepoLocal;
+import com.melahn.util.helm.model.HelmChartReposLocal;
+import com.melahn.util.helm.model.HelmDeploymentContainer;
+import com.melahn.util.helm.model.HelmDeploymentTemplate;
+import com.melahn.util.helm.model.HelmRequirement;
+import com.melahn.util.helm.model.HelmRequirements;
 
 public class ChartMap {
     private String apprSpec = null;
@@ -93,6 +93,7 @@ public class ChartMap {
     private IChartMapPrinter printer;
     private boolean refreshLocalRepo = false;
     private String tempDirName = null;
+    private int timeout = 300;
     private boolean verbose = false;
 
     private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
@@ -114,7 +115,6 @@ public class ChartMap {
     protected static final String HELM_SUBDIR = "/helm";
     protected static final String HOME = "HOME";
     protected static final String INTERRUPTED_EXCEPTION = "InterruptedException pulling chart from appr using specification %s : %s";
-    protected static final int PROCESS_TIMEOUT = 300000; 
     protected static final String RENDERED_TEMPLATE_FILE = "_renderedtemplates.yaml"; 
     protected static final String START_OF_TEMPLATE = "# Source: ";
     protected static final String TEMP = "TEMP";
@@ -178,6 +178,8 @@ public class ChartMap {
      * @param envFilename    The name of a yaml file that contains a set of
      *                       environment variables which may influence the way the
      *                       charts are rendered by helm.
+     * @param timeout        The maximum time (in seconds) to allow a helm command to 
+     *                       complete.
      * @param switches       An array containing a list of boolean values as follows
      *                       when true switches[0] generates an image from the
      *                       PlantUML file (if any) switches[1] refresh the local
@@ -186,18 +188,22 @@ public class ChartMap {
      * @throws ChartMapException when an error occurs creating the chart map
      **/
 
-    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, boolean[] switches)
+    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, int timeout, boolean[] switches)
             throws ChartMapException {
         setDebugLogLevel();
         ArrayList<String> args = new ArrayList<>();
-        addOptionsToArgs(args, option);
+        addChartOptionToArgs(args, option);
         args.add(chart);
+        args.add("-o");
+        args.add(outputFilename);
         if (envFilename != null) {
             args.add("-e");
             args.add(envFilename);
         }
-        args.add("-o");
-        args.add(outputFilename);
+        if (timeout > 0) {
+            args.add("-t");
+            args.add(String.valueOf(timeout));
+        }
         for (String a : args) {
             if (a == null) {
                 throw new ChartMapException("Null parameter");
@@ -223,7 +229,7 @@ public class ChartMap {
      * @param o the chart option (e.g. APPRSPEC)
      * @throws ChartMapException if a null is passed as the option
      */
-    private void addOptionsToArgs(ArrayList<String> a, ChartOption o) throws ChartMapException {
+    private void addChartOptionToArgs(ArrayList<String> a, ChartOption o) throws ChartMapException {
 
         if (o == null) {
             throw new ChartMapException("Invalid Option Specification");
@@ -321,6 +327,7 @@ public class ChartMap {
         options.addOption("h", false, "Help");
         options.addOption("o", true, "The Output Filename");
         options.addOption("r", false, "Update the Helm Chart dependencies");
+        options.addOption("t", true, "Helm command timeout value");
         options.addOption("u", true, "The Url of the Helm Chart ");
         options.addOption("v", false, "Verbose");
         options.addOption("z", false, "Debug Mode");
@@ -353,6 +360,9 @@ public class ChartMap {
         }
         if (cmd.hasOption("o")) {
             setOutputFilename(cmd.getOptionValue("o"));
+        }
+        if (cmd.hasOption("t")) {
+            setTimeout(Integer.valueOf(cmd.getOptionValue("t")));
         }
         if (cmd.hasOption("u")) { // e.g.
                                   // https://github.com/melahn/helm-chartmap/raw/master/src/test/resource/test-chart-file.tgz
@@ -552,10 +562,11 @@ public class ChartMap {
     protected void checkHelmVersion() throws ChartMapException {
         logger.log(logLevelDebug, "+ Entering checkHelmVersion");
         String[] c = { getHelmCommand(), "version", "--template", "{{ .Version }}" };
+        Process p = null;
         try {
-            Process p = getProcess(c, null);
+            p = getProcess(c, null);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+            p.waitFor(timeout, TimeUnit.SECONDS);
             int exitValue = p.exitValue();
             if (exitValue == 0) {
                 String o = br.readLine();
@@ -577,7 +588,9 @@ public class ChartMap {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format("InterruptedException checking helm version: %s", e.getMessage()));
-        }
+        } catch (IllegalThreadStateException e) {
+            handleIllegalStateThreadException(p, "version");
+        }  
     }
 
     /**
@@ -627,6 +640,7 @@ public class ChartMap {
      */
     protected void getHelmClientInformation() throws ChartMapException {
         // run the helm env command to get the client information
+        Process p = null;
         try {
             File tempEnvFile = getTempFile("helm-chartmap-env", ".txt");  
             // Guard against a vulnerability in the temp file by restricting to owner permissions
@@ -639,8 +653,8 @@ public class ChartMap {
             }
             ProcessBuilder pb = getProcessBuilder(getHelmCommand(), "env");
             pb.redirectOutput(tempEnvFile);
-            Process p = pb.start();
-            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+            p = pb.start();
+            p.waitFor(timeout, TimeUnit.SECONDS);
             int exitValue = p.exitValue();
             if (exitValue == 0) {
                 FileReader fileReader = new FileReader(tempEnvFile);
@@ -662,7 +676,9 @@ public class ChartMap {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw (new ChartMapException("IOException executing helm env command"));
-        }
+        }catch (IllegalThreadStateException e) {
+            handleIllegalStateThreadException(p, "template");
+        } 
     }
 
     /**
@@ -918,10 +934,11 @@ public class ChartMap {
      */
     protected String pullChart(String apprSpec) throws ChartMapException {
         String chartDirName = null;
+        Process p = null;
         try {
             String[] c = {"helm", "quay", "pull", apprSpec};
-            Process p = getProcess(c, new File(getTempDirName()));
-            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+            p = getProcess(c, new File(getTempDirName()));
+            p.waitFor(timeout, TimeUnit.SECONDS);
             int exitValue = p.exitValue();
             if (exitValue == 0) {
                 chartDirName = getTempDirName() + apprSpec.substring(apprSpec.indexOf('/') + 1, apprSpec.length())
@@ -938,7 +955,9 @@ public class ChartMap {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
-        }
+        } catch (IllegalThreadStateException e) {
+            handleIllegalStateThreadException(p, "helm pull");
+        }  
         return chartDirName;
     }
 
@@ -1049,11 +1068,12 @@ public class ChartMap {
         logger.log(logLevelVerbose, "Updating Helm dependencies in directory {}", d);
         // if the user wants us to update the Helm dependencies, do so
         if (this.isRefreshLocalRepo()) {
+            Process p = null;
             String[] c = {"helm", "dep", "update"};
             int exitValue = -1;
             try {
-                Process p = getProcess(c, new File(d));
-                p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+                p = getProcess(c, new File(d));
+                p.waitFor(timeout, TimeUnit.SECONDS);
                 exitValue = p.exitValue();
             } catch (IOException e) {
                 throw new ChartMapException("IOException executing helm dep update");
@@ -1061,7 +1081,9 @@ public class ChartMap {
                 Thread.currentThread().interrupt();
                 throw new ChartMapException(
                         "InterruptedException while executing helm dep update");
-            }
+            } catch (IllegalThreadStateException e) {
+                handleIllegalStateThreadException(p, "dependency update");
+            }  
             if (exitValue != 0) {
                 throw new ChartMapException("Exception updating chart repo in directory "
                 .concat(d)
@@ -1073,6 +1095,25 @@ public class ChartMap {
                 logger.log(logLevelVerbose, "Updated Helm dependencies in directory {}", d);
             }
         }
+    }
+
+    /**
+     * Handles the case where process p was started successfully but ChartMap did not wait long enough
+     * for the process to complete before checking exitValue. 
+     * 
+     * @param p the process
+     * @param c the command
+     * @throws ChartMapException
+     */
+    private void handleIllegalStateThreadException(Process p, String c) throws ChartMapException {
+        if (p != null && p.isAlive()) {
+            p.destroy();
+            logger.log(logLevelVerbose, "Process {} was still alive and needed to be destroyed.", p);
+            logger.log(logLevelVerbose, "ChartMap waited for {} {} but that was not long enough for helm to complete the {} command.", timeout, timeout>1?"seconds":"second", c);
+        }       
+        throw new ChartMapException(String.format(
+                "ChartMap did not wait long enough for helm to complete the %s command. Increase the timeout to a value greater than %d %s.",
+                c, timeout, timeout>1?"seconds":"second"));
     }
 
     /**
@@ -1658,7 +1699,7 @@ public class ChartMap {
             while ((len = bis.read(bytes)) > 0) {
                 bos.write(bytes, 0, len);
             }
-            p.waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+            p.waitFor(timeout, TimeUnit.SECONDS);
             int exitValue = p.exitValue();
             if (exitValue != 0) {
                 String message;
@@ -1678,7 +1719,9 @@ public class ChartMap {
             logger.error("InterruptedException running template command");
             Thread.currentThread().interrupt();
             throw new ChartMapException("InterruptedException running template command");
-        }
+        } catch (IllegalThreadStateException e) {
+            handleIllegalStateThreadException(p, "template");
+        }  
     }
 
     /**
@@ -2244,6 +2287,14 @@ public class ChartMap {
         this.tempDirName = t;
     } // keep private since this directory gets recursively removed and so its kinda
       // dangerous
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int t) {
+        timeout = t;
+    }
 
     public boolean isRefreshLocalRepo() {
         return refreshLocalRepo;

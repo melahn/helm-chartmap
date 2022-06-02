@@ -43,6 +43,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
 import com.melahn.util.helm.model.HelmChart;
 import com.melahn.util.helm.model.HelmChartRepoLocal;
 import com.melahn.util.helm.model.HelmDeploymentContainer;
@@ -52,15 +61,6 @@ import com.melahn.util.helm.model.HelmDeploymentSpecTemplateSpec;
 import com.melahn.util.helm.model.HelmDeploymentTemplate;
 import com.melahn.util.helm.model.HelmMaintainer;
 import com.melahn.util.test.ChartMapTestUtil;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 class ChartMapTest {
     static final String APPR_BASE_NAME = "helm-chartmap-test-chart";
@@ -88,12 +88,13 @@ class ChartMapTest {
     static final Path OUTPUT_JSON_PATH_NRNV = Paths.get(TARGET_TEST_DIR, "testChartFileNRNV.json");
     static final Path OUTPUT_APPR_PUML_PATH = Paths.get(TARGET_TEST_DIR, APPR_BASE_NAME.concat(".puml"));
     static final Path OUTPUT_APPR_PNG_PATH = Paths.get(TARGET_TEST_DIR, APPR_BASE_NAME.concat(".png"));
-    static final Path OUTPUT_CHART_NAME_PUML_PATH = Paths.get(TARGET_TEST_DIR, "nginx:9.3.0.puml");
-    static final Path OUTPUT_CHART_NAME_PNG_PATH = Paths.get(TARGET_TEST_DIR, "nginx:9.3.0.png");
+    static final Path OUTPUT_CHART_NAME_PUML_PATH = Paths.get(TARGET_TEST_DIR, "nginx:11.1.5.puml");
+    static final Path OUTPUT_CHART_NAME_PNG_PATH = Paths.get(TARGET_TEST_DIR, "nginx:11.1.5.png");
     static final Path OUTPUT_CHART_URL_PUML_PATH = Paths.get(TARGET_TEST_DIR, URL_BASE_NAME.concat(".puml"));
     static final Path OUTPUT_CHART_URL_PNG_PATH = Paths.get(TARGET_TEST_DIR, URL_BASE_NAME.concat(".png"));
+    static final int PROCESS_TIMEOUT = 600;
     static final String TEST_APPR_CHART = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
-    static final String TEST_CHART_NAME = "nginx:9.3.0";
+    static final String TEST_CHART_NAME = "nginx:11.1.5";
     static final String TEST_CHART_URL = "https://github.com/melahn/helm-chartmap/raw/master/".concat(INPUT_FILE_NAME_1);
     static final Path TEST_ONE_FILE_ZIP_PATH = Paths.get("src/test/resource/test-onefile.tgz");
     static final Path TEST_ENV_FILE_PATH = Paths.get("resource/example/example-env-spec.yaml");
@@ -223,7 +224,7 @@ class ChartMapTest {
         // test for InterruptedException using a spy
         Process p3 = Runtime.getRuntime().exec("echo", null);
         Process sp3 = spy(p3);
-        doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp3).waitFor(cm.getTimeout(), TimeUnit.SECONDS);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
             assertThrows(ChartMapException.class, () -> cm.runTemplateCommand(new File(TARGET_TEST, "foo"), sp3, new HelmChart()));
@@ -413,7 +414,7 @@ class ChartMapTest {
             doThrow(ChartMapException.class).when(scmp2).printSectionHeader(any());
             HelmChart h2 = new HelmChart();
             h2.setName("nginx");
-            h2.setVersion("9.3.0");
+            h2.setVersion("11.1.5");
             scm2.printChartDependencies(h2);
             assertTrue(
                     ChartMapTestUtil.streamContains(o, "Error printing chart dependencies:"));
@@ -701,7 +702,7 @@ class ChartMapTest {
         ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         cm.print();
-        HelmChart h = cm.chartsReferenced.get("nginx", "9.3.0");
+        HelmChart h = cm.chartsReferenced.get("nginx", "11.1.5");
         HashMap<String, ChartMap.WeightedDeploymentTemplate> dtr = cm.deploymentTemplatesReferenced;
         for (HelmDeploymentTemplate t : h.getDeploymentTemplates()) {
             dtr.remove(t.getFileName()); // this will force the case where the weighted template was not found
@@ -874,7 +875,7 @@ class ChartMapTest {
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp6 = spy(p6);
         doReturn(sp6).when(scm6).getProcess(any(), eq(null));
-        doThrow(InterruptedException.class).when(sp6).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp6).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -956,7 +957,7 @@ class ChartMapTest {
         ProcessBuilder spb7 = spy(pb7);
         Process p7 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to throw an InterruptedException on waitFor ... just watch me!!" });
         Process sp7 = spy(p7);
-        doThrow(InterruptedException.class).when(sp7).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp7).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         doReturn(sp7).when(spb7).start();
         doReturn(spb7).when(scm7).getProcessBuilder(any(), any());
         assertThrows(ChartMapException.class, () -> scm7.getHelmClientInformation());
@@ -1208,7 +1209,7 @@ class ChartMapTest {
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp2 = spy(p2);
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
-        doThrow(InterruptedException.class).when(sp2).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp2).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm2.print());
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1276,7 +1277,7 @@ class ChartMapTest {
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp3 = spy(p3);
         doReturn(sp3).when(scm3).getProcess(any(), any(File.class));
-        doThrow(InterruptedException.class).when(sp3).waitFor(ChartMap.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp3).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo"));
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1458,7 +1459,7 @@ class ChartMapTest {
         System.out.println("getCondition false tested");
         // Test getEnvVars throwing an IOException
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm3 = new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "foo-out.txt", "no-env-var-file-here.yaml", new boolean[] {false, false, false} );
+            ChartMap cm3 = new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "foo-out.txt", "no-env-var-file-here.yaml", PROCESS_TIMEOUT, new boolean[] {false, false, false} );
             System.setOut(new PrintStream(o));
             assertThrows(IOException.class, () -> cm3.getEnvVars());
             System.setOut(new PrintStream(INITIAL_OUT));
@@ -1724,7 +1725,7 @@ class ChartMapTest {
         // null env var file
         boolean[] switches = { true, false, false };
         ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, switches);
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, switches);
         cm1.print();
         assertTrue(Files.exists(OUTPUT_CHART_NAME_PUML_PATH));
         assertTrue(Files.exists(OUTPUT_CHART_NAME_PNG_PATH));
@@ -1745,11 +1746,11 @@ class ChartMapTest {
         final int BAD_NUMBER_OF_SWITCHES = 8;
         boolean[] switches = { true, false, false }; // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, switches)); //
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, switches)); //
         System.out.println("ChartMapException thrown as expected with a bad switches array");
         // test a bad switches array
         assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, new boolean[BAD_NUMBER_OF_SWITCHES]));
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, new boolean[BAD_NUMBER_OF_SWITCHES]));
         System.out.println("ChartMapException thrown as expected with a bad number of switches in the array");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1992,7 +1993,7 @@ class ChartMapTest {
             boolean refresh, boolean verbose) throws ChartMapException {
         boolean[] switches = new boolean[] { generateImage, refresh, verbose };
         ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
-                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), switches);
+                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), PROCESS_TIMEOUT, switches);
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
