@@ -84,8 +84,9 @@ Flags:
   -c  <chartname>  A name and version of a chart
   -f  <filename>  A location in the file system for a Helm Chart package (a tgz file)
   -u  <url>    A url for a Helm Chart
-  -o  <filename>  A name and version of the chart as an appr specification
-  -e  <filename>  The location of an Environment Specification
+  -o  <filename>  The location of the output file
+  -e  <filename>  The location of an Environment Specification file
+  -t  <timeout>  The maximum time in seconds to wait for a helm command to complete
   -g      Generate image from PlantUML file
   -r      Refresh
   -v      Verbose
@@ -112,6 +113,8 @@ Flags:
 * **Optional**
   * **-e** \<filename\>
     * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates. See the example environment specification provided in resource/example-env-spec.yaml to understand the format.
+  * **-t** \<seconds\>
+    * The maximum amount of time to wait (in seconds) for a helm command to complete. This is rarely, if ever needed, and is intended for cases where a helm chart is very complex, and the helm update dependency command may take a long time because of machine or network constraints. If the number is not greater than zero, a detault of 600 seconds is used.
   * **-g**
     * Generate image. Whenever specified, an image file is generated from the PlantUML file. This is only applicable if
       the filename of the generated output file has the extension 'puml'.
@@ -139,11 +142,11 @@ java -jar target/helm-chartmap-1.1.2.jar -f "./src/test/resource/test-chart-file
 ##### Generating a Chartmap using a url specification
 
 ``` bash
-java -jar target/helm-chartmap-1.1.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-5.2.0.tgz" -o alfresco-content-services-5.2.0.puml -g -v -r -e "./resource/example/example-env-spec.yaml"
+java -jar target/helm-chartmap-1.1.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-5.2.0.tgz" -o alfresco-content-services-5.2.0.puml -g -v -r -e "./resource/example/example-env-spec.yaml" -t 1200
 
 ```
 
-Note in this example, the *-g* flag is set to automatically generate the image from the PlantUML file.
+Note in this example, the *-g* flag is set to automatically generate the image from the PlantUML file and a timeout value of 1200 seconds is used.
 
 Also note that the system property *PLANTUML_LIMIT_SIZE* allows the generation of complex PlantUML images without cropping. It can be set directly on the command line using the '-D' argument or by setting it indirectly using the same named system environment variable. By default, Chart Map sets the property to 8192, which is enough to handle any chart encountered so far.
 
@@ -167,6 +170,7 @@ In addition to the command line interface, a Java API is provided.
                     String chart,
                     String outputFilename,
                     String envFilename,
+                    int, timeout,
                     boolean[] switches)                  
 ```
 
@@ -188,6 +192,8 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The name of the file to which to write the generated Chart Map. Note the file is overwritten if it exists.
 * *envSpecFilename*
   * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;. See the [example environment specification](./resource/example/example-env-spec.yaml) to understand the format.
+* *timeout*
+  * The maximum amount of time to wait (in seconds) for a helm command to complete. This is rarely, if ever needed, and is intended for cases where a helm chart is very complex, and the helm update dependency command may take a long time because of machine or network constraints. If the number is not greater than zero, a detault of 600 seconds is used.
 * *switches*
   * An array containing the following boolean values
     * *switches[0]* *generate*
@@ -232,6 +238,7 @@ public class ChartMapExample {
                     "src/test/resource/testChartFile.tgz",
                     "my-chartmap.puml",
                     "resource/example/example-env-spec.yaml",
+                    0,
                     new boolean[] { true, true, false });
             testMap.print();
         } catch (ChartMapException e) {

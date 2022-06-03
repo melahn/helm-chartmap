@@ -1765,8 +1765,9 @@ class ChartMapTest {
                 .concat("\t-c\t<chartname>\tA name and version of a chart\n")
                 .concat("\t-f\t<filename>\tA location in the file system for a Helm Chart package (a tgz file)\n")
                 .concat("\t-u\t<url>\t\tA url for a Helm Chart\n")
-                .concat("\t-o\t<filename>\tA name and version of the chart as an appr specification\n")
-                .concat("\t-e\t<filename>\tThe location of an Environment Specification\n")
+                .concat("\t-o\t<filename>\tThe location of the output file\n")
+                .concat("\t-e\t<filename>\tThe location of an Environment Specification file\n")
+                .concat("\t-t\t<seconds>\tThe amount of time to wait for a helm command to complete\n")
                 .concat("\t-g\t\t\tGenerate image from PlantUML file\n").concat("\t-r\t\t\tRefresh\n")
                 .concat("\t-v\t\t\tVerbose\n").concat("\t-h\t\t\tHelp\n")
                 .concat("\nSee https://github.com/melahn/helm-chartmap for more information\n");
