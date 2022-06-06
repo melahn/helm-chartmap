@@ -92,13 +92,14 @@ class ChartMapTest {
     static final Path OUTPUT_CHART_NAME_PNG_PATH = Paths.get(TARGET_TEST_DIR, "nginx:11.1.5.png");
     static final Path OUTPUT_CHART_URL_PUML_PATH = Paths.get(TARGET_TEST_DIR, URL_BASE_NAME.concat(".puml"));
     static final Path OUTPUT_CHART_URL_PNG_PATH = Paths.get(TARGET_TEST_DIR, URL_BASE_NAME.concat(".png"));
-    static final int PROCESS_TIMEOUT = 600;
     static final String TEST_APPR_CHART = "quay.io/melahn/helm-chartmap-test-chart@1.0.2";
     static final String TEST_CHART_NAME = "nginx:11.1.5";
     static final String TEST_CHART_URL = "https://github.com/melahn/helm-chartmap/raw/master/".concat(INPUT_FILE_NAME_1);
     static final Path TEST_ONE_FILE_ZIP_PATH = Paths.get("src/test/resource/test-onefile.tgz");
     static final Path TEST_ENV_FILE_PATH = Paths.get("resource/example/example-env-spec.yaml");
     static final String TEST_FAKE_FILE_NAME = "src/test/resource/test-fakechart.tgz";
+    static final int TIMEOUT_DEFAULT = 0; // use ChartMap's TIMEOUT_DEFAULT
+    static final int TIMEOUT_DOUBLE = ChartMap.TIMEOUT_DEFAULT * 2; 
 
     @BeforeAll
     static void setUp() {
@@ -131,7 +132,7 @@ class ChartMapTest {
      */
     @Test
     void WeightedDeploymentTemplateTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         HelmDeploymentTemplate hdt = new HelmDeploymentTemplate();
         ChartMap.WeightedDeploymentTemplate wdt = cm.new WeightedDeploymentTemplate("a/b/c/d/e", hdt);
@@ -152,7 +153,7 @@ class ChartMapTest {
      */
     @Test
     void processWeightsTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, Paths.get(TARGET_TEST, "processWeights.txt"), false, true,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, Paths.get(TARGET_TEST, "processWeights.txt"), false, true,
                 false);
         ChartMap scm = spy(cm);
         doReturn(0).when(scm).getWeight(anyString());
@@ -174,7 +175,7 @@ class ChartMapTest {
      */
     @Test
     void runTemplateCommandTest() throws ChartMapException, InterruptedException, IOException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         // test that a bogus directory will cause an IO exception
         HelmChart h = new HelmChart();
@@ -244,7 +245,7 @@ class ChartMapTest {
      */
     @Test
     void getTemplateArrayTest() throws ChartMapException, IOException {
-        ChartMap cm = createTestMap(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
@@ -292,7 +293,7 @@ class ChartMapTest {
         ChartMap cm1 = new ChartMap();
         cm1.printMap();
         assertEquals(null, cm1.getChart());
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.FILENAME, TEST_FAKE_FILE_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm2.print();
         cm2.setOutputFilename("./."); /// forces the exception because it is a directory
@@ -388,7 +389,7 @@ class ChartMapTest {
     @Test
     void printChartDependenciesTest() throws ChartMapException, IOException {
         // test for null getDiscoveredDependencies
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, true,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, true,
                 false);
         cm1.print();
         HelmChart h1 = new HelmChart();
@@ -404,7 +405,7 @@ class ChartMapTest {
         // test that the ChartMapException is handled
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     false);
             cm2.print();
             ChartMap scm2 = spy(cm2);
@@ -434,7 +435,7 @@ class ChartMapTest {
     void printContainerDependenciesTest() throws ChartMapException, IOException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     false);
             cm.print();
             ChartMap scm = spy(cm);
@@ -461,7 +462,7 @@ class ChartMapTest {
     void printContainersTest() throws ChartMapException, IOException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     false);
             cm.print();
             ChartMap scm = spy(cm);
@@ -486,7 +487,7 @@ class ChartMapTest {
      */
     @Test
     void detectPrintFormatTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         try {
             cm.detectPrintFormat(null);
@@ -503,7 +504,7 @@ class ChartMapTest {
      */
     @Test
     void isStableTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         // this set of images should not be stable
         Set<String> s = Stream.of("foo-stable", "foo-snapshot", "foo-alpha", "foo-beta", "foo-trial", "foo-rc")
@@ -568,7 +569,7 @@ class ChartMapTest {
         String l3 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/");
         String l4 = ChartMap.START_OF_TEMPLATE.concat(c).concat("/nottemplates/").concat("notrenderedtemplatesfile");
         ;
-        ChartMap cm = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         // Exercise all the mathematical variations one can find in the yaml line that
         // might signal a helm template element
@@ -598,14 +599,14 @@ class ChartMapTest {
     @Test
     void unpackChartTest() throws ChartMapException, IOException {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm1.setChartName("foo");
         cm1.createTempDir();
         assertThrows(ChartMapException.class, () -> cm1.unpackChart("foo"));
         System.out.println("ChartMapException thrown as expected");
         // force ChartMapException path when no temp dir
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm2.setChartName("foo");
         assertThrows(ChartMapException.class, () -> cm2.unpackChart("foo"));
@@ -615,7 +616,7 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm2.unpackChart(null));
         // test when the tgz has no directory
         System.out.println("ChartMapException thrown as expected");
-        ChartMap cm3 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm3 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm3.setChartName(null);
         cm3.setChartVersion(null);
@@ -630,7 +631,7 @@ class ChartMapTest {
         }
         // test when the tgz has no directory, this time with a non-null chartname and a
         // null version
-        ChartMap cm4 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm4.setChartName("foo");
         cm4.setChartVersion(null);
@@ -645,7 +646,7 @@ class ChartMapTest {
         }
         // test when the tgz has no directory, this time with a non-null version and a
         // null chartname to complete all the variations
-        ChartMap cm5 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm5 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm5.setChartName(null);
         cm5.setChartVersion("1.1.1");
@@ -672,7 +673,7 @@ class ChartMapTest {
         // Test some getters related to the print format and file name
         String b = ChartMap.getBaseName(Paths.get("./target").toString());
         assertEquals(null, b);
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         cm1.print();
         assertEquals(PrintFormat.PLANTUML, cm1.getPrintFormat());
@@ -699,7 +700,7 @@ class ChartMapTest {
      */
     @Test
     void applyTemplatesTest() throws ChartMapException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         cm.print();
         HelmChart h = cm.chartsReferenced.get("nginx", "11.1.5");
@@ -728,7 +729,7 @@ class ChartMapTest {
         Files.deleteIfExists(notMapPath);
         notMapPath = Files.createFile(notMapPath);
         Files.write(notMapPath, " foo ".getBytes()); // not a Map
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm1 = spy(cm1);
         doReturn(notMapPath.toFile()).when(scm1).runTemplateCommand(any(File.class), any(HelmChart.class));
@@ -742,7 +743,7 @@ class ChartMapTest {
         Files.deleteIfExists(notKindPath);
         notKindPath = Files.createFile(notKindPath);
         Files.write(notKindPath, "notKind: foo\n".getBytes()); // something not a 'kind' object
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm2 = spy(cm2);
         doReturn(notKindPath.toFile()).when(scm2).runTemplateCommand(any(File.class), any(HelmChart.class));
@@ -763,7 +764,7 @@ class ChartMapTest {
      */
     @Test
     void collectValuesTest() throws ChartMapException, IOException {
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         // test the cases where one or both of the parameters are null
         try {
@@ -777,7 +778,7 @@ class ChartMapTest {
         Path pathOfEmptyFile = Files.createFile(Paths.get(TARGET_TEST, "values.yaml"));
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     true);
             cm2.setVerboseLogLevel(); // this is called explicitly because print is not called
             cm2.collectValues(TARGET_TEST, new HelmChart());
@@ -800,7 +801,7 @@ class ChartMapTest {
      */
     @Test
     void loadLocalReposTest() throws ChartMapException, IOException {
-        ChartMap cm = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         // set a bogus helm config path to induce the exception
         cm.setHelmRepositoryConfigPath("bogus");
@@ -817,7 +818,7 @@ class ChartMapTest {
     @Test
     void checkHelmVersionTest() throws ChartMapException, InterruptedException, IOException {
         // Test a bad helm command
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm1 = spy(cm1);
         // Use a command that is the same across all the OS's so it will run
@@ -830,7 +831,7 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
         System.out.println("ChartMapException thrown as expected");
         // Test not helm version 3
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm2 = spy(cm2);
         // Use a command that is the same across all the OS's to mimic a helm not v3
@@ -840,7 +841,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected");
         // Use a command that will cause the process' BufferedReader to return null and
         // force the ChartMapException.
-        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm3 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm3 = spy(cm3);
         String nullCommand = isWindows() ? "type" : "cat";
@@ -851,7 +852,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected");
         // Use a command that will cause the process' BufferedReader to just one
         // character and force the ChartMapException
-        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm4 = spy(cm4);
         Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "1" });
@@ -859,7 +860,7 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> scm4.checkHelmVersion());
         System.out.println("ChartMapException thrown as expected");
         // Cause an IOException -> ChartMapException on getProcess()
-        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm5 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm5 = spy(cm5);
         doThrow(IOException.class).when(scm5).getProcess(any(), eq(null));
@@ -868,14 +869,14 @@ class ChartMapTest {
         // Cause an InterruptedException -> ChartMapException on waitFor()
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
-        ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm6 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm6 = spy(cm6);
         Process p6 = Runtime.getRuntime()
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp6 = spy(p6);
         doReturn(sp6).when(scm6).getProcess(any(), eq(null));
-        doThrow(InterruptedException.class).when(sp6).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp6).waitFor(cm6.getTimeout(), TimeUnit.SECONDS);
         assertThrows(ChartMapException.class, () -> scm6.checkHelmVersion());
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -889,7 +890,7 @@ class ChartMapTest {
     @Test
     void getHelmClientInformationTest() throws ChartMapException, InterruptedException, IOException {
         // Test the normal case
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         cm1.getHelmClientInformation();
         assertNotNull(cm1.getHelmCachePath());
@@ -898,7 +899,7 @@ class ChartMapTest {
         assertNotNull(cm1.getHelmRepositoryConfigPath());
         // Force File.setReadable to return false to test security protection of
         // temporary file
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm2 = spy(cm2);
         File sf2 = spy(new File("helmTempSpyRead", ".txt"));
@@ -910,7 +911,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected after setReadable");
         // Force File.setWritable to return false to test security protection of
         // temporary file
-        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm3 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm3 = spy(cm3);
         File sf3 = spy(new File("helmTempSpyWrite", ".txt"));
@@ -922,7 +923,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected after setWritable");
         // Force File.setExecutable to return false to test security protection of
         // temporary file
-        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm4 = spy(cm4);
         File sf4 = spy(new File("helmTempSpyWrite", ".txt"));
@@ -933,13 +934,13 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> scm4.getHelmClientInformation());
         System.out.println("ChartMapException thrown as expected after setExecutable");
         // Force ProcessBuilder to thrown an IOException to force helm env command failing
-        ChartMap cm5 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm5 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         ChartMap scm5 = spy(cm5);
         doThrow(IOException.class).when(scm5).getProcessBuilder(any(), any());
         assertThrows(ChartMapException.class, () -> scm5.getHelmClientInformation());
         System.out.println("IOException -> ChartMapException thrown as expected");
         // Force Process.exitValue to return a non-zero exit value
-        ChartMap cm6 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm6 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         ChartMap scm6 = spy(cm6);
         ProcessBuilder pb6 = new ProcessBuilder("foo", "bar");
         ProcessBuilder spb6 = spy(pb6);
@@ -951,17 +952,17 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> scm6.getHelmClientInformation());
         System.out.println("IOException -> ChartMapException thrown as expected with simulated bad exit code");
         // Force Process.start to throw an InterruptedException
-        ChartMap cm7 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm7 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         ChartMap scm7 = spy(cm7);
         ProcessBuilder pb7 = new ProcessBuilder("foo", "bar");
         ProcessBuilder spb7 = spy(pb7);
         Process p7 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to throw an InterruptedException on waitFor ... just watch me!!" });
         Process sp7 = spy(p7);
-        doThrow(InterruptedException.class).when(sp7).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp7).waitFor(cm7.getTimeout(), TimeUnit.SECONDS);
         doReturn(sp7).when(spb7).start();
         doReturn(spb7).when(scm7).getProcessBuilder(any(), any());
         assertThrows(ChartMapException.class, () -> scm7.getHelmClientInformation());
-        System.out.println("InterruptedException -> ChartMapException thrown as expected with simulated bad exit code");
+        System.out.println("InterruptedException -> ChartMapException thrown as expected with simulated bad waitFor");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -989,7 +990,7 @@ class ChartMapTest {
         Files.write(p, b);
         // Create a test ChartMap and validate I can load the chart from my fabricated
         // cache. Note that it will compesate for a missing url in the local helm chart.
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm1.loadChartsFromCache(r, f);
         assertNotNull(cm1.getCharts().get("foo", "6.6.6"));
@@ -1001,7 +1002,7 @@ class ChartMapTest {
                 .concat("\n".concat("    urls:\n"));
         b = s.getBytes();
         Files.write(p, b);
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm2.loadChartsFromCache(r, f);
         assertNotNull(cm2.getCharts().get("foo", "6.6.6"));
@@ -1013,7 +1014,7 @@ class ChartMapTest {
                 .concat("\n".concat("    urls: []\n"));
         b = s.getBytes();
         Files.write(p, b);
-        ChartMap cm3 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm3 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm3.loadChartsFromCache(r, f);
         assertNotNull(cm3.getCharts().get("foo", "6.6.6"));
@@ -1025,7 +1026,7 @@ class ChartMapTest {
                 .concat("\n".concat("    urls: []\n"));
         b = s.getBytes();
         Files.write(p, b);
-        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm4.loadChartsFromCache(r, f);
         assertNotNull(cm4.getCharts().get("foo", "6.6.6"));
@@ -1038,7 +1039,7 @@ class ChartMapTest {
                 .concat("\n".concat("    urls:\n    - ''\n"));
         b = s.getBytes();
         Files.write(p, b);
-        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm5 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm5.loadChartsFromCache(r, f);
         assertNotNull(cm5.getCharts().get("foo", "6.6.6"));
@@ -1048,7 +1049,7 @@ class ChartMapTest {
         // branches
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm6 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     false);
             cm6.loadChartsFromCache(r, null);
             assertTrue(ChartMapTestUtil.streamContains(o, String.format("Error loading charts from helm cache: ")));
@@ -1066,7 +1067,7 @@ class ChartMapTest {
     @Test
     void printChartsTest() throws ChartMapException, IOException {
         // Test for a single Chart
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
                 Paths.get(TARGET_TEST, "test-fakechart.txt"), true, false, false);
         cm1.print();
         assertTrue(
@@ -1074,7 +1075,7 @@ class ChartMapTest {
         // Force a ChartMapException using a spy
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm2 = createTestMap(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
+            ChartMap cm2 = createTestMapV11(ChartOption.FILENAME, "src/test/resource/test-fakechart.tgz",
                     Paths.get(TARGET_TEST, "test-fakechart.txt"), true, false, false);
             ChartMap scm2 = spy(cm2);
             IChartMapPrinter sp2 = spy(IChartMapPrinter.class);
@@ -1097,7 +1098,7 @@ class ChartMapTest {
     @Test
     void testExtractEmbeddedCharts() throws ChartMapException, IOException, RuntimeException {
         // Force a ChartMapException
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
             mf.when(() -> Files.walk(any(Path.class), anyInt())).thenThrow(IOException.class);
@@ -1146,7 +1147,7 @@ class ChartMapTest {
     void resolveChartDependenciesTest() throws ChartMapException, IOException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     true);
             ChartMap scm1 = spy(cm1);
             doReturn(null).when(scm1).fetchChart();
@@ -1166,14 +1167,14 @@ class ChartMapTest {
     @Test
     void getChartTest() throws ChartMapException {
         // Test chart not found in getChart()
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         ChartMap scm1 = spy(cm1);
         doReturn(null).when(scm1).getChart(anyString());
         assertNull(scm1.fetchChart());
 
         // Test getChart(String c) IOException to ChartMapException
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_TEXT_PATH_NRNV, false, false,
                 true);
         cm2.print();
         try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
@@ -1195,7 +1196,7 @@ class ChartMapTest {
     @Test
     void pullChartTest() throws ChartMapException, InterruptedException, IOException {
         // Use a spy to throw an IOException -> ChartMapException
-        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm1 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         ChartMap scm1 = spy(cm1);
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.print());
@@ -1203,13 +1204,13 @@ class ChartMapTest {
         // Use a spy to throw an InterruptedException -> ChartMapException
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm2 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         ChartMap scm2 = spy(cm2);
         Process p2 = Runtime.getRuntime()
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp2 = spy(p2);
         doReturn(sp2).when(scm2).getProcess(any(), any(File.class));
-        doThrow(InterruptedException.class).when(sp2).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp2).waitFor(cm2.getTimeout(), TimeUnit.SECONDS);
         assertThrows(ChartMapException.class, () -> scm2.print());
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1226,7 +1227,7 @@ class ChartMapTest {
         try (MockedStatic<ChartMap> mcm = Mockito.mockStatic(ChartMap.class)) {
             mcm.when(() -> ChartMap.getHttpResponse(any(CloseableHttpClient.class), anyString()))
                     .thenThrow(IOException.class);
-            ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false,
                     false);
             // force the creation of the temp dir so test artifacts don't accumulate in the project directory
             cm1.createTempDir();
@@ -1235,7 +1236,7 @@ class ChartMapTest {
         }
         // Test a bad http rc using a url that's guraranteed not to exist. See
         // https://github.com/Readify/httpstatus.
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm2 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
         // force the creation of the temp dir so test artifacts don't accumulate in the project directory
         cm2.createTempDir();
         assertThrows(ChartMapException.class, () -> cm2.downloadChart("https://httpstat.us/404"));
@@ -1254,13 +1255,13 @@ class ChartMapTest {
     void updateLocalRepoTest() throws ChartMapException, InterruptedException, IOException {
         // Use a spy to throw an IOException -> ChartMapException
         // Make sure refresh is set to true (second boolean parm)
-        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
+        ChartMap cm1 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
         ChartMap scm1 = spy(cm1);
         doThrow(IOException.class).when(scm1).getProcess(any(), any(File.class));
         assertThrows(ChartMapException.class, () -> scm1.updateLocalRepo("foo"));
         System.out.println("IOException -> ChartMapException thrown as expected");
         // Cause a bad exit value from the process
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
+        ChartMap cm2 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
         ChartMap scm2 = spy(cm2);
         Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "I am going to return a bad exitvalue!!!" });
         Process sp2 = spy(p2);
@@ -1271,13 +1272,13 @@ class ChartMapTest {
         // Simulate an InterruptedException -> ChartMapException on waitFor()
         // Be careful to put InterruptedException case last in the test case since the
         // thread is not usable after that
-        ChartMap cm3 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
+        ChartMap cm3 = createTestMapV11(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, false, true, false);
         ChartMap scm3 = spy(cm3);
         Process p3 = Runtime.getRuntime()
                 .exec(new String[] { "echo", "I am going to throw an InterruptedException!!" });
         Process sp3 = spy(p3);
         doReturn(sp3).when(scm3).getProcess(any(), any(File.class));
-        doThrow(InterruptedException.class).when(sp3).waitFor(PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
+        doThrow(InterruptedException.class).when(sp3).waitFor(cm3.getTimeout(), TimeUnit.SECONDS);
         assertThrows(ChartMapException.class, () -> scm3.updateLocalRepo("foo"));
         System.out.println("InterruptedException -> ChartMapException thrown as expected");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1292,7 +1293,7 @@ class ChartMapTest {
     @Test
     void createChartTest() throws IOException, ChartMapException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false,
                     false, false);
             String s = "foo";
             System.setOut(new PrintStream(o));
@@ -1320,7 +1321,7 @@ class ChartMapTest {
         Files.createDirectory(d);
         Files.createFile(f);
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                     false);
             System.setOut(new PrintStream(o));
             cm1.getConditionMap(d.toString());
@@ -1341,7 +1342,7 @@ class ChartMapTest {
     @Test
     void collectDependenciesTest() throws ChartMapException, IOException {
         // Test the currentDirectory.list returns null case
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         HelmChart h = new HelmChart();
         h.setName("foo");
@@ -1355,7 +1356,7 @@ class ChartMapTest {
         assertEquals(i1, cm1.getChartsReferenced().size());
         System.out.println("Tested collectDependencies when currentDirectory.list returns null");
         // Test no Chart.yaml file found 
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         Path d2p = Paths.get(TARGET_TEST, "collectDependenciesTestParent");
         Path d2c = Paths.get(d2p.toString(), "collectDependenciesTestChild");
@@ -1370,7 +1371,7 @@ class ChartMapTest {
         System.out.println("Tested collectDependencies when Chart.yaml does not exist");
         // Test the Chart.yaml file references a chart that does not exist
         Path p3 = Paths.get(d2c.toString(), ChartMap.CHART_YAML);
-        ChartMap cm3 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm3 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm3.print();
         String s = "apiVersion: v1\nentries:\n  foo-chart:\n  - name: ".concat("foo").concat("\n    version: ")
@@ -1380,7 +1381,7 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> cm3.collectDependencies(d2p.toString(), null));
         System.out.println("ChartMapException thrown as expected in collectDependencies");
         // Test the IOException is thrown
-        ChartMap cm4 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         cm4.print();
         Files.delete(p3);
@@ -1397,7 +1398,7 @@ class ChartMapTest {
      */
     @Test
     void checkForConditionTest() throws ChartMapException {
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
                 false);
         ChartMap scm1 = spy(cm1);
         doReturn(null).when(scm1).getCondition(anyString(), any(HelmChart.class));
@@ -1415,7 +1416,7 @@ class ChartMapTest {
     @Test
     void handleHelmChartConditionTest() throws ChartMapException, IOException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false,
                     false, false);
             ChartMap scm1 = spy(cm1);
             doThrow(IOException.class).when(scm1).collectValues(anyString(), any(HelmChart.class));
@@ -1439,7 +1440,7 @@ class ChartMapTest {
     void getConditionTest() throws ChartMapException, IOException {
         // Test getCondition throwing an IOException, using a spy
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false,
+            ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, false,
                     false, false);
             ChartMap scm1 = spy(cm1);
             doThrow(IOException.class).when(scm1).getEnvVars();
@@ -1452,14 +1453,14 @@ class ChartMapTest {
         }
         // Test the condition where the variable is found with a false value in the env
         // list
-        ChartMap cm2 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_NRNV, false, false,
         false);
         assertEquals(Boolean.FALSE,
                 cm2.getCondition("alfresco\\-infrastructure.alfresco\\-api\\-gateway.enabled", new HelmChart()));
         System.out.println("getCondition false tested");
         // Test getEnvVars throwing an IOException
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm3 = new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "foo-out.txt", "no-env-var-file-here.yaml", PROCESS_TIMEOUT, new boolean[] {false, false, false} );
+            ChartMap cm3 = new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "foo-out.txt", "no-env-var-file-here.yaml", new boolean[] {false, false, false} );
             System.setOut(new PrintStream(o));
             assertThrows(IOException.class, () -> cm3.getEnvVars());
             System.setOut(new PrintStream(INITIAL_OUT));
@@ -1478,7 +1479,7 @@ class ChartMapTest {
     @Test
     void plantUMLLimitSizeTest() throws ChartMapException, IOException, InterruptedException {
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
-            ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, true,
+            ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, true,
                     false, true);
             String e = "4000";
             System.setProperty("PLANTUML_LIMIT_SIZE", e);
@@ -1500,14 +1501,14 @@ class ChartMapTest {
     @Test
     void tempDirTest() throws ChartMapException, IOException {
         // force IOException to ChartMapExceptions using static mocking
-        ChartMap cm1 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm1 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
             mf.when(() -> Files.createTempDirectory(any(), any())).thenThrow(IOException.class);
             assertThrows(ChartMapException.class, () -> cm1.createTempDir());
         }
         System.out.println("IOException -> ChartMapException thrown as expected attempting to create temp dir");
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm2.createTempDir();
         try (MockedStatic<Files> mf = Mockito.mockStatic(Files.class)) {
@@ -1516,14 +1517,14 @@ class ChartMapTest {
         }
         System.out.println("ChartMapException thrown as expected attempting to remove temp dir");
         // create the ChartMap in non-debug mode and be sure the temp dir is deleted
-        ChartMap cm4 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm4 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 true);
         cm4.print();
         assertFalse(Files.exists(Paths.get(cm4.getTempDirName())));
         System.out.println("IOException -> ChartMapException thrown as expected attempting to remove temp dir");
         // Force File.setReadable to return false to test security protection of
         // temporary file
-        ChartMap cm5 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm5 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm5 = spy(cm5);
         File sf5 = spy(new File(TARGET_TEST, "helmTempDirSpyRead"));
@@ -1535,7 +1536,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected after setReadable");
         // Force File.setWritable to return false to test security protection of
         // temporary file
-        ChartMap cm6 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm6 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm6 = spy(cm6);
         File sf6 = spy(new File(TARGET_TEST, "helmTempDirSpyWrite"));
@@ -1547,7 +1548,7 @@ class ChartMapTest {
         System.out.println("ChartMapException thrown as expected after setWritable");
         // Force File.setExecutable to return false to test security protection of
         // temporary file
-        ChartMap cm7 = createTestMap(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
+        ChartMap cm7 = createTestMapV11(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, true, false,
                 false);
         ChartMap scm7 = spy(cm7);
         File sf7 = spy(new File(TARGET_TEST, "helmTempDirSpyWrite"));
@@ -1562,7 +1563,7 @@ class ChartMapTest {
 
     @Test
     void pumlChartRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RV, TIMEOUT_DOUBLE, true, true,
                 true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_RV));
@@ -1571,17 +1572,16 @@ class ChartMapTest {
 
     @Test
     void pumlChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRV, TIMEOUT_DEFAULT, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_NRV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
-
     @Test
     void pumlChartRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RNV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RNV, TIMEOUT_DOUBLE, true, true,
                 false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_RNV));
@@ -1590,7 +1590,7 @@ class ChartMapTest {
 
     @Test
     void pumlChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, TIMEOUT_DEFAULT, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_NRNV));
@@ -1600,7 +1600,7 @@ class ChartMapTest {
 
     @Test
     void textChartRefreshVerboseTest() throws ChartMapException, IOException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RV, TIMEOUT_DOUBLE, true, true,
                 true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_RV));
@@ -1609,7 +1609,7 @@ class ChartMapTest {
 
     @Test
     void textChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRV, TIMEOUT_DEFAULT, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_NRV));
@@ -1618,7 +1618,7 @@ class ChartMapTest {
 
     @Test
     void textChartRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RNV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RNV, TIMEOUT_DOUBLE, true, true,
                 false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_RNV));
@@ -1627,7 +1627,7 @@ class ChartMapTest {
 
     @Test
     void textChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, TIMEOUT_DEFAULT, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_NRNV));
@@ -1636,7 +1636,7 @@ class ChartMapTest {
 
     @Test
     void JSONChartRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RV, TIMEOUT_DOUBLE, true, true,
                 true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_RV));
@@ -1645,7 +1645,7 @@ class ChartMapTest {
 
     @Test
     void JSONChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRV, TIMEOUT_DEFAULT, true,
                 false, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_NRV));
@@ -1654,7 +1654,7 @@ class ChartMapTest {
 
     @Test
     void JSONChartRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RNV, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RNV, TIMEOUT_DOUBLE, true, true,
                 false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_RNV));
@@ -1663,7 +1663,7 @@ class ChartMapTest {
 
     @Test
     void JSONChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRNV, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRNV, TIMEOUT_DEFAULT, true,
                 false, false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_NRNV));
@@ -1672,7 +1672,7 @@ class ChartMapTest {
 
     @Test
     void APPRTest() throws ChartMapException, IOException{ // test normal path
-        ChartMap cm1 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, false);
+        ChartMap cm1 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, false);
         cm1.print();
         assertTrue(Files.exists(OUTPUT_APPR_PUML_PATH));
         assertEquals("quay.io/melahn",cm1.getApprRepoHostName());
@@ -1680,23 +1680,23 @@ class ChartMapTest {
         // Test null appr spec
         assertTrue(Files.exists(OUTPUT_APPR_PNG_PATH));
         assertThrows(ChartMapException.class,
-                () -> createTestMap(ChartOption.APPRSPEC, null, OUTPUT_APPR_PUML_PATH, true, false, false));
+                () -> createTestMapV12(ChartOption.APPRSPEC, null, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, false));
         System.out.println("ChartMapException thrown as expected with a null appr spec");
         // Test various malformed appr specs
-        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec/noat",
+        assertThrows(ChartMapException.class, () -> createTestMapV11(ChartOption.APPRSPEC, "badapprspec/noat",
                 OUTPUT_APPR_PUML_PATH, true, false, false));
         System.out.println("ChartMapException thrown as expected with a bad appr spec");
-        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.APPRSPEC, "badapprspec@noslash",
+        assertThrows(ChartMapException.class, () -> createTestMapV11(ChartOption.APPRSPEC, "badapprspec@noslash",
                 OUTPUT_APPR_PUML_PATH, true, false, false)); // test chart not found in app repo
         System.out.println("ChartMapException thrown as expected with a bad appr spec");
-        ChartMap cm2 = createTestMap(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0", OUTPUT_APPR_PUML_PATH,
+        ChartMap cm2 = createTestMapV12(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0", OUTPUT_APPR_PUML_PATH, 0,
                 true, false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
         System.out.println("ChartMapException thrown as expected");
         // Test the case where the repoUrl is guaranteed to be null 
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm3 = createTestMap(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, true, false, true);
+            ChartMap cm3 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, true);
             cm3.setApprRepoHostName(null);
             cm3.print();
             assertTrue(
@@ -1709,12 +1709,12 @@ class ChartMapTest {
 
     @Test
     void UrlTest() throws ChartMapException { // test normal path
-        ChartMap cm = createTestMap(ChartOption.URL, TEST_CHART_URL, OUTPUT_CHART_URL_PUML_PATH, true, true, false);
+        ChartMap cm = createTestMapV11(ChartOption.URL, TEST_CHART_URL, OUTPUT_CHART_URL_PUML_PATH, true, true, false);
         cm.print();
         assertTrue(Files.exists(OUTPUT_CHART_URL_PUML_PATH));
         assertTrue(Files.exists(OUTPUT_CHART_URL_PNG_PATH)); // test null chart name
         assertThrows(ChartMapException.class,
-                () -> createTestMap(ChartOption.URL, null, OUTPUT_CHART_URL_PUML_PATH, true, false, false));
+                () -> createTestMapV11(ChartOption.URL, null, OUTPUT_CHART_URL_PUML_PATH, true, false, false));
         System.out.println("ChartMapException thrown as expected with a null chart name");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1725,16 +1725,16 @@ class ChartMapTest {
         // null env var file
         boolean[] switches = { true, false, false };
         ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, switches);
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, switches);
         cm1.print();
         assertTrue(Files.exists(OUTPUT_CHART_NAME_PUML_PATH));
         assertTrue(Files.exists(OUTPUT_CHART_NAME_PNG_PATH));
         // test missing version in chartname
-        assertThrows(ChartMapException.class, () -> createTestMap(ChartOption.CHARTNAME, "badchartname-noversion",
+        assertThrows(ChartMapException.class, () -> createTestMapV11(ChartOption.CHARTNAME, "badchartname-noversion",
                 OUTPUT_CHART_NAME_PUML_PATH, true, false, false));
         System.out.println("ChartMapException thrown as expected test missing version in chartname");
         // test chart not found
-        ChartMap cm2 = createTestMap(ChartOption.CHARTNAME, "no-such-chart:9.9.9", OUTPUT_CHART_NAME_PUML_PATH, true,
+        ChartMap cm2 = createTestMapV11(ChartOption.CHARTNAME, "no-such-chart:9.9.9", OUTPUT_CHART_NAME_PUML_PATH, true,
                 false, false);
         assertThrows(ChartMapException.class, () -> cm2.print());
         System.out.println("ChartMapException thrown as expected when test chart not found");
@@ -1746,11 +1746,11 @@ class ChartMapTest {
         final int BAD_NUMBER_OF_SWITCHES = 8;
         boolean[] switches = { true, false, false }; // test that a correct option is used
         assertThrows(ChartMapException.class, () -> new ChartMap(null, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, switches)); //
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, switches)); //
         System.out.println("ChartMapException thrown as expected with a bad switches array");
         // test a bad switches array
         assertThrows(ChartMapException.class, () -> new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME,
-                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, PROCESS_TIMEOUT, new boolean[BAD_NUMBER_OF_SWITCHES]));
+                OUTPUT_CHART_NAME_PUML_PATH.toAbsolutePath().toString(), null, new boolean[BAD_NUMBER_OF_SWITCHES]));
         System.out.println("ChartMapException thrown as expected with a bad number of switches in the array");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
@@ -1834,13 +1834,13 @@ class ChartMapTest {
         Files.createFile(f);
         ChartMapPrinter cmp = null;
         try {
-            cmp = new ChartMapPrinter(createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, f, true, true, true), "/",
+            cmp = new ChartMapPrinter(createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, f, true, true, true), "/",
                     null, null);
         } catch (ChartMapException e) {
             System.out.println("First ChartMapException expected and thrown");
             assertFalse(false);
         }
-        cmp = new ChartMapPrinter(createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, f, true, true, true),
+        cmp = new ChartMapPrinter(createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, f, true, true, true),
                 f.toString(), null, null);
         assertEquals(ChartMapPrinter.NOT_SPECIFIED, cmp.formatString(" "));
         assertEquals(ChartMapPrinter.NOT_SPECIFIED, cmp.formatString(null));
@@ -1875,7 +1875,7 @@ class ChartMapTest {
         }
         // test case where the ChartMap logger is null and the ChartMapPrinter needs to
         // create its own
-        ChartMap cm = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_NRNV, true, false,
+        ChartMap cm = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_NRNV, true, false, 
                 false);
         cm.logger = null;
         cmp = new ChartMapPrinter(cm, f.toString(), null, null);
@@ -1901,7 +1901,7 @@ class ChartMapTest {
     @Test
     void PlantUMLChartMapPrinterTest() throws Exception {
         // Test bad values for repo and images when print puml files
-        ChartMap cm1 = createTestMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_NRNV, true,
+        ChartMap cm1 = createTestMapV11(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_NRNV, true,
                 true, false);
         cm1.createTempDir();
         cm1.loadLocalRepos();
@@ -1990,13 +1990,29 @@ class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
-    private ChartMap createTestMap(ChartOption option, String input, Path outputPath, boolean generateImage,
+    /*
+     * Creates a ChartMap using the API for V1.1.x and earlier.
+     */
+    private ChartMap createTestMapV11(ChartOption option, String input, Path outputPath, boolean generateImage, 
             boolean refresh, boolean verbose) throws ChartMapException {
         boolean[] switches = new boolean[] { generateImage, refresh, verbose };
         ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
-                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), PROCESS_TIMEOUT, switches);
+                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), switches);
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
     }
+
+    /*
+     * Creates a ChartMap using the API for V1.2.x and earlier.
+     */
+    private ChartMap createTestMapV12 (ChartOption option, String input, Path outputPath, int timeout,
+            boolean generateImage,
+            boolean refresh, boolean verbose) throws ChartMapException {
+        ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
+                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), timeout, refresh, verbose, generateImage);
+        cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
+                                 // necessarily calling print
+        return cm;
+}
 }

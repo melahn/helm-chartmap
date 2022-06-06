@@ -1,9 +1,9 @@
 # Chart Map
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/commit/master)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/releases/tag/v1.1.2)
-[![GitHub Release Date](https://img.shields.io/github/release-date/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/releases/tag/v1.1.2)
-[![Maven Central](https://img.shields.io/maven-central/v/com.melahn/helm-chartmap)](https://search.maven.org/artifact/com.melahn/helm-chartmap/1.1.2/jar)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/releases/tag/v1.2.0)
+[![GitHub Release Date](https://img.shields.io/github/release-date/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/releases/tag/v1.2.0)
+[![Maven Central](https://img.shields.io/maven-central/v/com.melahn/helm-chartmap)](https://search.maven.org/artifact/com.melahn/helm-chartmap/1.2.0/jar)
 [![GitHub issues](https://img.shields.io/github/issues/melahn/helm-chartmap)](https://github.com/melahn/helm-chartmap/issues)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![GitHub Build Status](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml/badge.svg)](https://github.com/melahn/helm-chartmap/actions/workflows/build.yml)
@@ -34,13 +34,13 @@ You can see an example of a text file generated from Chart Map here &#8594; <htt
 
 ## Dependency Info
 
-Available from the [Maven Central Repository](https://mvnrepository.com/artifact/com.melahn/helm-chartmap/1.1.2) and from [GitHub Packages](https://github.com/melahn/helm-chartmap/packages)
+Available from the [Maven Central Repository](https://mvnrepository.com/artifact/com.melahn/helm-chartmap/1.2.0) and from [GitHub Packages](https://github.com/melahn/helm-chartmap/packages)
 
 ``` xml
 <dependency>
   <groupId>com.melahn</groupId>
   <artifactId>helm-chartmap</artifactId>
-  <version>1.1.2</version>
+  <version>1.2.0</version>
 </dependency>
 
 ```
@@ -65,7 +65,7 @@ The location of the helm cache and configuration directories is derived using th
 
 ### Setup
 
-1. Download the executable jar from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.1.2/helm-chartmap-1.1.2.jar)
+1. Download the executable jar from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.2.0/helm-chartmap-1.2.0.jar)
 or build it yourself from source (see below)
 2. Run the command line
 3. Write a Java program using the API, to generate a chart
@@ -77,7 +77,7 @@ If debug information is desired, set the environment variable *CHARTMAP_DEBUG*=&
 ### Command Line Syntax
 
 ``` bash
-java -jar helm-chartmap-1.1.2.jar
+java -jar helm-chartmap-1.2.0.jar
 
 Flags:
   -a  <apprspec>  A name and version of a chart as an appr specification
@@ -130,19 +130,19 @@ Flags:
 ##### Generating a Chartmap using a chart reference
 
 ``` bash
-java -jar target/helm-chartmap-1.1.2.jar -c "wordpress:14.2.5" -o wordpress-14.2.5.txt  -v
+java -jar target/helm-chartmap-1.2.0.jar -c "wordpress:14.2.5" -o wordpress-14.2.5.txt  -v
 ```
 
 ##### Generating a Chartmap using a file specification
 
 ``` bash
-java -jar target/helm-chartmap-1.1.2.jar -f "./src/test/resource/test-chart-file-2.tgz" -o test-chart-file-2.puml -e "./resource/example/example-env-spec.yaml"
+java -jar target/helm-chartmap-1.2.0.jar -f "./src/test/resource/test-chart-file-2.tgz" -o test-chart-file-2.puml -e "./resource/example/example-env-spec.yaml"
 ```
 
 ##### Generating a Chartmap using a url specification
 
 ``` bash
-java -jar target/helm-chartmap-1.1.2.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-5.2.0.tgz" -o alfresco-content-services-5.2.0.puml -g -v -r -e "./resource/example/example-env-spec.yaml" -t 1200
+java -jar target/helm-chartmap-1.2.0.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-5.2.0.tgz" -o alfresco-content-services-5.2.0.puml -g -v -r -e "./resource/example/example-env-spec.yaml" -t 1200
 
 ```
 
@@ -153,7 +153,7 @@ Also note that the system property *PLANTUML_LIMIT_SIZE* allows the generation o
 ##### Generating a Chartmap using an appr specification
 
 ``` bash
-java -jar target/helm-chartmap-1.1.2.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o helm-chartmap-test-chart.puml -g -v
+java -jar target/helm-chartmap-1.2.0.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o helm-chartmap-test-chart.puml -g -v
 
 ```
 
@@ -163,15 +163,25 @@ Note in this example, the chart is stored as a quay.io application file and cont
 
 In addition to the command line interface, a Java API is provided.
 
-#### Constructor
+#### Constructor - V1.1.x and V1.0.x
 
 ``` java
     public ChartMap(ChartOption option,
                     String chart,
                     String outputFilename,
                     String envFilename,
-                    int, timeout,
                     boolean[] switches)                  
+```
+
+#### Constructor - V1.2.x
+
+``` java
+    public ChartMap(ChartOption option,
+                    String chart,
+                    String outputFilename,
+                    String envFilename,
+                    int timeout,
+                    boolean... switches)                  
 ```
 
 ##### Description of ChartMap constructor
@@ -192,16 +202,26 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The name of the file to which to write the generated Chart Map. Note the file is overwritten if it exists.
 * *envSpecFilename*
   * The location of an Environment Specification which is a yaml file containing a list of environment variables to set before rendering helm templates, or &lt;null&gt;. See the [example environment specification](./resource/example/example-env-spec.yaml) to understand the format.
-* *timeout*
+* *timeout* (V1.2.x only)
   * The maximum amount of time to wait (in seconds) for a helm command to complete. This is rarely, if ever needed, and is intended for cases where a helm chart is very complex, and the helm update dependency command may take a long time because of machine or network constraints. If the number is not greater than zero, a detault of 600 seconds is used.
 * *switches*
-  * An array containing the following boolean values
-    * *switches[0]* *generate*
-      * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
-    * *switches[1]* *refresh*
-      * When *true*, refresh the local Helm repo (default *false*)
-    * *switches[2]* *verbose*
-      * When *true*, provides a little more information as the Chart Map is generated (default *false*)
+  * V1.1.x and V1.1.0
+    * An array containing the following boolean values
+      * *switches[0]* *generate*
+        * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
+      * *switches[1]* *refresh*
+        * When *true*, refresh the local Helm repo (default *false*)
+      * *switches[2]* *verbose*
+        * When *true*, provides a little more information as the Chart Map is generated (default *false*)
+  * V1.2.x
+    * 0 or more boolean arguments defined as follows.
+      * *switches[0]* *refresh*
+        * When *true*, refresh the local Helm repo (default *false*)
+      * *switches[1]* *verbose*
+        * When *true*, provides a little more information as the Chart Map is generated (default *false*)
+      * *switches[2]* *generate*
+        * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
+      * Any extra switches are ignored.
 
 ##### Throws
 
@@ -223,14 +243,39 @@ Prints a *ChartMap*
 
 * *com.melahn.util.helm.ChartMapException*
 
-#### Java Example
+#### Java Example - V1.1.x and V1.0.x
 
 ``` java
 import com.melahn.util.helm.ChartMap;
 import com.melahn.util.helm.ChartMapException;
 import com.melahn.util.helm.ChartOption;
 
-public class ChartMapExample {
+public class ChartMapExampleV11 {
+    public static void printExampleChartMap(String[] args) {
+        try {
+            ChartMap testMap = new ChartMap(
+                    ChartOption.FILENAME,
+                    "src/test/resource/testChartFile.tgz",
+                    "my-chartmap.puml",
+                    "resource/example/example-env-spec.yaml",
+                    1200,
+                    new boolean[] { true, true, false });
+            testMap.print();
+        } catch (ChartMapException e) {
+            System.out.println("ChartMapException generating chart map: ".concat(e.getMessage()));
+        }
+    }
+}
+```
+
+#### Java Example - V1.2.x
+
+``` java
+import com.melahn.util.helm.ChartMap;
+import com.melahn.util.helm.ChartMapException;
+import com.melahn.util.helm.ChartOption;
+
+public class ChartMapExampleV12 {
     public static void printExampleChartMap(String[] args) {
         try {
             ChartMap testMap = new ChartMap(
@@ -239,7 +284,7 @@ public class ChartMapExample {
                     "my-chartmap.puml",
                     "resource/example/example-env-spec.yaml",
                     0,
-                    new boolean[] { true, true, false });
+                    true); // take the default values for verbose and generate
             testMap.print();
         } catch (ChartMapException e) {
             System.out.println("ChartMapException generating chart map: ".concat(e.getMessage()));
@@ -335,7 +380,7 @@ Having generated some PlantUML files, if you want to generate image files from t
 That will cause Chartmap to automatically generate a PNG file for you. For example,
 
 ``` bash
-java -jar helm-chartmap-1.1.2.jar -c "wordpress:14.2.5" -r -v -g -o "wordpress-14.2.5.puml" 
+java -jar helm-chartmap-1.2.0.jar -c "wordpress:14.2.5" -r -v -g -o "wordpress-14.2.5.puml" 
 ```
 
 * You can use the online [PlantUML Service](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000).
@@ -350,7 +395,7 @@ java -jar ~/Downloads/plantuml.jar alfresco-dbp-1.5.0.puml
 * You can build PlantUML from [source](https://github.com/plantuml/plantuml) and then use the command line like this ...
 
 ``` bash
-java -jar ~/IdeaProjects/plantuml/target/plantuml-1.2018.11-SNAPSHOT.jar -tsvg alfresco-dbp-1.5.0.puml
+java -jar ~/IdeaProjects/plantuml/target/plantuml-1.2022.5-SNAPSHOT.jar -tsvg alfresco-dbp-1.5.0.puml
 ```
 
 ### Other Notes

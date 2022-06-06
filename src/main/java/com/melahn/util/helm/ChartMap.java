@@ -63,6 +63,7 @@ import com.melahn.util.helm.model.HelmRequirements;
 public class ChartMap {
     private String apprSpec = null;
     private String apprRepoHostName = null;
+    ArrayList<String> args = new ArrayList<>();
     private HelmChart chart;
     private String chartFilename = null;
     private ChartKeyMap charts = new ChartKeyMap();
@@ -93,20 +94,25 @@ public class ChartMap {
     private IChartMapPrinter printer;
     private boolean refreshLocalRepo = false;
     private String tempDirName = null;
-    private int timeout = 300;
+    private int timeout = TIMEOUT_DEFAULT;
     private boolean verbose = false;
 
     private static final String DEFAULT_OUTPUT_FILENAME = "chartmap.text";
     private static final int GENERATE_SWITCH = 0;
+    private static final int GENERATE_SWITCH_1_2 = 2;
     private static final String LOG_FORMAT_2 = "{}{}";
     private static final String LOG_FORMAT_3 = "{}{}{}";
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
+    private static final int MAX_SWITCHES_V11 = 3;
+    private static final int MAX_SWITCHES_V12 = 3;
     private static final String PLANTUML_LIMIT_SIZE = "8192";
     private static final String PLANTUML_LIMIT_SIZE_NAME = "PLANTUML_LIMIT_SIZE";
     private static final int REFRESH_SWITCH = 1;
+    private static final int REFRESH_SWITCH_1_2 = 0;
     private static final String TEMP_DIR = "Temporary Directory ";
     private static final int VERBOSE_SWITCH = 2;
+    private static final int VERBOSE_SWITCH_1_2 = 1;
 
     protected static final String APPDATA = "APPDATA";
     protected static final String CHARTMAP_DEBUG_ENV_VAR = "CHARTMAP_DEBUG";
@@ -119,6 +125,7 @@ public class ChartMap {
     protected static final String START_OF_TEMPLATE = "# Source: ";
     protected static final String TEMP = "TEMP";
     protected static final String TEMP_DIR_ERROR = "IOException creating temp directory";
+    protected static final int TIMEOUT_DEFAULT = 600;
     protected static final int MAX_WEIGHT = 100;
 
     /**
@@ -168,7 +175,33 @@ public class ChartMap {
     }
 
     /**
-     * Constructor
+     * Constructor - prior to v1.2.x
+     *
+     * @param option         The format of the Helm Chart
+     * @param chart          The name of the Helm Chart in one of the formats
+     *                       specified by the option parameter
+     * @param outputFilename The name of the file to which to write the generated
+     *                       Chart Map. Note the file is overwritten if it exists
+     * @param envFilename    The name of a yaml file that contains a set of
+     *                       environment variables which may influence the way the
+     *                       charts are rendered by helm.
+     * @param switches       An array containing a list of boolean values as follows
+     *                       when true switches[0] generates an image from the
+     *                       PlantUML file (if any) switches[1] refresh the local
+     *                       Helm repo switches[2] provides a little more
+     *                       information as the Chart Map is generated 
+     * @throws ChartMapException when an error occurs creating the chart map
+     **/
+
+    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, boolean[] switches)
+            throws ChartMapException {
+        this();
+        addSwitchesToArgs(switches);
+        processCommonArgs(option, chart, outputFilename, envFilename);
+    }
+
+    /**
+     * Constructor - v1.2.x
      *
      * @param option         The format of the Helm Chart
      * @param chart          The name of the Helm Chart in one of the formats
@@ -180,46 +213,58 @@ public class ChartMap {
      *                       charts are rendered by helm.
      * @param timeout        The maximum time (in seconds) to allow a helm command to 
      *                       complete.
-     * @param switches       An array containing a list of boolean values as follows
-     *                       when true switches[0] generates an image from the
-     *                       PlantUML file (if any) switches[1] refresh the local
-     *                       Helm repo switches[2] provides a little more
-     *                       information as the Chart Map is generated 
+     * @param switches       A variable list of boolean values as follows, 
+     *                       When true ...
+     *                          switches[0] verbose outout
+     *                          switches[1] causes helm dependencies to be updated
+     *                          switches[0] generates an image if the output file was Plazzzzz
+     *                              PlantUML file (if any)
      * @throws ChartMapException when an error occurs creating the chart map
      **/
-
-    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, int timeout, boolean[] switches)
+    public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, int timeout, boolean... switches)
             throws ChartMapException {
-        setDebugLogLevel();
-        ArrayList<String> args = new ArrayList<>();
-        addChartOptionToArgs(args, option);
-        args.add(chart);
-        args.add("-o");
-        args.add(outputFilename);
-        if (envFilename != null) {
-            args.add("-e");
-            args.add(envFilename);
-        }
+        this();
         if (timeout > 0) {
             args.add("-t");
             args.add(String.valueOf(timeout));
         }
-        for (String a : args) {
-            if (a == null) {
-                throw new ChartMapException("Null parameter");
-            }
-        }
-        addSwitchesToArgs(args, switches);
-        parseArgs(args.toArray(new String[args.size()]));
+        addSwitchesToArgsV12(switches);
+        processCommonArgs(option, chart, outputFilename, envFilename);
     }
 
-     /**
+    /**
      * Default constructor.
      * 
      * Just sets the debug log level.
      */
     public ChartMap() {
         setDebugLogLevel();
+    }
+
+    /**
+     * Process common to the 1.2 and prior constructors.
+     * 
+     * @param o Chartmap option
+     * @param c Chart name
+     * @param f Outpput filename
+     * @param e Environment Spec filename
+     * @throws ChartMapException
+     */
+    void processCommonArgs(ChartOption o, String c, String f, String e) throws ChartMapException {
+        addChartOptionToArgs(args, o);
+        args.add(c);
+        args.add("-o");
+        args.add(f);
+        if (e != null) {
+            args.add("-e");
+            args.add(e);
+        }
+        for (String a : args) {
+            if (a == null) {
+                throw new ChartMapException("Null parameter");
+            }
+        }
+        parseArgs(args.toArray(new String[args.size()]));
     }
 
     /**
@@ -247,21 +292,43 @@ public class ChartMap {
     /**
      * Parses the switches array and adds them to the command line args.
      * 
-     * @param args
      * @param switches
+     * @throws ChartMapException if there are more or ess than three switches
      */
-    private void addSwitchesToArgs(ArrayList<String> a, boolean[] s) throws ChartMapException {
-        if (s.length != 3) {
+    private void addSwitchesToArgs(boolean[] s) throws ChartMapException {
+        if (s.length != MAX_SWITCHES_V11) {
             throw new ChartMapException("Switches are invalid. There should be three of them.");
         }
         if (s[GENERATE_SWITCH]) {
-            a.add("-g");
+            args.add("-g");
         }
         if (s[REFRESH_SWITCH]) {
-            a.add("-r");
+            args.add("-r");
         }
         if (s[VERBOSE_SWITCH]) {
-            a.add("-v");
+            args.add("-v");
+        }
+    }
+
+    /**
+     * Parses the switches array according to the V 1.2.x API 
+     * and adds them to the command line args.  Ignore any extra
+     * switches.
+     * 
+     * @param argsf
+     * @param switches
+     */
+    private void addSwitchesToArgsV12(boolean[] s){
+        for (int i = 0; i < s.length && i < MAX_SWITCHES_V12; i++) {
+            if (s[REFRESH_SWITCH_1_2]) {
+                args.add("-r");
+            }
+            if (s[VERBOSE_SWITCH_1_2]) {
+                args.add("-v");
+            }
+            if (s[GENERATE_SWITCH_1_2]) {
+                args.add("-g");
+            }
         }
     }
 
@@ -676,7 +743,7 @@ public class ChartMap {
             throw (new ChartMapException("IOException executing helm env command"));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw (new ChartMapException("IOException executing helm env command"));
+            throw (new ChartMapException("InterruptedException executing helm env command"));
         }catch (IllegalThreadStateException e) {
             handleIllegalStateThreadException(p, "template");
         } 
