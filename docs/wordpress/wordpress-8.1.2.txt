@@ -5,17 +5,17 @@ There are 2 referenced Helm Charts
 Chart: mariadb:7.3.6
 	apiVersion: v1
 	appVersion: 10.3.21
-	created: 2020-01-29T08:40:01.85392847Z
+	created: 2020-10-15T15:46:19.335193-04:00
 	dependencies: None
 	description: Fast, reliable, scalable, and easy to use open-source relational database system. MariaDB Server is intended for mission-critical, heavy-load production systems as well as for embedding into mass-deployed software. Highly available MariaDB cluster.
-	digest: ef54cdc74a900de33c94c8382cc875e994f893bdd5069b486727585f556db92e
+	digest: 9eb7b1d2a1a5a4ee0cb4fd0f7b36778bdd6e6e1570e56c250c870c467bb41bbc
 	icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
 	keywords: mariadb,mysql,database,sql,prometheus
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
+	repo url: https://charts.helm.sh/stable
 	name: mariadb
 	sources: https://github.com/bitnami/bitnami-docker-mariadb,https://github.com/prometheus/mysqld_exporter
-	urls: https://charts.bitnami.com/bitnami/mariadb-7.3.6.tgz
+	urls: https://charts.helm.sh/stable/packages/mariadb-7.3.6.tgz
 	version: 7.3.6
 Chart: wordpress:8.1.2
 	apiVersion: v1
@@ -27,7 +27,7 @@ Chart: wordpress:8.1.2
 	icon: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
 	keywords: wordpress,cms,blog,http,web,application,php
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
+	repo url: https://charts.helm.sh/stable
 	name: wordpress
 	sources: https://github.com/bitnami/bitnami-docker-wordpress
 	urls: Not specified
@@ -44,4 +44,4 @@ wordpress:8.1.2 depends on mariadb:7.3.6
 mariadb:7.3.6 uses docker.io/bitnami/mariadb:10.3.21-debian-10-r0
 wordpress:8.1.2 uses docker.io/bitnami/wordpress:5.3.2-debian-10-r0
 
-Generated on 2022/05/29 21:12:18 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:03:46 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

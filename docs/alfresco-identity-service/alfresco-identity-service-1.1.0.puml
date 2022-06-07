@@ -11,7 +11,7 @@ title Chart Map for alfresco-identity-service:1.1.0
 'There are 3 referenced Helm Charts
 artifact "postgresql:0.15.0\n====\n\tType: application\n====\n\tRepo: https://charts.helm.sh/stable\n====\n\tMaintainers: databus23\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql" as postgresql_0_15_0 #LightSteelBlue
 artifact "alfresco-identity-service:1.1.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_1_1_0 #Chartreuse
-artifact "keycloak:4.3.0\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tkeycloak\n\t\taccess-management" as keycloak_4_3_0 #LightBlue
+artifact "keycloak:4.3.0\n====\n\tType: application\n====\n\tRepo: https://charts.helm.sh/stable\n====\n\tMaintainers: \n\t\tunguiculus\n\t\tthomasdarimont\n====\n\tKeywords: \n\t\tsso\n\t\tidm\n\t\topenid connect\n\t\tsaml\n\t\tkerberos\n\t\tldap" as keycloak_4_3_0 #LightBlue
 
 'There are 2 referenced Docker Images
 usecase "Image\n====\nDocker Hub\n====\npostgres\n====\n10.1" as postgres_10_1 #Ivory
@@ -23,5 +23,5 @@ keycloak_4_3_0--[#green]-|>postgresql_0_15_0
 postgresql_0_15_0--[#orange]-|>postgres_10_1
 keycloak_4_3_0--[#orange]-|>jboss_keycloak_4_8_3_Final
 
-center footer Generated on 2022/05/29 21:10:24 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/06/07 11:02:09 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

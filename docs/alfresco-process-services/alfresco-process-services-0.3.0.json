@@ -23,16 +23,6 @@
       "version": "1.11.0"
     },
     {
-      "maintainers": [
-        {
-          "name": "Bitnami",
-          "email": "containers@bitnami.com"
-        },
-        {
-          "name": "desaintmartin",
-          "email": "cedric@desaintmartin.fr"
-        }
-      ],
       "keywords": [
         "postgresql",
         "postgres",
@@ -49,7 +39,7 @@
         "version": "11.7.0-debian-10-r26"
       }],
       "name": "postgresql:8.6.4",
-      "description": "Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+      "description": "DEPRECATED Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
       "type": "chart",
       "shortName": "postgresql",
       "version": "8.6.4"

@@ -31,31 +31,6 @@
           "version": "1.3.4"
         },
         {
-          "maintainers": [{
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          }],
-          "keywords": [
-            "postgresql",
-            "database",
-            "sql",
-            "replication",
-            "cluster"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "postgres",
-            "type": "image",
-            "version": "9.4.6"
-          }],
-          "name": "postgresql:1.0.0",
-          "description": "Chart for PostgreSQL",
-          "type": "chart",
-          "shortName": "postgresql",
-          "version": "1.0.0"
-        },
-        {
           "children": [
             {
               "maintainers": [
@@ -124,13 +99,23 @@
                 "identity-service"
               ],
               "children": [{
-                "maintainers": [{
-                  "name": "Bitnami",
-                  "email": "containers@bitnami.com"
-                }],
+                "maintainers": [
+                  {
+                    "name": "unguiculus",
+                    "email": "unguiculus@gmail.com"
+                  },
+                  {
+                    "name": "thomasdarimont",
+                    "email": "thomas.darimont+github@gmail.com"
+                  }
+                ],
                 "keywords": [
-                  "keycloak",
-                  "access-management"
+                  "sso",
+                  "idm",
+                  "openid connect",
+                  "saml",
+                  "kerberos",
+                  "ldap"
                 ],
                 "children": [
                   {
@@ -163,7 +148,7 @@
                   }
                 ],
                 "name": "keycloak:4.3.0",
-                "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+                "description": "Open Source Identity and Access Management For Modern Applications and Services",
                 "type": "chart",
                 "shortName": "keycloak",
                 "version": "4.3.0"
@@ -180,6 +165,26 @@
           "type": "chart",
           "shortName": "alfresco-infrastructure",
           "version": "4.1.1"
+        },
+        {
+          "keywords": [
+            "postgresql",
+            "postgres",
+            "database",
+            "sql"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "postgres",
+            "type": "image",
+            "version": "9.4.6"
+          }],
+          "name": "postgresql:1.0.0",
+          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+          "type": "chart",
+          "shortName": "postgresql",
+          "version": "1.0.0"
         }
       ],
       "name": "alfresco-process-services:0.2.0",
@@ -257,13 +262,23 @@
             "identity-service"
           ],
           "children": [{
-            "maintainers": [{
-              "name": "Bitnami",
-              "email": "containers@bitnami.com"
-            }],
+            "maintainers": [
+              {
+                "name": "unguiculus",
+                "email": "unguiculus@gmail.com"
+              },
+              {
+                "name": "thomasdarimont",
+                "email": "thomas.darimont+github@gmail.com"
+              }
+            ],
             "keywords": [
-              "keycloak",
-              "access-management"
+              "sso",
+              "idm",
+              "openid connect",
+              "saml",
+              "kerberos",
+              "ldap"
             ],
             "children": [
               {
@@ -296,7 +311,7 @@
               }
             ],
             "name": "keycloak:4.3.0",
-            "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+            "description": "Open Source Identity and Access Management For Modern Applications and Services",
             "type": "chart",
             "shortName": "keycloak",
             "version": "4.3.0"
@@ -379,24 +394,6 @@
           "version": "2.0.17"
         },
         {
-          "keywords": [
-            "alfresco",
-            "digital workspace"
-          ],
-          "children": [{
-            "repoHost": "quay.io",
-            "children": [],
-            "name": "alfresco/alfresco-digital-workspace:1.3.0",
-            "type": "image",
-            "version": "1.3.0"
-          }],
-          "name": "alfresco-digital-workspace:2.2.0",
-          "description": "A Helm chart for deploying Alfresco Digital Workspace application",
-          "type": "chart",
-          "shortName": "alfresco-digital-workspace",
-          "version": "2.2.0"
-        },
-        {
           "children": [
             {
               "maintainers": [
@@ -465,13 +462,23 @@
                 "identity-service"
               ],
               "children": [{
-                "maintainers": [{
-                  "name": "Bitnami",
-                  "email": "containers@bitnami.com"
-                }],
+                "maintainers": [
+                  {
+                    "name": "unguiculus",
+                    "email": "unguiculus@gmail.com"
+                  },
+                  {
+                    "name": "thomasdarimont",
+                    "email": "thomas.darimont+github@gmail.com"
+                  }
+                ],
                 "keywords": [
-                  "keycloak",
-                  "access-management"
+                  "sso",
+                  "idm",
+                  "openid connect",
+                  "saml",
+                  "kerberos",
+                  "ldap"
                 ],
                 "children": [
                   {
@@ -504,7 +511,7 @@
                   }
                 ],
                 "name": "keycloak:4.3.0",
-                "description": "Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.",
+                "description": "Open Source Identity and Access Management For Modern Applications and Services",
                 "type": "chart",
                 "shortName": "keycloak",
                 "version": "4.3.0"
@@ -521,6 +528,67 @@
           "type": "chart",
           "shortName": "alfresco-infrastructure",
           "version": "4.1.1"
+        },
+        {
+          "keywords": [
+            "search",
+            "search services",
+            "alfresco search services",
+            "insight",
+            "insight engine",
+            "alfresco insight engine"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "alfresco/alfresco-search-services",
+            "type": "image",
+            "version": "1.4.0"
+          }],
+          "name": "alfresco-search:1.0.1",
+          "description": "A Helm chart for deploying Alfresco Search",
+          "type": "chart",
+          "shortName": "alfresco-search",
+          "version": "1.0.1"
+        },
+        {
+          "maintainers": [{"name": "databus23"}],
+          "keywords": [
+            "postgresql",
+            "postgres",
+            "database",
+            "sql"
+          ],
+          "children": [{
+            "repoHost": "Docker Hub",
+            "children": [],
+            "name": "postgres",
+            "type": "image",
+            "version": "11.4"
+          }],
+          "name": "postgresql:0.9.3",
+          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
+          "type": "chart",
+          "shortName": "postgresql",
+          "version": "0.9.3"
+        },
+        {
+          "keywords": [
+            "alfresco",
+            "digital workspace"
+          ],
+          "children": [{
+            "repoHost": "quay.io",
+            "children": [],
+            "name": "alfresco/alfresco-digital-workspace:1.3.0",
+            "type": "image",
+            "version": "1.3.0"
+          }],
+          "name": "alfresco-digital-workspace:2.2.0",
+          "description": "A Helm chart for deploying Alfresco Digital Workspace application",
+          "type": "chart",
+          "shortName": "alfresco-digital-workspace",
+          "version": "2.2.0"
         },
         {
           "maintainers": [{"name": "Alfresco Apps Repo Team"}],
@@ -564,49 +632,6 @@
           "type": "chart",
           "shortName": "alfresco-sync-service",
           "version": "1.1.1"
-        },
-        {
-          "maintainers": [{"name": "databus23"}],
-          "keywords": [
-            "postgresql",
-            "postgres",
-            "database",
-            "sql"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "postgres",
-            "type": "image",
-            "version": "11.4"
-          }],
-          "name": "postgresql:0.9.3",
-          "description": "Object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.",
-          "type": "chart",
-          "shortName": "postgresql",
-          "version": "0.9.3"
-        },
-        {
-          "keywords": [
-            "search",
-            "search services",
-            "alfresco search services",
-            "insight",
-            "insight engine",
-            "alfresco insight engine"
-          ],
-          "children": [{
-            "repoHost": "Docker Hub",
-            "children": [],
-            "name": "alfresco/alfresco-search-services",
-            "type": "image",
-            "version": "1.4.0"
-          }],
-          "name": "alfresco-search:1.0.1",
-          "description": "A Helm chart for deploying Alfresco Search",
-          "type": "chart",
-          "shortName": "alfresco-search",
-          "version": "1.0.1"
         }
       ],
       "name": "alfresco-content-services:2.1.3",

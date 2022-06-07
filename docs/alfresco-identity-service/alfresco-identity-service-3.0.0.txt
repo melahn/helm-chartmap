@@ -5,17 +5,16 @@ There are 4 referenced Helm Charts
 Chart: postgresql:9.1.1
 	apiVersion: v1
 	appVersion: 11.8.0
-	created: 2020-07-15T01:13:34.411089622Z
+	created: Not specified
 	dependencies: common:0.3.1
 	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
-	digest: ff2a79314bc60c6cd94bfb4b792fb523cee9fbbe5ef1956aa7c6b9135159ca1e
+	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
 	keywords: postgresql,postgres,database,sql,replication,cluster
 	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
-	repo url: https://charts.bitnami.com/bitnami
 	name: postgresql
 	sources: https://github.com/bitnami/bitnami-docker-postgresql
-	urls: https://charts.bitnami.com/bitnami/postgresql-9.1.1.tgz
+	urls: Not specified
 	version: 9.1.1
 Chart: alfresco-identity-service:3.0.0
 	apiVersion: v1
@@ -50,17 +49,16 @@ Chart: keycloak:9.9.5
 Chart: common:0.3.1
 	apiVersion: v1
 	appVersion: 0.3.1
-	created: 2020-06-06T02:15:40.491713531Z
+	created: Not specified
 	dependencies: None
 	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
-	digest: 1a4532a2b4d32277152ff52c568cf1d1fb7ac5cbf481115e7dfae84d4bc85906
+	digest: Not specified
 	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
 	keywords: common,helper,template,function,bitnami
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
 	name: common
 	sources: https://github.com/bitnami/charts
-	urls: https://charts.bitnami.com/bitnami/common-0.3.1.tgz
+	urls: Not specified
 	version: 0.3.1
 
 There are 2 referenced Docker Images
@@ -76,4 +74,4 @@ postgresql:9.1.1 depends on common:0.3.1
 postgresql:9.1.1 uses docker.io/bitnami/postgresql:11.8.0-debian-10-r61
 keycloak:9.9.5 uses quay.io/alfresco/alfresco-identity-service:1.4.0
 
-Generated on 2022/05/29 21:09:30 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:01:21 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

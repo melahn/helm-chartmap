@@ -5,17 +5,16 @@ There are 4 referenced Helm Charts
 Chart: common:1.4.1
 	apiVersion: v2
 	appVersion: 1.4.1
-	created: 2021-02-23T14:16:25.700860051Z
+	created: Not specified
 	dependencies: None
 	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
-	digest: 7e4300b0cd0a7912f6f51186e8819d586207ef162b0fbc3fab70ee2226520180
+	digest: Not specified
 	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
 	keywords: common,helper,template,function,bitnami
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
 	name: common
 	sources: https://github.com/bitnami/charts,http://www.bitnami.com/
-	urls: https://charts.bitnami.com/bitnami/common-1.4.1.tgz
+	urls: Not specified
 	version: 1.4.1
 Chart: alfresco-identity-service:4.0.0
 	apiVersion: v1
@@ -35,17 +34,16 @@ Chart: alfresco-identity-service:4.0.0
 Chart: postgresql:10.3.13
 	apiVersion: v2
 	appVersion: 11.11.0
-	created: 2021-03-12T04:38:23.009599681Z
+	created: Not specified
 	dependencies: common:1.4.1
 	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
-	digest: 9b7ac83baa2b4736891c044cfe1c5f7608d8c94dc3fc008aea5571bd1f8b297f
+	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
 	keywords: postgresql,postgres,database,sql,replication,cluster
 	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
-	repo url: https://charts.bitnami.com/bitnami
 	name: postgresql
 	sources: https://github.com/bitnami/bitnami-docker-postgresql,https://www.postgresql.org/
-	urls: https://charts.bitnami.com/bitnami/postgresql-10.3.13.tgz
+	urls: Not specified
 	version: 10.3.13
 Chart: keycloak:11.0.1
 	apiVersion: v1
@@ -76,4 +74,4 @@ postgresql:10.3.13 depends on common:1.4.1
 postgresql:10.3.13 uses docker.io/bitnami/postgresql:11.11.0-debian-10-r31
 keycloak:11.0.1 uses quay.io/alfresco/alfresco-identity-service:1.5.0
 
-Generated on 2022/05/29 21:09:14 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:01:06 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

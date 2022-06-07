@@ -9,10 +9,10 @@ skinparam artifactArrowColor LightSlateGray
 title Chart Map for alfresco-identity-service:3.0.0
 
 'There are 4 referenced Helm Charts
-artifact "postgresql:9.1.1\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: \n\t\tBitnami\n\t\tdesaintmartin\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_9_1_1 #LightSteelBlue
+artifact "postgresql:9.1.1\n====\n\tType: application\n====\n\tRepo: N/A - Explicit Dependency\n====\n\tMaintainers: \n\t\tBitnami\n\t\tdesaintmartin\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_9_1_1 #LightSteelBlue
 artifact "alfresco-identity-service:3.0.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: \n\t\talfresco\n\t\tkeycloak\n\t\tidentity-service" as alfresco_identity_service_3_0_0 #Chartreuse
 artifact "keycloak:9.9.5\n====\n\tType: application\n====\n\tRepo: https://codecentric.github.io/helm-charts\n====\n\tMaintainers: \n\t\tunguiculus\n\t\tthomasdarimont\n====\n\tKeywords: \n\t\tsso\n\t\tidm\n\t\topenid connect\n\t\tsaml\n\t\tkerberos\n\t\tldap" as keycloak_9_9_5 #LightBlue
-artifact "common:0.3.1\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_0_3_1 #DarkSeaGreen
+artifact "common:0.3.1\n====\n\tType: application\n====\n\tRepo: N/A - Explicit Dependency\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_0_3_1 #DarkSeaGreen
 
 'There are 2 referenced Docker Images
 usecase "Image\n====\ndocker.io\n====\nbitnami/postgresql:11.8.0-debian-10-r61\n====\n11.8.0-debian-10-r61" as docker_io_bitnami_postgresql_11_8_0_debian_10_r61 #DarkSalmon
@@ -25,5 +25,5 @@ postgresql_9_1_1--[#green]-|>common_0_3_1
 postgresql_9_1_1--[#orange]-|>docker_io_bitnami_postgresql_11_8_0_debian_10_r61
 keycloak_9_9_5--[#orange]-|>quay_io_alfresco_alfresco_identity_service_1_4_0
 
-center footer Generated on 2022/05/29 21:09:39 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/06/07 11:01:29 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

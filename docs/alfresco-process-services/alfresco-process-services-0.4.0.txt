@@ -20,17 +20,16 @@ Chart: alfresco-process-services:0.4.0
 Chart: postgresql:8.9.6
 	apiVersion: v1
 	appVersion: 11.7.0
-	created: 2020-05-08T15:37:53.072615698Z
+	created: Not specified
 	dependencies: None
 	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
-	digest: 3f196b2533bd42648e9b0e787f8d1f5e97dbdb376429f04c78727991052c9201
+	digest: Not specified
 	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
 	keywords: postgresql,postgres,database,sql,replication,cluster
 	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
-	repo url: https://charts.bitnami.com/bitnami
 	name: postgresql
 	sources: https://github.com/bitnami/bitnami-docker-postgresql
-	urls: https://charts.bitnami.com/bitnami/postgresql-8.9.6.tgz
+	urls: Not specified
 	version: 8.9.6
 Chart: common:1.12.0
 	apiVersion: v2
@@ -64,4 +63,4 @@ alfresco-process-services:0.4.0 uses quay.io/alfresco/alfresco-process-workspace
 alfresco-process-services:0.4.0 uses quay.io/alfresco/alfresco-process-services:2.3.0
 postgresql:8.9.6 uses docker.io/bitnami/postgresql:11.6.0
 
-Generated on 2022/05/29 21:10:44 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:02:27 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

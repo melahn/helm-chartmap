@@ -3,19 +3,19 @@ Chart Map for alfresco-identity-service:1.0.0
 There are 3 referenced Helm Charts
 ----------------------------------
 Chart: keycloak:4.0.3
-	apiVersion: v2
-	appVersion: 14.0.0
-	created: 2021-07-27T18:42:05.450901514Z
+	apiVersion: v1
+	appVersion: 4.5.0.Final
+	created: 2020-10-15T15:46:18.448561-04:00
 	dependencies: postgresql:0.15.0
-	description: Keycloak is a high performance Java-based identity and access management solution. It lets developers add an authentication layer to their applications with minimum effort.
-	digest: bf40cda849be410b8415fa1b984707b4700bbdb3af45ef57c3a5d492f2a77180
-	icon: https://bitnami.com/assets/stacks/keycloak/img/keycloak-stack-220x234.png
-	keywords: keycloak,access-management
-	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
+	description: Open Source Identity and Access Management For Modern Applications and Services
+	digest: 6306b51cf77d56bd6bcbc67bec5647ba2cf6e7a242369f01e6f3222b9d6e1c37
+	icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
+	keywords: sso,idm,openid connect,saml,kerberos,ldap
+	maintainers: unguiculus:unguiculus@gmail.com
+	repo url: https://charts.helm.sh/stable
 	name: keycloak
-	sources: https://github.com/bitnami/bitnami-docker-keycloak,https://github.com/keycloak/keycloak
-	urls: https://charts.bitnami.com/bitnami/keycloak-4.0.3.tgz
+	sources: https://github.com/jboss-dockerfiles/keycloak
+	urls: https://charts.helm.sh/stable/packages/keycloak-4.0.3.tgz
 	version: 4.0.3
 Chart: alfresco-identity-service:1.0.0
 	apiVersion: Not specified
@@ -60,4 +60,4 @@ keycloak:4.0.3 depends on postgresql:0.15.0
 keycloak:4.0.3 uses jboss/keycloak:4.5.0.Final
 postgresql:0.15.0 uses postgres:10.1
 
-Generated on 2022/05/29 21:10:29 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:02:14 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

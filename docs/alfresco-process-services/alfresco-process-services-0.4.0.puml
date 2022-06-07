@@ -10,7 +10,7 @@ title Chart Map for alfresco-process-services:0.4.0
 
 'There are 3 referenced Helm Charts
 artifact "alfresco-process-services:0.4.0\n====\n\tType: application\n====\n\tRepo: https://kubernetes-charts.alfresco.com/stable\n====\n\tMaintainers: Alfresco\n====\n\tKeywords: " as alfresco_process_services_0_4_0 #Gainsboro
-artifact "postgresql:8.9.6\n====\n\tType: application\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: \n\t\tBitnami\n\t\tdesaintmartin\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_8_9_6 #LightSteelBlue
+artifact "postgresql:8.9.6\n====\n\tType: application\n====\n\tRepo: N/A - Explicit Dependency\n====\n\tMaintainers: \n\t\tBitnami\n\t\tdesaintmartin\n====\n\tKeywords: \n\t\tpostgresql\n\t\tpostgres\n\t\tdatabase\n\t\tsql\n\t\treplication\n\t\tcluster" as postgresql_8_9_6 #LightSteelBlue
 artifact "common:1.12.0\n====\n\tType: library\n====\n\tRepo: https://charts.bitnami.com/bitnami\n====\n\tMaintainers: Bitnami\n====\n\tKeywords: \n\t\tcommon\n\t\thelper\n\t\ttemplate\n\t\tfunction\n\t\tbitnami" as common_1_12_0 #DarkSeaGreen
 
 'There are 4 referenced Docker Images
@@ -27,5 +27,5 @@ alfresco_process_services_0_4_0--[#orange]-|>quay_io_alfresco_alfresco_process_w
 alfresco_process_services_0_4_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_2_3_0
 postgresql_8_9_6--[#orange]-|>docker_io_bitnami_postgresql_11_6_0
 
-center footer Generated on 2022/05/29 21:10:55 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/06/07 11:02:36 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

@@ -5,17 +5,17 @@ There are 3 referenced Helm Charts
 Chart: postgresql:6.3.13
 	apiVersion: v1
 	appVersion: 11.5.0
-	created: 2019-10-16T15:34:56.938394762Z
+	created: 2020-10-15T15:46:22.479453-04:00
 	dependencies: None
 	description: Chart for PostgreSQL, an object-relational database management system (ORDBMS) with an emphasis on extensibility and on standards-compliance.
-	digest: 69f6929adcf2f5fadf1943d6f48bdb5dca18396101ba3ec706e818c9126496aa
+	digest: f0ff25e75937255b8c297642e0b6f5e11159163901278afdb89dd18b84e888f2
 	icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
 	keywords: postgresql,postgres,database,sql,replication,cluster
 	maintainers: Bitnami:containers@bitnami.com,desaintmartin:cedric@desaintmartin.fr
-	repo url: https://charts.bitnami.com/bitnami
+	repo url: https://charts.helm.sh/stable
 	name: postgresql
 	sources: https://github.com/bitnami/bitnami-docker-postgresql
-	urls: https://charts.bitnami.com/bitnami/postgresql-6.3.13.tgz
+	urls: https://charts.helm.sh/stable/packages/postgresql-6.3.13.tgz
 	version: 6.3.13
 Chart: keycloak:6.0.0
 	apiVersion: Not specified
@@ -60,4 +60,4 @@ keycloak:6.0.0 depends on postgresql:6.3.13
 postgresql:6.3.13 uses docker.io/bitnami/postgresql:11.5.0-debian-9-r60
 keycloak:6.0.0 uses alfresco/alfresco-identity-service:1.2
 
-Generated on 2022/05/29 21:09:45 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 11:01:35 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)

@@ -20,7 +20,7 @@ Chart: alfresco-insight-zeppelin:1.0.3
 	apiVersion: v1
 	appVersion: Not specified
 	created: 2020-07-08T12:03:13.303561171Z
-	dependencies: common:1.14.1
+	dependencies: common:1.16.0
 	description: A Helm chart for deploying Alfresco Insight Zeppelin
 	digest: 5b77f751e7b74b89aaf10d7e5d1fb80cd75ce2ea5332e6e9a1af147222d56096
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -35,7 +35,7 @@ Chart: alfresco-search:1.0.4
 	apiVersion: v2
 	appVersion: Not specified
 	created: Not specified
-	dependencies: alfresco-insight-zeppelin:1.0.3, common:1.14.1
+	dependencies: common:1.16.0, alfresco-insight-zeppelin:1.0.3
 	description: A Helm chart for deploying Alfresco Search
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -64,7 +64,7 @@ Chart: alfresco-content-services:5.2.0
 	apiVersion: v2
 	appVersion: Not specified
 	created: Not specified
-	dependencies: alfresco-sync-service:3.0.9, postgresql:10.16.2, alfresco-search:1.0.4, common:7.2.0, activemq:2.1.0
+	dependencies: postgresql:10.16.2, common:7.2.0, alfresco-search:1.0.4, activemq:2.1.0, alfresco-sync-service:3.0.9
 	description: A Helm chart for deploying Alfresco Content Services
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -75,6 +75,21 @@ Chart: alfresco-content-services:5.2.0
 	sources: https://github.com/Alfresco/acs-deployment
 	urls: Not specified
 	version: 5.2.0
+Chart: common:1.16.0
+	apiVersion: v2
+	appVersion: 1.16.0
+	created: 2022-06-03T14:26:06.328357199Z
+	dependencies: None
+	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
+	digest: sha256:612ba0ee47eecb204499b7021508c8ebff38d8b50899be717de3e44e7aa78aec
+	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
+	keywords: common,helper,template,function,bitnami
+	maintainers: Bitnami
+	repo url: https://charts.bitnami.com/bitnami
+	name: common
+	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
+	urls: https://charts.bitnami.com/bitnami/common-1.16.0.tgz
+	version: 1.16.0
 Chart: activemq:2.1.0
 	apiVersion: v2
 	appVersion: 5.16.4
@@ -89,26 +104,11 @@ Chart: activemq:2.1.0
 	sources: https://github.com/Alfresco/acs-deployment
 	urls: Not specified
 	version: 2.1.0
-Chart: common:1.14.1
-	apiVersion: v2
-	appVersion: 1.13.1
-	created: 2022-05-20T15:32:40.107594375Z
-	dependencies: None
-	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
-	digest: sha256:330a278e01fc3f3d4b9a90a8614b1a5ddda007de10bb4ee650710991af415f27
-	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
-	keywords: common,helper,template,function,bitnami
-	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
-	name: common
-	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
-	urls: https://charts.bitnami.com/bitnami/common-1.14.1.tgz
-	version: 1.14.1
 Chart: alfresco-sync-service:3.0.9
 	apiVersion: v2
 	appVersion: Not specified
 	created: Not specified
-	dependencies: common:1.14.1
+	dependencies: common:1.16.0
 	description: Alfresco Sync Service
 	digest: Not specified
 	icon: https://avatars0.githubusercontent.com/u/391127?s=200&v=4
@@ -121,17 +121,16 @@ Chart: alfresco-sync-service:3.0.9
 Chart: common:1.10.3
 	apiVersion: v2
 	appVersion: 1.10.0
-	created: 2021-11-30T20:17:51.684597621Z
+	created: Not specified
 	dependencies: None
 	description: A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.
-	digest: 5c5c415745755c80f39b5fc5fc54a846d81ef72fdd27662e0fa6061e3d342f7e
+	digest: Not specified
 	icon: https://bitnami.com/downloads/logos/bitnami-mark.png
 	keywords: common,helper,template,function,bitnami
 	maintainers: Bitnami:containers@bitnami.com
-	repo url: https://charts.bitnami.com/bitnami
 	name: common
 	sources: https://github.com/bitnami/charts,https://www.bitnami.com/
-	urls: https://charts.bitnami.com/bitnami/common-1.10.3.tgz
+	urls: Not specified
 	version: 1.10.3
 
 There are 14 referenced Docker Images
@@ -153,21 +152,21 @@ Image: quay.io/alfresco/search-services:2.0.3
 
 Chart Dependencies
 ------------------
-alfresco-content-services:5.2.0 depends on alfresco-sync-service:3.0.9
-alfresco-sync-service:3.0.9 depends on common:1.14.1
 alfresco-content-services:5.2.0 depends on postgresql:10.16.2
 postgresql:10.16.2 depends on common:1.10.3
-alfresco-content-services:5.2.0 depends on alfresco-search:1.0.4
-alfresco-search:1.0.4 depends on alfresco-insight-zeppelin:1.0.3
-alfresco-insight-zeppelin:1.0.3 depends on common:1.14.1
-alfresco-search:1.0.4 depends on common:1.14.1
 alfresco-content-services:5.2.0 depends on common:7.2.0
+alfresco-content-services:5.2.0 depends on alfresco-search:1.0.4
+alfresco-search:1.0.4 depends on common:1.16.0
+alfresco-search:1.0.4 depends on alfresco-insight-zeppelin:1.0.3
+alfresco-insight-zeppelin:1.0.3 depends on common:1.16.0
 alfresco-content-services:5.2.0 depends on activemq:2.1.0
+alfresco-content-services:5.2.0 depends on alfresco-sync-service:3.0.9
+alfresco-sync-service:3.0.9 depends on common:1.16.0
 alfresco-insight-zeppelin:1.0.3 uses quay.io/alfresco/insight-zeppelin:1.4.0
 alfresco-search:1.0.4 uses quay.io/alfresco/search-services:2.0.3
 postgresql:10.16.2 uses docker.io/bitnami/postgresql:13.3.0
-alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-share:7.2.0
 alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-content-repository:7.2.0
+alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-share:7.2.0
 alfresco-content-services:5.2.0 uses alfresco/alfresco-imagemagick:2.5.7
 alfresco-content-services:5.2.0 uses alfresco/alfresco-tika:2.5.7
 alfresco-content-services:5.2.0 uses alfresco/alfresco-libreoffice:2.5.7
@@ -178,4 +177,4 @@ alfresco-content-services:5.2.0 uses quay.io/alfresco/alfresco-transform-router:
 activemq:2.1.0 uses alfresco/alfresco-activemq:5.16.4-jre11-centos7
 alfresco-sync-service:3.0.9 uses quay.io/alfresco/service-sync:3.6.0
 
-Generated on 2022/05/29 21:05:35 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/07 10:58:32 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
