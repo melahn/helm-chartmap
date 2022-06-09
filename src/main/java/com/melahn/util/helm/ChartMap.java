@@ -34,7 +34,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.MapIterator;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -889,7 +888,7 @@ public class ChartMap {
      * with a summary of how many charts were referenced
      */
     protected void printCharts() {
-        MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
+        MapIterator<?, HelmChart> it = chartsReferenced.mapIterator();
         IChartMapPrinter p = getPrinter();
         try {
             if (chartsReferenced.size() == 1) {
@@ -1518,7 +1517,7 @@ public class ChartMap {
      * children) and set that one in the chart
      */
     protected void applyTemplates() {
-        MapIterator<MultiKey<? extends String>, HelmChart> i = chartsReferenced.mapIterator();
+        MapIterator<?, HelmChart> i = chartsReferenced.mapIterator();
         while (i.hasNext()) {
             i.next();
             HelmChart h = i.getValue();
@@ -2086,7 +2085,7 @@ public class ChartMap {
      * chart
      */
     protected void printContainerDependencies() {
-        MapIterator<MultiKey<? extends String>, HelmChart> it = chartsReferenced.mapIterator();
+        MapIterator<?, HelmChart> it = chartsReferenced.mapIterator();
         try {
             while (it.hasNext()) {
                 it.next();
