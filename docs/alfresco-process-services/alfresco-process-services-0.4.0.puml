@@ -20,12 +20,12 @@ usecase "Image\n====\ndocker.io\n====\nbitnami/postgresql:11.6.0\n====\n11.6.0" 
 usecase "Image\n====\nquay.io\n====\nalfresco/alfresco-process-services:2.3.0\n====\n2.3.0" as quay_io_alfresco_alfresco_process_services_2_3_0 #LightCoral
 
 'Chart Dependencies
-alfresco_process_services_0_4_0--[#green]-|>postgresql_8_9_6
 alfresco_process_services_0_4_0--[#green]-|>common_1_12_0
+alfresco_process_services_0_4_0--[#green]-|>postgresql_8_9_6
 alfresco_process_services_0_4_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_admin_2_3_0
 alfresco_process_services_0_4_0--[#orange]-|>quay_io_alfresco_alfresco_process_workspace_app_1_3_4
 alfresco_process_services_0_4_0--[#orange]-|>quay_io_alfresco_alfresco_process_services_2_3_0
 postgresql_8_9_6--[#orange]-|>docker_io_bitnami_postgresql_11_6_0
 
-center footer Generated on 2022/06/07 11:02:36 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/06/09 15:04:37 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml
