@@ -1561,6 +1561,124 @@ class ChartMapTest {
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    /**
+     * Tests all combinations of the number of variable args for the switches.
+     */
+    @Test
+    void varargsTest() {
+        boolean[][] a = new boolean[][] { 
+            // no varargs
+            {},
+            // one vararg
+            { false }, { true }, 
+            // two varargs
+            { false, false }, { false, true }, { true, false },{ true, true },
+            // three varargs
+            { false, false, false }, { false, false, true }, { false, true, false }, { false, true, true },
+            { true, false, false }, { true, false, true }, { true, true, false }, { true, true, true }, 
+            // more than three varargs
+            { false, false, false, false } 
+        };
+        int i = 0;
+        ArrayList<ChartMap> c = new ArrayList<>();
+        // first just test that all the variations are exercised
+        try {
+            for(;i < a.length && a[i].length < 1; i++) {
+                c.add(new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "varargsTest0.puml",
+                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), TIMEOUT_DEFAULT));
+                        System.out.println(String.format("varargs = %s", "null"));
+            }
+            for(;i < a.length && a[i].length < 2; i++) {
+                c.add(new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "varargsTest1.puml",
+                        TEST_ENV_FILE_PATH.toAbsolutePath().toString(), TIMEOUT_DEFAULT, a[i][0]));
+                        System.out.println(String.format("varargs = (%s)", a[i][0]));
+            }
+            for(;i < a.length && a[i].length < 3; i++) {
+                for (int j = 0; j < 1; j++) {
+                    c.add(new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "varargsTest3.puml",
+                            TEST_ENV_FILE_PATH.toAbsolutePath().toString(), TIMEOUT_DEFAULT, a[i][j], a[i][j+1]));
+                    System.out.println(String.format("varargs = (%s,%s)", a[i][j], a[i][j+1]));
+                }
+            }
+            for(;i < a.length && a[i].length < 4; i++) {
+                for (int j = 0; j < 1; j++) {
+                    for (int k = 0; k < 1; k++) {
+                        c.add(new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "varargsTest4.puml",
+                                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), TIMEOUT_DEFAULT, a[i][j + k],
+                                a[i][j + k + 1], a[i][j + k + 2]));
+                        System.out.println(String.format("varargs = (%s,%s,%s)", a[i][j + k],
+                                a[i][j + k + 1], a[i][j + k + 2]));
+                    }
+                }
+            }
+            for(;i < a.length && a[i].length< 5; i++) {
+                c.add(new ChartMap(ChartOption.FILENAME, INPUT_FILE_NAME_1, "varargsTest5.puml",
+                        TEST_ENV_FILE_PATH.toAbsolutePath().toString(), TIMEOUT_DEFAULT, a[i][0], a[i][1], a[i][2],
+                        a[i][3]));
+                        System.out.println(String.format("varargs = (%s,%s,%s,%s)", a[i][0], a[i][1], a[i][2],
+                        a[i][3]));
+            }
+            // now verify that the flags were actuall set properly
+            ChartMap[] ca = c.toArray(new ChartMap[0]);
+            assertTrue(
+                    !ca[0].isRefreshLocalRepo()   &&
+                    !ca[1].isRefreshLocalRepo()   &&
+                     ca[2].isRefreshLocalRepo()   &&
+                    !ca[3].isRefreshLocalRepo()   &&
+                    !ca[4].isRefreshLocalRepo()   &&
+                     ca[5].isRefreshLocalRepo()   &&
+                     ca[6].isRefreshLocalRepo()   &&
+                    !ca[7].isRefreshLocalRepo()   &&
+                    !ca[8].isRefreshLocalRepo()   &&
+                    !ca[9].isRefreshLocalRepo()   &&
+                    !ca[10].isRefreshLocalRepo()  &&
+                     ca[11].isRefreshLocalRepo()  &&
+                     ca[12].isRefreshLocalRepo()  &&
+                     ca[13].isRefreshLocalRepo()  &&
+                     ca[14].isRefreshLocalRepo()  &&
+                    !ca[15].isRefreshLocalRepo());
+            assertTrue(
+                    !ca[0].isVerbose()   &&
+                    !ca[1].isVerbose()   &&
+                    !ca[2].isVerbose()   &&
+                    !ca[3].isVerbose()   &&
+                     ca[4].isVerbose()   &&
+                    !ca[5].isVerbose()   &&
+                     ca[6].isVerbose()   &&
+                    !ca[7].isVerbose()   &&
+                    !ca[8].isVerbose()   &&
+                     ca[9].isVerbose()   &&
+                     ca[10].isVerbose()  &&
+                    !ca[11].isVerbose()  &&
+                    !ca[12].isVerbose()  &&
+                     ca[13].isVerbose()  &&
+                     ca[14].isVerbose()  &&
+                    !ca[15].isVerbose());
+            assertTrue(
+                    !ca[0].getGenerateImage()  &&
+                    !ca[1].getGenerateImage()  &&
+                    !ca[2].getGenerateImage()  &&
+                    !ca[3].getGenerateImage()  &&
+                    !ca[4].getGenerateImage()  &&
+                    !ca[5].getGenerateImage()  &&
+                    !ca[6].getGenerateImage()  &&
+                    !ca[7].getGenerateImage()  &&
+                     ca[8].getGenerateImage()  &&
+                    !ca[9].getGenerateImage()  &&
+                     ca[10].getGenerateImage() &&
+                    !ca[11].getGenerateImage() &&
+                     ca[12].getGenerateImage() &&
+                    !ca[13].getGenerateImage() &&
+                     ca[14].getGenerateImage() &&
+                    !ca[15].getGenerateImage());;
+
+        } catch (ChartMapException e) {
+            // No exception is expected
+            assertFalse(true);
+        }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
     @Test
     void pumlChartRefreshVerboseTest() throws ChartMapException {
         ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RV, TIMEOUT_DOUBLE, true, true,

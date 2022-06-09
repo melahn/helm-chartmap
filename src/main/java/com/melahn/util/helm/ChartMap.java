@@ -105,7 +105,6 @@ public class ChartMap {
     private static final String LOG_FORMAT_4 = "{}{}{}{}";
     private static final String LOG_FORMAT_9 = "{}{}{}{}{}{}{}{}{}";
     private static final int MAX_SWITCHES_V11 = 3;
-    private static final int MAX_SWITCHES_V12 = 3;
     private static final String PLANTUML_LIMIT_SIZE = "8192";
     private static final String PLANTUML_LIMIT_SIZE_NAME = "PLANTUML_LIMIT_SIZE";
     private static final int REFRESH_SWITCH = 1;
@@ -319,16 +318,14 @@ public class ChartMap {
      * @param switches
      */
     private void addSwitchesToArgsV12(boolean[] s){
-        for (int i = 0; i < s.length && i < MAX_SWITCHES_V12; i++) {
-            if (s[REFRESH_SWITCH_1_2]) {
-                args.add("-r");
-            }
-            if (s[VERBOSE_SWITCH_1_2]) {
-                args.add("-v");
-            }
-            if (s[GENERATE_SWITCH_1_2]) {
-                args.add("-g");
-            }
+        if (s.length > REFRESH_SWITCH_1_2 && s[REFRESH_SWITCH_1_2]) {
+            args.add("-r");
+        }
+        if (s.length > VERBOSE_SWITCH_1_2 && s[VERBOSE_SWITCH_1_2]) {
+            args.add("-v");
+        }
+        if (s.length > GENERATE_SWITCH_1_2 && s[GENERATE_SWITCH_1_2]) {
+            args.add("-g");
         }
     }
 
@@ -2293,6 +2290,10 @@ public class ChartMap {
 
     protected void setEnvFilename(String e) {
         this.envFilename = e;
+    }
+
+    protected boolean getGenerateImage() {
+        return generateImage;
     }
 
     protected void setGenerateImage(boolean b) {
