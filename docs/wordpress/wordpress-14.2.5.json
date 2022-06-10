@@ -26,6 +26,52 @@
         "email": "containers@bitnami.com"
       }],
       "keywords": [
+        "mariadb",
+        "mysql",
+        "database",
+        "sql",
+        "prometheus"
+      ],
+      "children": [
+        {
+          "repoHost": "docker.io",
+          "children": [],
+          "name": "bitnami/mariadb:10.6.7-debian-10-r91",
+          "type": "image",
+          "version": "10.6.7-debian-10-r91"
+        },
+        {
+          "maintainers": [{
+            "name": "Bitnami",
+            "email": "containers@bitnami.com"
+          }],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.14.0",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.14.0"
+        }
+      ],
+      "name": "mariadb:11.0.6",
+      "description": "MariaDB is an open source, community-developed SQL database server that is widely in use around the world due to its enterprise features, flexibility, and collaboration with leading tech firms.",
+      "type": "chart",
+      "shortName": "mariadb",
+      "version": "11.0.6"
+    },
+    {
+      "maintainers": [{
+        "name": "Bitnami",
+        "email": "containers@bitnami.com"
+      }],
+      "keywords": [
         "common",
         "helper",
         "template",
@@ -81,52 +127,6 @@
       "type": "chart",
       "shortName": "memcached",
       "version": "6.0.20"
-    },
-    {
-      "maintainers": [{
-        "name": "Bitnami",
-        "email": "containers@bitnami.com"
-      }],
-      "keywords": [
-        "mariadb",
-        "mysql",
-        "database",
-        "sql",
-        "prometheus"
-      ],
-      "children": [
-        {
-          "repoHost": "docker.io",
-          "children": [],
-          "name": "bitnami/mariadb:10.6.7-debian-10-r91",
-          "type": "image",
-          "version": "10.6.7-debian-10-r91"
-        },
-        {
-          "maintainers": [{
-            "name": "Bitnami",
-            "email": "containers@bitnami.com"
-          }],
-          "keywords": [
-            "common",
-            "helper",
-            "template",
-            "function",
-            "bitnami"
-          ],
-          "children": [],
-          "name": "common:1.14.0",
-          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
-          "type": "chart",
-          "shortName": "common",
-          "version": "1.14.0"
-        }
-      ],
-      "name": "mariadb:11.0.6",
-      "description": "MariaDB is an open source, community-developed SQL database server that is widely in use around the world due to its enterprise features, flexibility, and collaboration with leading tech firms.",
-      "type": "chart",
-      "shortName": "mariadb",
-      "version": "11.0.6"
     }
   ],
   "name": "wordpress:14.2.5",
