@@ -1169,11 +1169,11 @@ public class ChartMap {
      * @param c the command
      * @throws ChartMapException
      */
-    private void handleIllegalStateThreadException(Process p, String c) throws ChartMapException {
+    protected void handleIllegalStateThreadException(Process p, String c) throws ChartMapException {
         if (p != null && p.isAlive()) {
             p.destroy();
+            logger.log(logLevelVerbose, "ChartMap waited but not long enough for helm to complete the {} command. Timeout: {}", c, timeout);
             logger.log(logLevelVerbose, "Process {} was still alive and needed to be destroyed.", p);
-            logger.log(logLevelVerbose, "ChartMap waited for {} {} but that was not long enough for helm to complete the {} command.", timeout, timeout>1?"seconds":"second", c);
         }       
         throw new ChartMapException(String.format(
                 "ChartMap did not wait long enough for helm to complete the %s command. Increase the timeout to a value greater than %d %s.",

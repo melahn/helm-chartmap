@@ -1562,6 +1562,124 @@ class ChartMapTest {
     }
 
     /**
+     * Tests IllegalThreadStateExceptionTest is thrown in checkHelmVersion.
+     * 
+     * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
+     */
+    @Test
+    void illegalThreadStateExceptionTest1() throws ChartMapException, IOException{
+        ChartMap cm1 = createTestMapV12(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, TIMEOUT_DEFAULT);
+        ChartMap scm1 = spy(cm1);
+        Process p1 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest1" });
+        Process sp1 = spy(p1);
+        doReturn(sp1).when(scm1).getProcess(any(), eq(null));
+        doThrow(IllegalThreadStateException.class).when(sp1).exitValue();
+        assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
+        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in checkHelmVersion");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests IllegalThreadStateExceptionTest is thrown in getHelmClientInformation.
+     *      
+     * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
+     */
+    @Test
+    void illegalThreadStateExceptionTest2() throws ChartMapException, IOException{
+        ChartMap cm2 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/illegalThreadStateExceptionTest2.puml", null, TIMEOUT_DEFAULT);
+        ChartMap scm2 = spy(cm2);
+        scm2.print();
+        ProcessBuilder pb2 = new ProcessBuilder("foo", "bar");
+        ProcessBuilder spb2 = spy(pb2);
+        Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest2" });
+        Process sp2 = spy(p2);
+        doThrow(IllegalThreadStateException.class).when(sp2).exitValue();
+        doReturn(sp2).when(spb2).start();
+        doReturn(spb2).when(scm2).getProcessBuilder(any(), any());
+        assertThrows(ChartMapException.class, () -> scm2.getHelmClientInformation());
+        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in getHelmClientInformation");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+    
+    /**
+     * Tests IllegalThreadStateExceptionTest is thrown in pullChart.
+     * 
+     * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
+     */
+    @Test
+    void illegalThreadStateExceptionTest3() throws ChartMapException, IOException{
+        ChartMap cm3 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/illegalThreadStateExceptionTest3.puml", null, TIMEOUT_DEFAULT);
+        ChartMap scm3 = spy(cm3);
+        scm3.print();
+        Process p3 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest3" });
+        Process sp3 = spy(p3);
+        doReturn(sp3).when(scm3).getProcess(any(), any());
+        doThrow(IllegalThreadStateException.class).when(sp3).exitValue();
+        assertThrows(ChartMapException.class, () -> scm3.pullChart("foo"));
+        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in pullChart");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
+     * Tests IllegalThreadStateExceptionTest is thrown in checkHelmVersion.
+     * 
+     * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
+     */
+    @Test
+    void illegalThreadStateExceptionTest4() throws ChartMapException, IOException{
+        ChartMap cm4 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/illegalThreadStateExceptionTest4.puml", null, TIMEOUT_DEFAULT, false, true);
+        Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest4" });
+        Process sp4 = spy(p4);
+        doThrow(IllegalThreadStateException.class).when(sp4).exitValue();
+        assertThrows(ChartMapException.class, () -> cm4.runTemplateCommand(new File("target/illegalThreadStateExceptionTest4"), sp4, new HelmChart()));
+        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in runTemplateCommand");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+
+    /**
+     * Tests handleIllegalStateThreadException.
+     * 
+     * @throws InterruptedException
+     */
+    @Test
+    void handleIllegalStateThreadExceptionTest() throws ChartMapException, InterruptedException, IOException {
+        // handle process that is null
+        ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest1.puml", null, TIMEOUT_DEFAULT, false, true);
+        assertThrows(ChartMapException.class,
+                () -> cm1.handleIllegalStateThreadException(null, "foo-command"));
+        System.out.println(
+                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is null");
+        // handle process that is not alive
+        ChartMap cm2 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest2.puml", null, TIMEOUT_DEFAULT, false, true);
+        Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "foo"});
+        p2.waitFor(10, TimeUnit.SECONDS); // plenty of time for echo to finish
+        assertThrows(ChartMapException.class,
+                () -> cm2.handleIllegalStateThreadException(p2, "foo-command"));
+        System.out.println(
+                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is not alive");
+        // handle process that is alive
+        ChartMap cm3 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest3.puml", null, TIMEOUT_DEFAULT, false, true);
+        Process p3 = Runtime.getRuntime().exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
+                "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v" });
+        p3.waitFor(10, TimeUnit.SECONDS); // not enough time for this process to finish but enough to be started
+        assertThrows(ChartMapException.class,
+                () -> cm3.handleIllegalStateThreadException(p3, "foo-command"));
+        System.out.println(
+                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is alive");
+        // handle process that is alive (the one second timeout case)
+        ChartMap cm4 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest4.puml", null, 1, false, true);
+        Process p4 = Runtime.getRuntime().exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
+                "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v" });
+        p4.waitFor(10, TimeUnit.SECONDS); // not enough time for this process to finish but enough to be started
+        assertThrows(ChartMapException.class,
+                () -> cm4.handleIllegalStateThreadException(p3, "foo-command"));
+        System.out.println(
+                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is alive (one second case)");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
+
+    /**
      * Tests all combinations of the number of variable args for the switches.
      */
     @Test
@@ -1690,8 +1808,8 @@ class ChartMapTest {
 
     @Test
     void pumlChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRV, TIMEOUT_DEFAULT, true,
-                false, true);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRV, TIMEOUT_DEFAULT, false,
+                true, false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_NRV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1699,7 +1817,7 @@ class ChartMapTest {
 
     @Test
     void pumlChartRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RNV, TIMEOUT_DOUBLE, true, true,
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_PUML_PATH_RNV, TIMEOUT_DOUBLE, true, false,
                 false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_RNV));
@@ -1708,8 +1826,8 @@ class ChartMapTest {
 
     @Test
     void pumlChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, TIMEOUT_DEFAULT, true,
-                false, false);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_PUML_PATH_NRNV, TIMEOUT_DEFAULT, false,
+                false, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_PUML_PATH_NRNV));
         assertTrue(Files.exists(OUTPUT_PNG_PATH_NRNV));
@@ -1718,8 +1836,7 @@ class ChartMapTest {
 
     @Test
     void textChartRefreshVerboseTest() throws ChartMapException, IOException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RV, TIMEOUT_DOUBLE, true, true,
-                true);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RV, TIMEOUT_DOUBLE, true, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_RV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1727,8 +1844,8 @@ class ChartMapTest {
 
     @Test
     void textChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRV, TIMEOUT_DEFAULT, true,
-                false, true);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRV, TIMEOUT_DEFAULT, false,
+                true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_NRV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1736,8 +1853,7 @@ class ChartMapTest {
 
     @Test
     void textChartRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RNV, TIMEOUT_DOUBLE, true, true,
-                false);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_TEXT_PATH_RNV, TIMEOUT_DOUBLE, true, false);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_RNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1745,8 +1861,7 @@ class ChartMapTest {
 
     @Test
     void textChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, TIMEOUT_DEFAULT, true,
-                false, false);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_TEXT_PATH_NRNV, TIMEOUT_DEFAULT);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_TEXT_PATH_NRNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1754,8 +1869,7 @@ class ChartMapTest {
 
     @Test
     void JSONChartRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RV, TIMEOUT_DOUBLE, true, true,
-                true);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_1, OUTPUT_JSON_PATH_RV, TIMEOUT_DOUBLE, true, true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_RV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1763,8 +1877,8 @@ class ChartMapTest {
 
     @Test
     void JSONChartNoRefreshVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRV, TIMEOUT_DEFAULT, true,
-                false, true);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRV, TIMEOUT_DEFAULT, false,
+                true);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_NRV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
@@ -1781,24 +1895,25 @@ class ChartMapTest {
 
     @Test
     void JSONChartNoRefreshNoVerboseTest() throws ChartMapException {
-        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRNV, TIMEOUT_DEFAULT, true,
-                false, false);
+        ChartMap testMap = createTestMapV12(ChartOption.FILENAME, INPUT_FILE_NAME_2, OUTPUT_JSON_PATH_NRNV, TIMEOUT_DEFAULT);
         testMap.print();
         assertTrue(Files.exists(OUTPUT_JSON_PATH_NRNV));
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     @Test
-    void APPRTest() throws ChartMapException, IOException{ // test normal path
-        ChartMap cm1 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, false);
+    void APPRTest() throws ChartMapException, IOException { // test normal path
+        ChartMap cm1 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT,
+                false, false, true);
         cm1.print();
         assertTrue(Files.exists(OUTPUT_APPR_PUML_PATH));
-        assertEquals("quay.io/melahn",cm1.getApprRepoHostName());
+        assertEquals("quay.io/melahn", cm1.getApprRepoHostName());
         System.out.println("Normal APPR test variation succeeded");
         // Test null appr spec
         assertTrue(Files.exists(OUTPUT_APPR_PNG_PATH));
         assertThrows(ChartMapException.class,
-                () -> createTestMapV12(ChartOption.APPRSPEC, null, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, false));
+                () -> createTestMapV12(ChartOption.APPRSPEC, null, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, false, false,
+                        true));
         System.out.println("ChartMapException thrown as expected with a null appr spec");
         // Test various malformed appr specs
         assertThrows(ChartMapException.class, () -> createTestMapV11(ChartOption.APPRSPEC, "badapprspec/noat",
@@ -1807,14 +1922,16 @@ class ChartMapTest {
         assertThrows(ChartMapException.class, () -> createTestMapV11(ChartOption.APPRSPEC, "badapprspec@noslash",
                 OUTPUT_APPR_PUML_PATH, true, false, false)); // test chart not found in app repo
         System.out.println("ChartMapException thrown as expected with a bad appr spec");
-        ChartMap cm2 = createTestMapV12(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0", OUTPUT_APPR_PUML_PATH, 0,
-                true, false, false);
+        ChartMap cm2 = createTestMapV12(ChartOption.APPRSPEC, "quay.io/melahn/no-such-chart@1.0.0",
+                OUTPUT_APPR_PUML_PATH, 0,
+                false, false, true);
         assertThrows(ChartMapException.class, () -> cm2.print());
         System.out.println("ChartMapException thrown as expected");
-        // Test the case where the repoUrl is guaranteed to be null 
+        // Test the case where the repoUrl is guaranteed to be null
         try (ByteArrayOutputStream o = new ByteArrayOutputStream()) {
             System.setOut(new PrintStream(o));
-            ChartMap cm3 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH, TIMEOUT_DEFAULT, true, false, true);
+            ChartMap cm3 = createTestMapV12(ChartOption.APPRSPEC, TEST_APPR_CHART, OUTPUT_APPR_PUML_PATH,
+                    TIMEOUT_DEFAULT, false, true, true);
             cm3.setApprRepoHostName(null);
             cm3.print();
             assertTrue(
@@ -2122,15 +2239,14 @@ class ChartMapTest {
     }
 
     /*
-     * Creates a ChartMap using the API for V1.2.x and earlier.
+     * Creates a ChartMap using the API for V1.2.x.
      */
-    private ChartMap createTestMapV12 (ChartOption option, String input, Path outputPath, int timeout,
-            boolean generateImage,
-            boolean refresh, boolean verbose) throws ChartMapException {
+    private ChartMap createTestMapV12(ChartOption option, String input, Path outputPath, int timeout,
+            boolean... switches) throws ChartMapException {
         ChartMap cm = new ChartMap(option, input, outputPath.toAbsolutePath().toString(),
-                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), timeout, refresh, verbose, generateImage);
+                TEST_ENV_FILE_PATH.toAbsolutePath().toString(), timeout, switches);
         cm.setHelmEnvironment(); // set this explictly so that test cases can test helm dependent methods without
                                  // necessarily calling print
         return cm;
-}
+    }
 }
