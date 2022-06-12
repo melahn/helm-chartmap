@@ -1567,15 +1567,18 @@ class ChartMapTest {
      * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
      */
     @Test
-    void illegalThreadStateExceptionTest1() throws ChartMapException, IOException{
-        ChartMap cm1 = createTestMapV12(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, TIMEOUT_DEFAULT);
+    void illegalThreadStateExceptionTest1() throws ChartMapException, InterruptedException, IOException {
+        ChartMap cm1 = createTestMapV12(ChartOption.CHARTNAME, TEST_CHART_NAME, OUTPUT_CHART_NAME_PUML_PATH, 3);
         ChartMap scm1 = spy(cm1);
-        Process p1 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest1" });
+        scm1.print();
+        Process p1 = Runtime.getRuntime()
+                .exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
+                        "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v", "-o",
+                        "target/".concat("illegalThreadStateExceptionTest1.txt") });
         Process sp1 = spy(p1);
         doReturn(sp1).when(scm1).getProcess(any(), eq(null));
         doThrow(IllegalThreadStateException.class).when(sp1).exitValue();
         assertThrows(ChartMapException.class, () -> scm1.checkHelmVersion());
-        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in checkHelmVersion");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
@@ -1621,7 +1624,7 @@ class ChartMapTest {
     }
 
     /**
-     * Tests IllegalThreadStateExceptionTest is thrown in checkHelmVersion.
+     * Tests IllegalThreadStateExceptionTest is thrown in runTemplateCommand.
      * 
      * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
      */
@@ -1630,12 +1633,34 @@ class ChartMapTest {
         ChartMap cm4 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/illegalThreadStateExceptionTest4.puml", null, TIMEOUT_DEFAULT, false, true);
         Process p4 = Runtime.getRuntime().exec(new String[] { "echo", "illegalThreadStateExceptionTest4" });
         Process sp4 = spy(p4);
+        ChartMap scm4 = spy(cm4);
+        doReturn(sp4).when(scm4).getProcess(any(), any());
         doThrow(IllegalThreadStateException.class).when(sp4).exitValue();
         assertThrows(ChartMapException.class, () -> cm4.runTemplateCommand(new File("target/illegalThreadStateExceptionTest4"), sp4, new HelmChart()));
         System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in runTemplateCommand");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
+    /**
+     * Tests IllegalThreadStateExceptionTest is thrown in updateLocalRepo.
+     * 
+     * This must be done in a separate method because of the processing in handleIllegalStateThreadException.
+     */
+    @Test
+    void illegalThreadStateExceptionTest5() throws ChartMapException, IOException{
+        ChartMap cm5 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/illegalThreadStateExceptionTest5.puml", null, 1, true, true);
+        ChartMap scm5 = spy(cm5);
+        Process p5 = Runtime.getRuntime()
+                .exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
+                        "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v", "-o",
+                        "target/".concat("illegalThreadStateExceptionTest1.txt") });
+        Process sp5 = spy(p5);
+        doReturn(sp5).when(scm5).getProcess(any(), any());
+        doThrow(IllegalThreadStateException.class).when(sp5).exitValue();
+        assertThrows(ChartMapException.class, () -> scm5.updateLocalRepo("target/illegalThreadStateExceptionTest5"));
+        System.out.println("IllegalThreadStateException -> ChartMapException thrown as expected in updateLocalRepo");
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
+    }
 
     /**
      * Tests handleIllegalStateThreadException.
@@ -1646,36 +1671,28 @@ class ChartMapTest {
     void handleIllegalStateThreadExceptionTest() throws ChartMapException, InterruptedException, IOException {
         // handle process that is null
         ChartMap cm1 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest1.puml", null, TIMEOUT_DEFAULT, false, true);
-        assertThrows(ChartMapException.class,
-                () -> cm1.handleIllegalStateThreadException(null, "foo-command"));
-        System.out.println(
-                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is null");
+        assertDoesNotThrow(() ->
+                cm1.handleIllegalStateThreadException(null, "foo-command"));
         // handle process that is not alive
         ChartMap cm2 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest2.puml", null, TIMEOUT_DEFAULT, false, true);
         Process p2 = Runtime.getRuntime().exec(new String[] { "echo", "foo"});
         p2.waitFor(10, TimeUnit.SECONDS); // plenty of time for echo to finish
-        assertThrows(ChartMapException.class,
+        assertDoesNotThrow(
                 () -> cm2.handleIllegalStateThreadException(p2, "foo-command"));
-        System.out.println(
-                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is not alive");
         // handle process that is alive
         ChartMap cm3 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest3.puml", null, TIMEOUT_DEFAULT, false, true);
         Process p3 = Runtime.getRuntime().exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
                 "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v" });
         p3.waitFor(10, TimeUnit.SECONDS); // not enough time for this process to finish but enough to be started
-        assertThrows(ChartMapException.class,
+        assertDoesNotThrow(
                 () -> cm3.handleIllegalStateThreadException(p3, "foo-command"));
-        System.out.println(
-                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is alive");
         // handle process that is alive (the one second timeout case)
         ChartMap cm4 = new ChartMap(ChartOption.CHARTNAME, TEST_CHART_NAME, "target/handleIllegalStateThreadExceptionTest4.puml", null, 1, false, true);
         Process p4 = Runtime.getRuntime().exec(new String[] { "java", "-jar", "target/".concat(new ChartMapTestUtil().getShadedJarName()),
                 "-f", INPUT_FILE_NAME_1, "-r", "-e", "./resource/example/example-env-spec.yaml", "-v" });
         p4.waitFor(10, TimeUnit.SECONDS); // not enough time for this process to finish but enough to be started
-        assertThrows(ChartMapException.class,
+        assertDoesNotThrow(
                 () -> cm4.handleIllegalStateThreadException(p3, "foo-command"));
-        System.out.println(
-                "IllegalThreadStateException -> ChartMapException thrown as expected in handleIllegalStateThreadException when process is alive (one second case)");
         System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 

@@ -645,6 +645,7 @@ public class ChartMap {
                 throw new ChartMapException("Error Code: " + exitValue + " executing command " + c[0]
                         + c[1] + c[2] + c[3]);
             }
+        
         } catch (IOException e) {
             // we could not get the output of the helm command
             throw new ChartMapException(
@@ -653,8 +654,10 @@ public class ChartMap {
             Thread.currentThread().interrupt();
             throw new ChartMapException(String.format("InterruptedException checking helm version: %s", e.getMessage()));
         } catch (IllegalThreadStateException e) {
-            handleIllegalStateThreadException(p, "version");
-        }  
+            handleIllegalStateThreadException(p, "version");      
+            throw new ChartMapException(String.format(
+                    "ChartMap did not wait long enough for helm to complete the checkHelmVersion command. Try increasing the timeout to a value greater than %d.", timeout));
+        }
     }
 
     /**
@@ -668,7 +671,7 @@ public class ChartMap {
      * @throws IOException if an error occurs getting the process
      */
     protected Process getProcess(String[] c, File d) throws IOException {
-        return d!=null?Runtime.getRuntime().exec(c, null, d):Runtime.getRuntime().exec(c, null);
+       return d!=null?Runtime.getRuntime().exec(c, null, d):Runtime.getRuntime().exec(c, null);
     }
 
     /**
@@ -741,7 +744,10 @@ public class ChartMap {
             Thread.currentThread().interrupt();
             throw (new ChartMapException("InterruptedException executing helm env command"));
         }catch (IllegalThreadStateException e) {
-            handleIllegalStateThreadException(p, "template");
+            handleIllegalStateThreadException(p, "env");
+            throw new ChartMapException(String.format(
+                "ChartMap did not wait long enough for helm to complete the helm env command. Increase the timeout to a value greater than %d.",
+                timeout));
         } 
     }
 
@@ -1021,6 +1027,9 @@ public class ChartMap {
             throw new ChartMapException(String.format(INTERRUPTED_EXCEPTION, apprSpec, e.getMessage()));
         } catch (IllegalThreadStateException e) {
             handleIllegalStateThreadException(p, "helm pull");
+            throw new ChartMapException(String.format(
+                "ChartMap did not wait long enough for helm to complete the helm pull command. Increase the timeout to a value greater than %d.",
+                timeout));
         }  
         return chartDirName;
     }
@@ -1147,6 +1156,9 @@ public class ChartMap {
                         "InterruptedException while executing helm dep update");
             } catch (IllegalThreadStateException e) {
                 handleIllegalStateThreadException(p, "dependency update");
+                throw new ChartMapException(String.format(
+                    "ChartMap did not wait long enough for helm to complete the helm dep update command. Increase the timeout to a value greater than %d.",
+                    timeout));
             }  
             if (exitValue != 0) {
                 throw new ChartMapException("Exception updating chart repo in directory "
@@ -1167,17 +1179,13 @@ public class ChartMap {
      * 
      * @param p the process
      * @param c the command
-     * @throws ChartMapException
      */
-    protected void handleIllegalStateThreadException(Process p, String c) throws ChartMapException {
+    protected void handleIllegalStateThreadException(Process p, String c) {
         if (p != null && p.isAlive()) {
             p.destroy();
             logger.log(logLevelVerbose, "ChartMap waited but not long enough for helm to complete the {} command. Timeout: {}", c, timeout);
             logger.log(logLevelVerbose, "Process {} was still alive and needed to be destroyed.", p);
         }       
-        throw new ChartMapException(String.format(
-                "ChartMap did not wait long enough for helm to complete the %s command. Increase the timeout to a value greater than %d %s.",
-                c, timeout, timeout>1?"seconds":"second"));
     }
 
     /**
@@ -1785,7 +1793,10 @@ public class ChartMap {
             throw new ChartMapException("InterruptedException running template command");
         } catch (IllegalThreadStateException e) {
             handleIllegalStateThreadException(p, "template");
-        }  
+            throw new ChartMapException(String.format(
+                    "ChartMap did not wait long enough for helm to complete the helm template command. Increase the timeout to a value greater than %d.",
+                    timeout));
+        }
     }
 
     /**
