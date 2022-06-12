@@ -95,4 +95,4 @@ memcached:6.0.20 uses docker.io/bitnami/memcached:1.6.15-debian-10-r49
 wordpress:14.2.5 uses docker.io/bitnami/wordpress:5.9.3-debian-10-r48
 mariadb:11.0.6 uses docker.io/bitnami/mariadb:10.6.7-debian-10-r91
 
-Generated on 2022/06/10 17:33:57 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/12 20:11:29 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
