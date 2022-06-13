@@ -154,4 +154,4 @@ nginx-ingress:0.14.0 uses quay.io/kubernetes-ingress-controller/nginx-ingress-co
 keycloak:4.3.0 uses jboss/keycloak:4.8.3.Final
 activemq:1.1.1 uses alfresco/alfresco-activemq:5.15.8-java-8-oracle-centos-7-87b15e37ce8b
 
-Generated on 2022/06/12 20:11:13 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
+Generated on 2022/06/13 17:51:28 by com.melahn.util.helm.TextChartMapPrinter (https://github.com/melahn/helm-chartmap)
