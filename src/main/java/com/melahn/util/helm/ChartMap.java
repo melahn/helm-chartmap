@@ -155,7 +155,7 @@ public class ChartMap {
     }
 
     /**
-     * Parses the command line and generates a Chart Map file
+     * Parses the command line and generates a ChartMap file
      *
      * @param arg The command line args
      * @throws ChartMapException when an error occurs
@@ -179,7 +179,7 @@ public class ChartMap {
      * @param chart          The name of the Helm Chart in one of the formats
      *                       specified by the option parameter
      * @param outputFilename The name of the file to which to write the generated
-     *                       Chart Map. Note the file is overwritten if it exists
+     *                       ChartMap. Note the file is overwritten if it exists
      * @param envFilename    The name of a yaml file that contains a set of
      *                       environment variables which may influence the way the
      *                       charts are rendered by helm.
@@ -187,8 +187,8 @@ public class ChartMap {
      *                       when true switches[0] generates an image from the
      *                       PlantUML file (if any) switches[1] refresh the local
      *                       Helm repo switches[2] provides a little more
-     *                       information as the Chart Map is generated 
-     * @throws ChartMapException when an error occurs creating the chart map
+     *                       information as the ChartMap is generated 
+     * @throws ChartMapException when an error occurs creating the ChartMap
      **/
 
     public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, boolean[] switches)
@@ -205,7 +205,7 @@ public class ChartMap {
      * @param chart          The name of the Helm Chart in one of the formats
      *                       specified by the option parameter
      * @param outputFilename The name of the file to which to write the generated
-     *                       Chart Map. Note the file is overwritten if it exists
+     *                       ChartMap. Note the file is overwritten if it exists
      * @param envFilename    The name of a yaml file that contains a set of
      *                       environment variables which may influence the way the
      *                       charts are rendered by helm.
@@ -217,7 +217,7 @@ public class ChartMap {
      *                          switches[1] causes helm dependencies to be updated
      *                          switches[0] generates an image if the output file was Plazzzzz
      *                              PlantUML file (if any)
-     * @throws ChartMapException when an error occurs creating the chart map
+     * @throws ChartMapException when an error occurs creating the ChartMap
      **/
     public ChartMap(ChartOption option, String chart, String outputFilename, String envFilename, int timeout, boolean... switches)
             throws ChartMapException {
@@ -242,9 +242,9 @@ public class ChartMap {
     /**
      * Process common to the 1.2 and prior constructors.
      * 
-     * @param o Chartmap option
+     * @param o Chart option
      * @param c Chart name
-     * @param f Outpput filename
+     * @param f Output filename
      * @param e Environment Spec filename
      * @throws ChartMapException
      */
@@ -329,9 +329,9 @@ public class ChartMap {
     }
 
     /**
-     * Prints the Chart Map by creating a temp directory, loading the local repo
+     * Prints the ChartMap by creating a temp directory, loading the local repo
      * with charts, resolving the dependencies of the selected chart, printing the
-     * Chart Map, then cleans up
+     * ChartMap, then cleans up
      *
      * @throws ChartMapException if an error occurs during print
      */
@@ -1385,7 +1385,7 @@ public class ChartMap {
 
     /**
      * Handles the case where a HelmChart wasn't excluded by a condition property in
-     * a parent Helm Chart so it needs to be added to the referenced chart map and
+     * a parent Helm Chart so it needs to be added to the referenced ChartMap and
      * attached as a dependent of the parent
      * 
      * Note that charts with false condition properties are not printed at all
@@ -1956,9 +1956,9 @@ public class ChartMap {
     }
 
      /**
-     * Prints the Chart Map
+     * Prints the ChartMap
      * 
-     * @throws ChartMapException when an error occurs printing the chart map
+     * @throws ChartMapException when an error occurs printing the ChartMap
      */
     protected void printMap() throws ChartMapException {
         try {
@@ -2131,7 +2131,7 @@ public class ChartMap {
     /**
      * Determines the print format to use based on the file extension
      *
-     * @param fileName the name of the file to which the chart map will be printed
+     * @param fileName the name of the file to which the ChartMap will be printed
      */
     protected void detectPrintFormat(String fileName) {
         if (fileName != null) {

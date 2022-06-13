@@ -49,7 +49,7 @@ Available from the [Maven Central Repository](https://mvnrepository.com/artifact
 
 Java 8 or later.
 
-The **Helm Client** is required since the chart map is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.1.x versions have been tested with version 3.8.1 of the Helm Client and the helm-chartmap-1.0.2 version has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
+The **Helm Client** is required since a ChartMap is based on the dependencies discovered with the Kubernetes Helm client using the *helm template* command. The helm-chartmap-1.1.x and 1.2.x versions have been tested with version 3.8.1 of the Helm Client and the helm-chartmap-1.0.2 version has been tested with version 2.17.0 of the Helm Client. Other Helm client versons may also work.
 
 For instructions on installing the Helm Client, see <https://docs.helm.sh/using_helm/#installing-helm>.
 
@@ -59,7 +59,7 @@ the executable *helm* will be found in the PATH. It is arguably more secure to s
 
 The location of the helm cache and configuration directories is derived using the [helm env command.](https://helm.sh/docs/helm/helm_env/)
 
-[Graphviz](https://www.graphviz.org/) is a prerequisite if you want to generate images from the PlantUML files created by helm-chartmap.
+[Graphviz](https://www.graphviz.org/) is a prerequisite if you want to have ChartMap generate images from the PlantUML files created by helm-chartmap.
 
 ## Using Chart Map
 
@@ -68,7 +68,7 @@ The location of the helm cache and configuration directories is derived using th
 1. Download the executable jar from [Maven Central](https://oss.sonatype.org/service/local/repositories/releases/content/com/melahn/helm-chartmap/1.2.0/helm-chartmap-1.2.0.jar)
 or build it yourself from source (see below)
 2. Run the command line
-3. Write a Java program using the API, to generate a chart
+3. Write a Java program using the API, to generate a ChartMap
 
 See Syntax and Examples below.
 
@@ -127,19 +127,19 @@ Flags:
 
 #### Example Commands
 
-##### Generating a Chartmap using a chart reference
+##### Generating a ChartMap using a chart reference
 
 ``` bash
 java -jar target/helm-chartmap-1.2.0.jar -c "wordpress:14.2.5" -o wordpress-14.2.5.txt  -v
 ```
 
-##### Generating a Chartmap using a file specification
+##### Generating a ChartMap using a file specification
 
 ``` bash
 java -jar target/helm-chartmap-1.2.0.jar -f "./src/test/resource/test-chart-file-2.tgz" -o test-chart-file-2.puml -e "./resource/example/example-env-spec.yaml"
 ```
 
-##### Generating a Chartmap using a url specification
+##### Generating a ChartMap using a url specification
 
 ``` bash
 java -jar target/helm-chartmap-1.2.0.jar -u "http://kubernetes-charts.alfresco.com/stable/alfresco-content-services-5.2.0.tgz" -o alfresco-content-services-5.2.0.puml -g -v -r -e "./resource/example/example-env-spec.yaml" -t 1200
@@ -150,7 +150,7 @@ Note in this example, the *-g* flag is set to automatically generate the image f
 
 Also note that the system property *PLANTUML_LIMIT_SIZE* allows the generation of complex PlantUML images without cropping. It can be set directly on the command line using the '-D' argument or by setting it indirectly using the same named system environment variable. By default, Chart Map sets the property to 8192, which is enough to handle any chart encountered so far.
 
-##### Generating a Chartmap using an appr specification
+##### Generating a ChartMap using an appr specification
 
 ``` bash
 java -jar target/helm-chartmap-1.2.0.jar -a "quay.io/melahn/helm-chartmap-test-chart@1.0.2"  -o helm-chartmap-test-chart.puml -g -v
@@ -206,7 +206,7 @@ Constructs a new instance of the *com.melahn.util.helm.ChartMap* class
   * The maximum amount of time to wait (in seconds) for a helm command to complete. This is rarely, if ever needed, and is intended for cases where a helm chart is very complex, and the helm update dependency command may take a long time because of machine or network constraints. If the number is not greater than zero, a detault of 600 seconds is used.
 * *switches*
   * V1.1.x and V1.1.0
-    * An array containing the following boolean values
+    * An array containing the following three boolean values
       * *switches[0]* *generate*
         * When *true*, an image file is generated from the PlantUML file (if any). (default *false*)
       * *switches[1]* *refresh*
@@ -262,7 +262,7 @@ public class ChartMapExampleV11 {
                     new boolean[] { true, true, false });
             testMap.print();
         } catch (ChartMapException e) {
-            System.out.println("ChartMapException generating chart map: ".concat(e.getMessage()));
+            System.out.println("ChartMapException generating ChartMap: ".concat(e.getMessage()));
         }
     }
 }
@@ -287,7 +287,7 @@ public class ChartMapExampleV12 {
                     true); // take the default values for verbose and generate
             testMap.print();
         } catch (ChartMapException e) {
-            System.out.println("ChartMapException generating chart map: ".concat(e.getMessage()));
+            System.out.println("ChartMapException generating ChartMap: ".concat(e.getMessage()));
         }
     }
 }
@@ -297,7 +297,7 @@ Many more examples illustrating the use of the Java interface can be found in [C
 
 ### Examples of Generated Files
 
-#### Example Image generated from a PlantUML file generated by Chartmap
+#### Example Image generated from a PlantUML file generated by ChartMap
 
 ![Example Image](./docs/alfresco-dbp/alfresco-dbp-1.5.0.png)
 
@@ -311,15 +311,15 @@ Helm Charts are depicted as rectangular objects. Docker Images are depicted as o
 
 Dependencies of Helm Charts on other Helm Charts are shown as green lines. Dependencies of Helm Charts on Docker Images are shown as orange lines.
 
-#### Example PlantUML File generated by Chartmap
+#### Example PlantUML File generated by ChartMap
 
 [Example PlantUML File](./docs/alfresco-dbp/alfresco-dbp-1.5.0.puml)
 
-#### Example JSON File generated by Chartmap
+#### Example JSON File generated by ChartMap
 
 [Example JSON File](./docs/alfresco-dbp/alfresco-dbp-1.5.0.json)
 
-#### Example Text File generated by Chartmap
+#### Example Text File generated by ChartMap
 
 [Example Text File](./docs/alfresco-dbp/alfresco-dbp-1.5.0.txt)
 
@@ -327,7 +327,7 @@ Dependencies of Helm Charts on other Helm Charts are shown as green lines. Depen
 
 ![Architecture](./resource/documentation/architecture.png)
 
-A illustrated, there is a *Chartmap* component, implemented as a Java class, that reads
+A illustrated, there is a *ChartMap* component, implemented as a Java class, that reads
 in a Helm Chart from a Helm Chart source. It then relies on the use
 of the [helm template command](https://helm.sh/docs/helm/helm_template)
 to recursively generate a template representation of a Helm Chart and its dependencies.
@@ -376,8 +376,8 @@ mvn com.github.jeluard:plantuml-maven-plugin:generate
 
 Having generated some PlantUML files, if you want to generate image files from the PlantUML files outside of Maven, there are several options.
 
-* The simplest option is to just include the '-g' option when running Chartmap to generate the PlantUML file.
-That will cause Chartmap to automatically generate a PNG file for you. For example,
+* The simplest option is to just include the '-g' option when running ChartMap to generate the PlantUML file.
+That will cause ChartMap to automatically generate a PNG file for you. For example,
 
 ``` bash
 java -jar helm-chartmap-1.2.0.jar -c "wordpress:14.2.5" -r -v -g -o "wordpress-14.2.5.puml" 
