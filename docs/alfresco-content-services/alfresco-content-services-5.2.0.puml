@@ -42,15 +42,15 @@ alfresco_insight_zeppelin_1_0_3--[#green]-|>common_1_16_0
 alfresco_search_1_0_4--[#green]-|>common_1_16_0
 alfresco_content_services_5_2_0--[#green]-|>alfresco_sync_service_3_0_9
 alfresco_sync_service_3_0_9--[#green]-|>common_1_16_0
+alfresco_content_services_5_2_0--[#green]-|>common_7_2_0
 alfresco_content_services_5_2_0--[#green]-|>postgresql_10_16_2
 postgresql_10_16_2--[#green]-|>common_1_10_3
 alfresco_content_services_5_2_0--[#green]-|>activemq_2_1_0
-alfresco_content_services_5_2_0--[#green]-|>common_7_2_0
 alfresco_insight_zeppelin_1_0_3--[#orange]-|>quay_io_alfresco_insight_zeppelin_1_4_0
 alfresco_search_1_0_4--[#orange]-|>quay_io_alfresco_search_services_2_0_3
 postgresql_10_16_2--[#orange]-|>docker_io_bitnami_postgresql_13_3_0
-alfresco_content_services_5_2_0--[#orange]-|>quay_io_alfresco_alfresco_content_repository_7_2_0
 alfresco_content_services_5_2_0--[#orange]-|>quay_io_alfresco_alfresco_share_7_2_0
+alfresco_content_services_5_2_0--[#orange]-|>quay_io_alfresco_alfresco_content_repository_7_2_0
 alfresco_content_services_5_2_0--[#orange]-|>alfresco_alfresco_imagemagick_2_5_7
 alfresco_content_services_5_2_0--[#orange]-|>alfresco_alfresco_tika_2_5_7
 alfresco_content_services_5_2_0--[#orange]-|>quay_io_alfresco_alfresco_shared_file_store_0_16_1
@@ -61,5 +61,5 @@ alfresco_content_services_5_2_0--[#orange]-|>alfresco_alfresco_transform_misc_2_
 activemq_2_1_0--[#orange]-|>alfresco_alfresco_activemq_5_16_4_jre11_centos7
 alfresco_sync_service_3_0_9--[#orange]-|>quay_io_alfresco_service_sync_3_6_0
 
-center footer Generated on 2022/06/13 17:48:01 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
+center footer Generated on 2022/06/13 20:10:26 by com.melahn.util.helm.PlantUmlChartMapPrinter\nhttps://github.com/melahn/helm-chartmap
 @enduml

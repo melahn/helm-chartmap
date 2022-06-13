@@ -9,14 +9,14 @@
     {
       "repoHost": "quay.io",
       "children": [],
-      "name": "alfresco/alfresco-content-repository:7.2.0",
+      "name": "alfresco/alfresco-share:7.2.0",
       "type": "image",
       "version": "7.2.0"
     },
     {
       "repoHost": "quay.io",
       "children": [],
-      "name": "alfresco/alfresco-share:7.2.0",
+      "name": "alfresco/alfresco-content-repository:7.2.0",
       "type": "image",
       "version": "7.2.0"
     },
@@ -71,24 +71,6 @@
     },
     {
       "keywords": [
-        "activemq",
-        "message broker"
-      ],
-      "children": [{
-        "repoHost": "Docker Hub",
-        "children": [],
-        "name": "alfresco/alfresco-activemq",
-        "type": "image",
-        "version": "5.16.4-jre11-centos7"
-      }],
-      "name": "activemq:2.1.0",
-      "description": "A Helm chart Providing Apache ActiveMQ.",
-      "type": "chart",
-      "shortName": "activemq",
-      "version": "2.1.0"
-    },
-    {
-      "keywords": [
         "search",
         "search services",
         "alfresco search services",
@@ -103,22 +85,6 @@
           "name": "alfresco/search-services:2.0.3",
           "type": "image",
           "version": "2.0.3"
-        },
-        {
-          "maintainers": [{"name": "Bitnami"}],
-          "keywords": [
-            "common",
-            "helper",
-            "template",
-            "function",
-            "bitnami"
-          ],
-          "children": [],
-          "name": "common:1.16.0",
-          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
-          "type": "chart",
-          "shortName": "common",
-          "version": "1.16.0"
         },
         {
           "keywords": [
@@ -157,6 +123,22 @@
           "type": "chart",
           "shortName": "alfresco-insight-zeppelin",
           "version": "1.0.3"
+        },
+        {
+          "maintainers": [{"name": "Bitnami"}],
+          "keywords": [
+            "common",
+            "helper",
+            "template",
+            "function",
+            "bitnami"
+          ],
+          "children": [],
+          "name": "common:1.16.0",
+          "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+          "type": "chart",
+          "shortName": "common",
+          "version": "1.16.0"
         }
       ],
       "name": "alfresco-search:1.0.4",
@@ -201,6 +183,14 @@
       "type": "chart",
       "shortName": "alfresco-sync-service",
       "version": "3.0.9"
+    },
+    {
+      "children": [],
+      "name": "common:7.2.0",
+      "description": "A Helm chart for Activiti Cloud Common Templates",
+      "type": "chart",
+      "shortName": "common",
+      "version": "7.2.0"
     },
     {
       "maintainers": [
@@ -256,12 +246,22 @@
       "version": "10.16.2"
     },
     {
-      "children": [],
-      "name": "common:7.2.0",
-      "description": "A Helm chart for Activiti Cloud Common Templates",
+      "keywords": [
+        "activemq",
+        "message broker"
+      ],
+      "children": [{
+        "repoHost": "Docker Hub",
+        "children": [],
+        "name": "alfresco/alfresco-activemq",
+        "type": "image",
+        "version": "5.16.4-jre11-centos7"
+      }],
+      "name": "activemq:2.1.0",
+      "description": "A Helm chart Providing Apache ActiveMQ.",
       "type": "chart",
-      "shortName": "common",
-      "version": "7.2.0"
+      "shortName": "activemq",
+      "version": "2.1.0"
     }
   ],
   "name": "alfresco-content-services:5.2.0",
