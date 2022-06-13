@@ -258,7 +258,6 @@ public class ChartMapExampleV11 {
                     "src/test/resource/testChartFile.tgz",
                     "my-chartmap.puml",
                     "resource/example/example-env-spec.yaml",
-                    1200,
                     new boolean[] { true, true, false });
             testMap.print();
         } catch (ChartMapException e) {
@@ -283,7 +282,7 @@ public class ChartMapExampleV12 {
                     "src/test/resource/testChartFile.tgz",
                     "my-chartmap.puml",
                     "resource/example/example-env-spec.yaml",
-                    0,
+                    1200,
                     true); // take the default values for verbose and generate
             testMap.print();
         } catch (ChartMapException e) {
