@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -975,6 +975,7 @@ class ChartMapTest {
      */
     @Test
     void loadChartsFromCacheTest() throws ChartMapException, IOException {
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" starting"));
         HelmChartRepoLocal r = new HelmChartRepoLocal();
         // Fabricate a HelmChartRepoLocal (I only need tbe url for this test)
         r.setUrl("http://foo");
@@ -1056,6 +1057,7 @@ class ChartMapTest {
             System.setOut(INITIAL_OUT);
             System.out.println("Exception -> ChartMapException thrown as expected");
         }
+        System.out.println(new Throwable().getStackTrace()[0].getMethodName().concat(" completed"));
     }
 
     /**

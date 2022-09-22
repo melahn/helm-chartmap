@@ -34,11 +34,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.MapIterator;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1090,9 +1090,9 @@ public class ChartMap {
         String tgzFileName = tempDirName + this.getClass().getCanonicalName() + "_chart.tgz";
         try (FileOutputStream fos = new FileOutputStream(new File(tgzFileName));) {
             CloseableHttpClient client = HttpClientBuilder.create().build();
-            HttpResponse response = getHttpResponse(client, u);
+            CloseableHttpResponse response = getHttpResponse(client, u);
             HttpEntity entity = response.getEntity();
-            int rc = response.getStatusLine().getStatusCode();
+            int rc = response.getCode();
             if (rc == 200) {
                 InputStream is = entity.getContent();
                 int b;
@@ -1125,7 +1125,7 @@ public class ChartMap {
      * @return the HttpResponse
      * @throws IOException if an error occured executing the HTTP request
      */
-    protected static HttpResponse getHttpResponse(CloseableHttpClient c, String u) throws IOException {
+    protected static CloseableHttpResponse getHttpResponse(CloseableHttpClient c, String u) throws IOException {
         HttpGet request = new HttpGet(u);
         return c.execute(request);
     }
